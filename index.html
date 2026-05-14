@@ -1,22 +1,2347 @@
-THE LAB · LEO SIERRA
-PROPÓSITO: Diseña una Vida Extraordinaria
-Inicio
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROPÓSITO: Diseña una Vida Extraordinaria en 6 Pasos — The Lab</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --yellow:#FFE600;
+  --black:#111111;
+  --white:#FFFFFF;
+  --gray-1:#F8F7F2;
+  --gray-2:#EFEFEB;
+  --gray-3:#DEDDD8;
+  --gray-4:#AAAAAA;
+  --gray-5:#666666;
+  --radius:12px;
+  --shadow:0 4px 24px rgba(0,0,0,0.08);
+  --font-display:'Georgia',serif;
+  --font-body:'Segoe UI',system-ui,sans-serif;
+}
+body{font-family:var(--font-body);background:var(--gray-1);min-height:100vh;color:var(--black);padding:0 0 5rem;}
+.container{max-width:660px;margin:0 auto;padding:0 1rem;}
 
-Diseña Tu Propósito en 6 Pasos
-Un proceso guiado para descubrir quién eres, qué te mueve y cómo puedes generar un impacto real en el mundo.
-"Hay dos grandes momentos en la vida de una persona: el día que nace y el día que descubre por qué nació."
-— Mark Twain
-COMENZAR MI PROCESO →
-QUÉ VAS A DESCUBRIR EN ESTE PROCESO
-01
-Tu Ubicación — Dónde estás realmente hoy
-02
-Tu Identidad — Los valores que realmente te gobiernan
-03
-Tu Pasión — Lo que te mueve desde adentro
-04
-Tus Fortalezas — Cómo generas valor naturalmente
-05
-Tu Valor Único — El impacto que solo tú puedes generar
-06
-Tu Propósito — La declaración que lo integra todo
+/* HEADER */
+.app-header{background:var(--yellow);padding:1.25rem 1.5rem 1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.1);}
+.header-inner{max-width:660px;margin:0 auto;}
+.header-top{display:flex;align-items:center;gap:12px;margin-bottom:0.75rem;}
+.logo-wrap{display:flex;align-items:center;gap:10px;flex:1;}
+.logo-svg{width:40px;height:40px;flex-shrink:0;}
+.header-titles{}
+.header-sub{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;line-height:1;}
+.header-main{font-size:14px;font-weight:800;color:var(--black);line-height:1.2;margin-top:2px;}
+.step-badge{background:var(--black);color:var(--yellow);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;letter-spacing:.05em;}
+.progress-track{background:rgba(0,0,0,0.15);border-radius:4px;height:4px;overflow:hidden;}
+.progress-fill{background:var(--black);height:100%;border-radius:4px;transition:width .5s ease;}
+
+/* SCREENS */
+.screen{display:none;padding-top:1.5rem;}
+.screen.active{display:block;}
+
+/* WELCOME */
+.welcome-hero{background:var(--black);border-radius:var(--radius);padding:2.5rem 2rem;margin-bottom:1rem;text-align:center;}
+.welcome-logo{display:flex;justify-content:center;margin-bottom:1.5rem;}
+.welcome-hero h1{font-family:var(--font-display);font-size:clamp(1.4rem,5vw,2rem);color:var(--yellow);line-height:1.2;margin-bottom:.75rem;}
+.welcome-hero p{color:rgba(255,255,255,0.75);font-size:.95rem;line-height:1.6;max-width:480px;margin:0 auto 1.5rem;}
+.welcome-quote{border-left:3px solid var(--yellow);padding:.75rem 1rem;text-align:left;margin:1.5rem 0;}
+.welcome-quote p{color:rgba(255,255,255,0.6);font-style:italic;font-size:.875rem;line-height:1.5;}
+.welcome-quote cite{color:var(--yellow);font-size:.8rem;font-style:normal;font-weight:600;}
+
+/* STEP HEADER */
+.step-header{margin-bottom:1.5rem;}
+.step-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gray-5);margin-bottom:.35rem;}
+.step-title{font-family:var(--font-display);font-size:1.5rem;font-weight:700;line-height:1.2;color:var(--black);}
+.step-title span{color:var(--yellow);background:var(--black);padding:0 4px;border-radius:3px;}
+.step-intro{font-size:.95rem;color:var(--gray-5);line-height:1.6;margin-top:.5rem;}
+
+/* CARDS */
+.card{background:var(--white);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);border:1.5px solid transparent;}
+.card.active-card{border-color:var(--yellow);}
+.card-title{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-5);margin-bottom:.75rem;}
+.card-title span{color:var(--black);}
+
+/* LOCATION OPTIONS */
+.location-options{display:flex;flex-direction:column;gap:.6rem;}
+.loc-btn{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border:2px solid var(--gray-3);border-radius:var(--radius);background:var(--white);cursor:pointer;transition:all .2s;text-align:left;width:100%;}
+.loc-btn:hover{border-color:var(--black);transform:translateY(-1px);}
+.loc-btn.selected{border-color:var(--black);background:var(--black);}
+.loc-btn.selected .loc-label{color:var(--yellow);}
+.loc-btn.selected .loc-desc{color:rgba(255,255,255,0.6);}
+.loc-icon{font-size:1.5rem;flex-shrink:0;}
+.loc-label{font-size:1rem;font-weight:700;color:var(--black);display:block;}
+.loc-desc{font-size:.8rem;color:var(--gray-5);display:block;margin-top:2px;}
+
+/* FOLLOWUP */
+.followup-card{background:var(--yellow);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1rem;animation:fadeIn .4s ease;}
+
+/* TEXTAREA */
+textarea{width:100%;border:1.5px solid var(--gray-3);border-radius:var(--radius);padding:.875rem 1rem;font-family:var(--font-body);font-size:.95rem;line-height:1.6;color:var(--black);resize:vertical;min-height:110px;background:var(--white);transition:border-color .2s;}
+textarea:focus{outline:none;border-color:var(--black);}
+textarea::placeholder{color:var(--gray-4);}
+.char-hint{font-size:.75rem;color:var(--gray-4);margin-top:.35rem;text-align:right;}
+
+/* AI RESPONSE */
+.ai-wrap{background:var(--black);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;animation:fadeIn .5s ease;}
+.ai-label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem;}
+.ai-text{color:rgba(255,255,255,0.88);font-size:.95rem;line-height:1.7;}
+.typing-dots{display:flex;gap:5px;padding:.5rem 0;}
+.typing-dots span{width:8px;height:8px;background:var(--yellow);border-radius:50%;animation:bounce .9s infinite;}
+.typing-dots span:nth-child(2){animation-delay:.15s;}
+.typing-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-8px);}}
+
+/* IDENTITY QUESTIONS */
+.q-progress{display:flex;gap:5px;margin-bottom:1rem;}
+.q-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-3);transition:all .3s;}
+.q-dot.done{background:var(--black);}
+.q-dot.current{background:var(--yellow);transform:scale(1.3);}
+.territory-tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--yellow);color:var(--black);padding:3px 8px;border-radius:4px;margin-bottom:.6rem;}
+.q-part2{margin-top:.75rem;padding-top:.75rem;border-top:1px dashed var(--gray-3);}
+.q-part2-label{font-size:.75rem;font-weight:600;color:var(--gray-5);margin-bottom:.4rem;}
+
+/* CHIPS */
+.chips-area{display:flex;flex-wrap:wrap;gap:.4rem;margin:.75rem 0;}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:.35rem .8rem;border-radius:20px;border:1.5px solid var(--gray-3);background:var(--white);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .18s;color:var(--black);}
+.chip:hover{border-color:var(--black);}
+.chip.selected{background:var(--black);color:var(--yellow);border-color:var(--black);}
+.chip.locked{cursor:default;}
+.chips-instruction{font-size:.8rem;color:var(--gray-5);margin-bottom:.5rem;}
+.chips-count{font-size:.75rem;color:var(--gray-5);margin-top:.4rem;}
+.chips-count strong{color:var(--black);}
+
+/* FINAL 4 SELECTION */
+.all-chips-pool{display:flex;flex-wrap:wrap;gap:.4rem;margin:.75rem 0;}
+.select-4-instruction{background:var(--yellow);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1rem;font-size:.9rem;font-weight:600;color:var(--black);}
+
+/* RANKING */
+.rank-slots{display:flex;flex-direction:column;gap:.5rem;margin:1rem 0;}
+.rank-slot{display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;border:2px dashed var(--gray-3);border-radius:var(--radius);background:var(--gray-2);cursor:pointer;transition:all .2s;min-height:56px;}
+.rank-slot.active-slot{border-color:var(--yellow);background:#FFFDE0;animation:pulse .8s infinite alternate;}
+.rank-slot.filled{border-style:solid;border-color:var(--black);background:var(--black);cursor:pointer;}
+.rank-slot.filled .slot-num{color:var(--yellow);}
+.rank-slot.filled .slot-label{color:var(--white);}
+.rank-slot.filled .slot-hint{color:rgba(255,255,255,.4);}
+.slot-num{font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--gray-3);min-width:28px;line-height:1;}
+.slot-label{font-size:.95rem;font-weight:600;flex:1;}
+.slot-hint{font-size:.7rem;color:var(--gray-4);}
+.value-pool{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0;}
+@keyframes pulse{from{box-shadow:0 0 0 0 rgba(255,230,0,.4);}to{box-shadow:0 0 0 8px rgba(255,230,0,0);}}
+
+/* STRENGTHS */
+.color-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:1rem 0;}
+.color-card{border-radius:var(--radius);padding:1.1rem;cursor:pointer;border:2.5px solid transparent;transition:all .2s;}
+.color-card.rojo{background:#FFF0EE;border-color:#FFCCC8;}
+.color-card.amarillo{background:#FFFDE0;border-color:#FFE600;}
+.color-card.azul{background:#EEF3FF;border-color:#C0CFFF;}
+.color-card.verde{background:#EEFAF0;border-color:#AEEDC0;}
+.color-card.selected-color{border-width:3px;}
+.color-card.rojo.selected-color{border-color:#FF4444;}
+.color-card.amarillo.selected-color{border-color:#E6A000;}
+.color-card.azul.selected-color{border-color:#2244FF;}
+.color-card.verde.selected-color{border-color:#00AA44;}
+.color-card-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
+.color-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+.rojo .color-dot{background:#FF4444;}
+.amarillo .color-dot{background:#E6A000;}
+.azul .color-dot{background:#2244FF;}
+.verde .color-dot{background:#00AA44;}
+.color-name{font-size:.8rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;}
+.color-tagline{font-size:.78rem;font-weight:600;color:var(--gray-5);margin-bottom:.5rem;}
+.color-strengths-list{font-size:.78rem;color:var(--gray-5);line-height:1.6;}
+
+/* STRENGTH CHIPS PANEL */
+.strength-panel{background:var(--white);border:1.5px solid var(--gray-3);border-radius:var(--radius);padding:1.25rem;margin:1rem 0;}
+.strength-panel-title{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-5);margin-bottom:.75rem;}
+.strength-chips{display:flex;flex-wrap:wrap;gap:.4rem;}
+.s-chip{display:inline-flex;align-items:center;gap:5px;padding:.35rem .85rem;border-radius:20px;font-size:.83rem;font-weight:600;cursor:pointer;transition:all .18s;border:1.5px solid;background:var(--white);}
+.s-chip.active-chip{background:var(--black);color:var(--white);border-color:var(--black);}
+.s-chip.inactive-chip{color:var(--gray-4);border-color:var(--gray-3);text-decoration:line-through;}
+.s-chip .chip-x{font-size:.65rem;opacity:.6;}
+.add-strength-row{display:flex;gap:.5rem;margin-top:.75rem;}
+.add-strength-input{flex:1;border:1.5px solid var(--gray-3);border-radius:20px;padding:.35rem .9rem;font-size:.83rem;font-family:var(--font-body);}
+.add-strength-input:focus{outline:none;border-color:var(--black);}
+.add-btn{background:var(--black);color:var(--yellow);border:none;border-radius:20px;padding:.35rem .9rem;font-size:.83rem;font-weight:700;cursor:pointer;}
+.panel-instruction{font-size:.8rem;color:var(--gray-5);background:var(--gray-2);border-radius:8px;padding:.6rem .9rem;margin-bottom:.75rem;line-height:1.5;}
+
+/* QUESTIONS */
+.question-text{font-size:1rem;font-weight:600;color:var(--black);line-height:1.5;margin-bottom:.75rem;}
+.question-number{display:inline-block;background:var(--yellow);color:var(--black);font-weight:800;font-size:.75rem;width:22px;height:22px;border-radius:50%;line-height:22px;text-align:center;margin-right:.4rem;flex-shrink:0;}
+
+/* PASSION */
+.passion-statement{background:var(--black);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;}
+.passion-label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow);margin-bottom:.4rem;}
+.passion-text{color:var(--white);font-size:1rem;font-style:italic;line-height:1.6;}
+.passion-edit{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.3);color:var(--white);font-size:1rem;font-style:italic;font-family:var(--font-body);line-height:1.6;padding:.25rem 0;resize:none;}
+.passion-edit:focus{outline:none;border-bottom-color:var(--yellow);}
+
+/* UNIQUE VALUE */
+.uv-result{background:var(--yellow);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;}
+.uv-label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#666;margin-bottom:.4rem;}
+.uv-text{font-size:1rem;font-weight:700;color:var(--black);line-height:1.5;}
+
+/* PURPOSE */
+.purpose-formula{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin:1rem 0;padding:1rem;background:var(--gray-2);border-radius:var(--radius);}
+.formula-part{font-size:.8rem;font-weight:700;padding:.3rem .7rem;border-radius:6px;background:var(--black);color:var(--yellow);}
+.formula-plus{font-weight:700;color:var(--gray-4);}
+.formula-eq{font-weight:900;color:var(--black);}
+.purpose-result{background:var(--black);border-radius:var(--radius);padding:1.75rem;margin:1rem 0;}
+.purpose-label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow);margin-bottom:.75rem;}
+.purpose-text-display{color:var(--white);font-family:var(--font-display);font-size:1.1rem;line-height:1.7;font-style:italic;}
+.purpose-edit-area{width:100%;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:8px;color:var(--white);font-size:1rem;font-family:var(--font-display);font-style:italic;line-height:1.7;padding:.75rem;resize:vertical;min-height:120px;}
+.purpose-edit-area:focus{outline:none;border-color:var(--yellow);}
+
+/* MANTRA CARD */
+.mantra-card{background:var(--black);border-radius:var(--radius);padding:1.5rem;margin:1rem 0;border:1.5px solid rgba(255,230,0,.4);}
+.mantra-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow);margin-bottom:.4rem;}
+.mantra-hint{font-size:.8rem;color:rgba(255,255,255,.45);margin-bottom:.9rem;line-height:1.4;}
+.mantra-text{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,230,0,.4);color:var(--yellow);font-size:1.15rem;font-family:var(--font-display);font-style:italic;font-weight:600;line-height:1.5;padding:.25rem 0;resize:none;text-align:center;}
+.mantra-text:focus{outline:none;border-bottom-color:var(--yellow);}
+.mantra-footer{font-size:.72rem;color:rgba(255,255,255,.3);margin-top:.6rem;text-align:center;}
+
+
+.final-hero{background:var(--black);border-radius:var(--radius);padding:2rem;text-align:center;margin-bottom:1rem;}
+.final-hero h2{font-family:var(--font-display);font-size:1.6rem;color:var(--yellow);margin-bottom:.5rem;}
+.final-hero p{color:rgba(255,255,255,.7);font-size:.9rem;}
+.summary-card{background:var(--white);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:.75rem;border-left:4px solid var(--yellow);}
+.summary-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-5);margin-bottom:.35rem;}
+.summary-value{font-size:.95rem;color:var(--black);line-height:1.5;font-weight:500;}
+.next-steps{background:var(--gray-2);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1rem;}
+.next-steps h4{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-5);margin-bottom:.75rem;}
+.next-step-item{display:flex;gap:.75rem;align-items:flex-start;margin-bottom:.6rem;font-size:.9rem;line-height:1.4;}
+.next-step-num{background:var(--yellow);color:var(--black);font-weight:800;font-size:.75rem;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.cta-coach{background:var(--yellow);border-radius:var(--radius);padding:1.5rem;text-align:center;margin-bottom:1rem;}
+.cta-coach h4{font-size:1rem;font-weight:800;color:var(--black);margin-bottom:.4rem;}
+.cta-coach p{font-size:.85rem;color:#444;margin-bottom:1rem;}
+.download-row{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;}
+
+/* BUTTONS */
+.btn-primary{background:var(--black);color:var(--yellow);border:none;border-radius:var(--radius);padding:.875rem 1.75rem;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;transition:all .2s;letter-spacing:.02em;}
+.btn-primary:hover{background:#333;transform:translateY(-1px);}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-secondary{background:var(--white);color:var(--black);border:2px solid var(--black);border-radius:var(--radius);padding:.75rem 1.5rem;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-secondary:hover{background:var(--black);color:var(--yellow);}
+.btn-yellow{background:var(--yellow);color:var(--black);border:none;border-radius:var(--radius);padding:.875rem 1.75rem;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;transition:all .2s;}
+.btn-yellow:hover{background:#E6CF00;}
+.btn-row{margin-top:1rem;}
+.btn-sm{padding:.5rem 1rem;font-size:.82rem;border-radius:8px;width:auto;display:inline-flex;align-items:center;gap:.4rem;}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--gray-3);margin:1.25rem 0;}
+
+/* QUOTE */
+.quote-block{border-left:3px solid var(--yellow);padding:.75rem 1rem;margin:1rem 0;background:var(--gray-2);border-radius:0 var(--radius) var(--radius) 0;}
+.quote-block p{font-style:italic;font-size:.88rem;color:var(--gray-5);line-height:1.5;}
+.quote-block cite{font-size:.78rem;font-weight:700;color:var(--black);font-style:normal;}
+
+/* INSIGHT BOX */
+.insight-box{background:var(--yellow);border-radius:var(--radius);padding:1rem 1.25rem;margin:1rem 0;font-size:.88rem;line-height:1.6;font-weight:500;}
+.insight-box strong{display:block;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem;}
+
+/* ACCESS SCREEN */
+.access-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;background:var(--black);}
+.access-card{background:var(--white);border-radius:var(--radius);padding:2.5rem 2rem;width:100%;max-width:400px;text-align:center;}
+.access-logo-text{font-size:.75rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--gray-5);margin-bottom:1.5rem;}
+.access-title{font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--black);margin-bottom:.5rem;}
+.access-sub{font-size:.88rem;color:var(--gray-5);margin-bottom:1.75rem;line-height:1.5;}
+.access-input{width:100%;border:2px solid var(--gray-3);border-radius:var(--radius);padding:.875rem 1rem;font-size:1.1rem;font-weight:700;letter-spacing:.12em;text-align:center;text-transform:uppercase;font-family:var(--font-body);color:var(--black);transition:border-color .2s;margin-bottom:.75rem;}
+.access-input:focus{outline:none;border-color:var(--black);}
+.access-error{font-size:.82rem;color:#CC2200;font-weight:600;margin-bottom:.75rem;min-height:1.2rem;}
+.access-hint{font-size:.75rem;color:var(--gray-4);margin-top:1rem;line-height:1.4;}
+
+/* COACH FORM */
+.coach-form{margin-top:1rem;padding:1.25rem;background:var(--gray-2);border-radius:var(--radius);text-align:left;}
+.coach-form-title{font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-5);margin-bottom:1rem;}
+.coach-field{margin-bottom:.75rem;}
+.coach-field label{display:block;font-size:.78rem;font-weight:600;color:var(--gray-5);margin-bottom:.3rem;}
+.coach-field input{width:100%;border:1.5px solid var(--gray-3);border-radius:8px;padding:.6rem .875rem;font-size:.9rem;font-family:var(--font-body);color:var(--black);background:var(--white);}
+.coach-field input:focus{outline:none;border-color:var(--black);}
+.coach-success{background:var(--black);color:var(--yellow);border-radius:var(--radius);padding:1rem 1.25rem;font-size:.9rem;font-weight:600;text-align:center;margin-top:.75rem;}
+.coach-error-msg{color:#CC2200;font-size:.82rem;font-weight:600;margin-top:.5rem;}
+
+/* ANIMATIONS */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.fade-in{animation:fadeIn .4s ease;}
+
+/* RESUME BANNER */
+.resume-banner{background:var(--yellow);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;}
+.resume-banner p{font-size:.88rem;font-weight:600;color:var(--black);}
+.resume-banner button{background:var(--black);color:var(--yellow);border:none;border-radius:8px;padding:.4rem .9rem;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+/* RESPONSIVE */
+@media(max-width:500px){
+  .color-grid{grid-template-columns:1fr;}
+  .header-main{font-size:12px;}
+  .welcome-hero h1{font-size:1.3rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="logo-wrap">
+        <div class="header-titles">
+          <div class="header-sub">The Lab · Leo Sierra</div>
+          <div class="header-main">PROPÓSITO: Diseña una Vida Extraordinaria</div>
+        </div>
+      </div>
+      <div class="step-badge" id="stepBadge">Inicio</div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ACCESS SCREEN -->
+<div id="screen-access" class="access-screen">
+  <div class="access-card">
+    <div class="access-logo-text">The Lab · Leo Sierra</div>
+    <div class="access-title">Diseña Tu Propósito</div>
+    <div class="access-sub">Ingresa tu código de acceso personal para comenzar el proceso.</div>
+    <input type="text" class="access-input" id="access-code-input" placeholder="TLAB-XXXX"
+      maxlength="9" autocomplete="off" spellcheck="false"
+      onkeydown="if(event.key==='Enter') validateAccessCode()">
+    <div class="access-error" id="access-error"></div>
+    <button class="btn-primary" onclick="validateAccessCode()">INGRESAR →</button>
+    <div class="access-hint">Si no tienes un código, contacta a The Lab para obtener acceso.</div>
+  </div>
+</div>
+
+<!-- RESUME BANNER -->
+<div class="resume-banner" id="resumeBanner" style="display:none;">
+  <p>Tienes progreso guardado. ¿Continuar?</p>
+  <button onclick="resumeSession()">Continuar →</button>
+</div>
+
+<!-- WELCOME SCREEN -->
+<div class="screen" id="screen-0" style="display:none;">
+  <div class="welcome-hero">
+    <h1>Diseña Tu Propósito en 6 Pasos</h1>
+    <p>Un proceso guiado para descubrir quién eres, qué te mueve y cómo puedes generar un impacto real en el mundo.</p>
+    <div class="welcome-quote">
+      <p>"Hay dos grandes momentos en la vida de una persona: el día que nace y el día que descubre por qué nació."</p>
+      <cite>— Mark Twain</cite>
+    </div>
+    <button class="btn-yellow" onclick="startJourney()">COMENZAR MI PROCESO →</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Qué vas a descubrir en este proceso</div>
+    <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.9rem;color:var(--gray-5);">
+      <div style="display:flex;gap:.75rem;align-items:flex-start;"><span style="background:var(--yellow);color:var(--black);font-weight:800;font-size:.7rem;padding:2px 7px;border-radius:4px;margin-top:1px;flex-shrink:0;">01</span><span><strong style="color:var(--black);">Tu Ubicación</strong> — Dónde estás realmente hoy</span></div>
+      <div style="display:flex;gap:.75rem;align-items:flex-start;"><span style="background:var(--yellow);color:var(--black);font-weight:800;font-size:.7rem;padding:2px 7px;border-radius:4px;margin-top:1px;flex-shrink:0;">02</span><span><strong style="color:var(--black);">Tu Identidad</strong> — Los valores que realmente te gobiernan</span></div>
+      <div style="display:flex;gap:.75rem;align-items:flex-start;"><span style="background:var(--yellow);color:var(--black);font-weight:800;font-size:.7rem;padding:2px 7px;border-radius:4px;margin-top:1px;flex-shrink:0;">03</span><span><strong style="color:var(--black);">Tu Pasión</strong> — Lo que te mueve desde adentro</span></div>
+      <div style="display:flex;gap:.75rem;align-items:flex-start;"><span style="background:var(--yellow);color:var(--black);font-weight:800;font-size:.7rem;padding:2px 7px;border-radius:4px;margin-top:1px;flex-shrink:0;">04</span><span><strong style="color:var(--black);">Tus Fortalezas</strong> — Cómo generas valor naturalmente</span></div>
+      <div style="display:flex;gap:.75rem;align-items:flex-start;"><span style="background:var(--yellow);color:var(--black);font-weight:800;font-size:.7rem;padding:2px 7px;border-radius:4px;margin-top:1px;flex-shrink:0;">05</span><span><strong style="color:var(--black);">Tu Valor Único</strong> — El impacto que solo tú puedes generar</span></div>
+      <div style="display:flex;gap:.75rem;align-items:flex-start;"><span style="background:var(--yellow);color:var(--black);font-weight:800;font-size:.7rem;padding:2px 7px;border-radius:4px;margin-top:1px;flex-shrink:0;">06</span><span><strong style="color:var(--black);">Tu Propósito</strong> — La declaración que lo integra todo</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 1: UBICACIÓN -->
+<div class="screen" id="screen-1">
+  <div class="step-header">
+    <div class="step-label">Paso 1 de 6</div>
+    <div class="step-title">Tu <span>Ubicación</span></div>
+    <div class="step-intro">Antes de trazar cualquier ruta, necesitas saber exactamente dónde estás. Sin este diagnóstico honesto, cualquier dirección se convierte en ruido.</div>
+  </div>
+
+  <div class="quote-block">
+    <p>"Para desarrollar tu potencial, debes saber dónde quieres ir y dónde te encuentras ahora."</p>
+    <cite>— John C. Maxwell</cite>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pregunta de reflexión</div>
+    <div class="question-text">En este momento de tu vida, ¿por qué sientes que es importante descubrir tu propósito?</div>
+    <textarea id="why-answer" placeholder="Escribe con honestidad. No hay respuesta correcta o incorrecta..." rows="4"></textarea>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="submitWhy()">CONTINUAR →</button>
+    </div>
+  </div>
+
+  <div id="why-ai-response" style="display:none;"></div>
+
+  <div id="location-section" style="display:none;" class="fade-in">
+    <div class="card">
+      <div class="card-title">¿Con cuál de estas situaciones te identificas más?</div>
+      <div class="location-options">
+        <button class="loc-btn" onclick="selectLocation('confundido', this)">
+          <span class="loc-icon">😶‍🌫️</span>
+          <div><span class="loc-label">Confundido</span><span class="loc-desc">No sé lo que me gustaría hacer</span></div>
+        </button>
+        <button class="loc-btn" onclick="selectLocation('frustrado', this)">
+          <span class="loc-icon">😤</span>
+          <div><span class="loc-label">Frustrado</span><span class="loc-desc">Sé lo que quiero, pero no lo hago</span></div>
+        </button>
+        <button class="loc-btn" onclick="selectLocation('realizado', this)">
+          <span class="loc-icon">✨</span>
+          <div><span class="loc-label">Realizado</span><span class="loc-desc">Sé lo que quiero y lo hago</span></div>
+        </button>
+      </div>
+    </div>
+
+    <div id="followup-section" style="display:none;" class="fade-in">
+      <div class="followup-card">
+        <div id="followup-question" style="font-weight:700;font-size:.95rem;color:var(--black);margin-bottom:.75rem;"></div>
+        <textarea id="followup-answer" placeholder="Tu respuesta..." rows="3" style="background:rgba(255,255,255,0.8);"></textarea>
+      </div>
+      <div id="location-ai-response"></div>
+      <div id="btn-to-step2" style="display:none;" class="btn-row">
+        <button class="btn-primary" onclick="goToStep(2)">SIGUIENTE: TU IDENTIDAD →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 2: IDENTIDAD -->
+<div class="screen" id="screen-2">
+  <div class="step-header">
+    <div class="step-label">Paso 2 de 6</div>
+    <div class="step-title">Tu <span>Identidad</span></div>
+    <div class="step-intro">Tu identidad no se define por lo que admiras en otros — se revela en las decisiones que has tomado, los valores que no negocias, y los momentos donde fuiste completamente tú mismo.</div>
+  </div>
+
+  <div class="quote-block">
+    <p>"Crea la más alta visión posible basada en tu identidad, porque te conviertes en lo que crees, no en lo que sabes."</p>
+    <cite>— Oprah Winfrey</cite>
+  </div>
+
+  <div id="identity-questions-area">
+    <div class="q-progress" id="q-progress">
+      <div class="q-dot current" id="qd-0"></div>
+      <div class="q-dot" id="qd-1"></div>
+      <div class="q-dot" id="qd-2"></div>
+      <div class="q-dot" id="qd-3"></div>
+      <div class="q-dot" id="qd-4"></div>
+    </div>
+    <div id="current-identity-question"></div>
+  </div>
+
+  <div id="identity-phase2" style="display:none;" class="fade-in"></div>
+  <div id="identity-phase3" style="display:none;" class="fade-in"></div>
+  <div id="identity-ai-result" style="display:none;" class="fade-in"></div>
+  <div id="btn-to-step3" style="display:none;" class="btn-row">
+    <button class="btn-primary" onclick="goToStep(3)">SIGUIENTE: TU PASIÓN →</button>
+  </div>
+</div>
+
+<!-- PASO 3: PASIÓN -->
+<div class="screen" id="screen-3">
+  <div class="step-header">
+    <div class="step-label">Paso 3 de 6</div>
+    <div class="step-title">Tu <span>Pasión</span></div>
+    <div class="step-intro">La pasión no es emoción superficial. Es dirección interna. Es la fuerza que conecta lo que te mueve con lo que eres capaz de hacer.</div>
+  </div>
+
+  <div class="quote-block">
+    <p>"El coraje de un gran líder para cumplir su visión proviene de la pasión, no de la posición."</p>
+    <cite>— John C. Maxwell</cite>
+  </div>
+
+  <div class="card" id="passion-q1-card">
+    <div class="territory-tag">Experiencia Real</div>
+    <div class="question-text">¿Cuándo has ayudado a alguien o contribuido a algo y sentiste que estabas exactamente donde debías estar? Describe ese momento.</div>
+    <textarea id="passion-q1" placeholder="Sé específico. ¿Qué estabas haciendo? ¿Cómo te sentiste? ¿Qué impacto generaste?..." rows="4"></textarea>
+  </div>
+
+  <div class="card" id="passion-q2-card">
+    <div class="territory-tag">Dolor Conectado</div>
+    <div class="question-text">¿Qué es lo que más te duele ver en el mundo, en tu comunidad, o en las personas que te rodean?</div>
+    <textarea id="passion-q2" placeholder="No pienses en injusticias genéricas. ¿Qué dolor específico te mueve a querer hacer algo?..." rows="4"></textarea>
+  </div>
+
+  <div class="card" id="passion-q3-card">
+    <div class="territory-tag">Visión Futura</div>
+    <div class="question-text">¿Qué sueñas hacer o construir? ¿Qué te visualizas haciendo en el futuro?</div>
+    <textarea id="passion-q3" placeholder="Imagina que no hay obstáculos. ¿Qué estarías construyendo o haciendo?..." rows="4"></textarea>
+  </div>
+
+  <div class="btn-row">
+    <button id="passion-submit-btn" class="btn-primary" onclick="generatePassion()">DESCUBRIR MI PASIÓN →</button>
+  </div>
+
+  <div id="passion-result" style="display:none;" class="fade-in">
+    <div class="passion-statement">
+      <div class="passion-label">✦ Tu Declaración de Pasión</div>
+      <textarea class="passion-edit" id="passion-statement-text" rows="3"></textarea>
+    </div>
+    <div id="passion-ai-reflection" style="margin:1rem 0;"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goToStep(4)">SIGUIENTE: TUS FORTALEZAS →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 4: FORTALEZAS -->
+<div class="screen" id="screen-4">
+  <div class="step-header">
+    <div class="step-label">Paso 4 de 6</div>
+    <div class="step-title">Tus <span>Fortalezas</span></div>
+    <div class="step-intro">Tus fortalezas no son solo cosas que haces bien. Son patrones. Son la manera en la que naturalmente generas resultados en otros. Cuando las entiendes bien, dejas de forzarte y empiezas a operar desde tu diseño.</div>
+  </div>
+
+  <div class="insight-box">
+    <strong>Idea Clave</strong>
+    No todos ganamos de la misma manera. Algunos avanzan tomando decisiones. Otros conectando personas. Otros sosteniendo procesos. Otros trayendo orden y claridad. La pregunta no es: "¿En qué soy bueno?" — la verdadera pregunta es: <strong>"¿Cómo genero valor de forma natural?"</strong>
+  </div>
+
+  <div id="strength-scenarios">
+    <div class="card">
+      <div class="card-title">Escenario <span>1</span> — El Ascensor</div>
+      <div class="question-text">Si entras a un ascensor con personas desconocidas, ¿qué haces naturalmente?</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.75rem;">
+        <button class="loc-btn" id="elev-a" onclick="selectScenario('elevator','extrovertido',this)">
+          <span class="loc-icon">🗣️</span>
+          <div><span class="loc-label">Opción A</span><span class="loc-desc">Entras con presencia — comentas algo, interactúas, buscas conexión</span></div>
+        </button>
+        <button class="loc-btn" id="elev-b" onclick="selectScenario('elevator','reservado',this)">
+          <span class="loc-icon">📱</span>
+          <div><span class="loc-label">Opción B</span><span class="loc-desc">Te mantienes reservado — enfocado en lo tuyo, sin interacción</span></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Escenario <span>2</span> — El Viaje</div>
+      <div class="question-text">Si vas a hacer un viaje, ¿qué te emociona más al prepararte?</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.75rem;">
+        <button class="loc-btn" id="trip-a" onclick="selectScenario('trip','tareas',this)">
+          <span class="loc-icon">📋</span>
+          <div><span class="loc-label">Opción A</span><span class="loc-desc">Tener todo organizado y bajo control — itinerario, logística, detalles</span></div>
+        </button>
+        <button class="loc-btn" id="trip-b" onclick="selectScenario('trip','personas',this)">
+          <span class="loc-icon">🎉</span>
+          <div><span class="loc-label">Opción B</span><span class="loc-desc">La experiencia, las personas y los momentos — lo que se va a vivir</span></div>
+        </button>
+      </div>
+    </div>
+
+    <div id="strength-result-section" style="display:none;" class="fade-in">
+      <div id="strength-color-display"></div>
+      <div id="strength-panel-area"></div>
+      <div id="strength-reflection-questions" style="display:none;"></div>
+      <div id="strength-ai-response"></div>
+      <div id="btn-to-step5" style="display:none;" class="btn-row">
+        <button class="btn-primary" onclick="goToStep(5)">SIGUIENTE: TU VALOR ÚNICO →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 5: VALOR ÚNICO -->
+<div class="screen" id="screen-5">
+  <div class="step-header">
+    <div class="step-label">Paso 5 de 6</div>
+    <div class="step-title">Tu <span>Valor Único</span></div>
+    <div class="step-intro">Tu valor no está en lo que haces. Está en el problema que puedes resolver para otros — de una manera que nadie más puede replicar exactamente igual.</div>
+  </div>
+
+  <div class="quote-block">
+    <p>"Haz lo que puedas, con lo que tengas, desde donde estés."</p>
+    <cite>— Theodore Roosevelt</cite>
+  </div>
+
+  <div class="card">
+    <div class="territory-tag">Define a quién sirves</div>
+    <div class="question-text">¿A qué tipo de persona, grupo u organización sientes una mayor inclinación a ayudar?</div>
+    <textarea id="uv-q1" placeholder="No pienses en 'todo el mundo'. Sé específico — individuos, organizaciones, familias, comunidades, tu industria..." rows="3"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="territory-tag">Identifica el problema real</div>
+    <div class="question-text">¿Qué problema, dolor o necesidad ves repetidamente en esas personas?</div>
+    <textarea id="uv-q2" placeholder="El valor no empieza con lo que haces. Empieza con lo que otros necesitan..." rows="3"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="territory-tag">Conecta tus fortalezas</div>
+    <div class="question-text">¿Cómo usarías estas fortalezas para ayudar a resolver ese problema?</div>
+    <textarea id="uv-q3" placeholder="Aquí es donde todo lo anterior cobra sentido..." rows="3"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="territory-tag">Define el resultado</div>
+    <div class="question-text">¿Qué cambio o resultado concreto experimentan las personas después de que tú intervienes?</div>
+    <textarea id="uv-q4" placeholder="La gente no busca servicios… busca resultados. ¿Cuál es el tuyo?..." rows="3"></textarea>
+  </div>
+
+  <div class="btn-row">
+    <button id="uv-submit-btn" class="btn-primary" onclick="generateUniqueValue()">DEFINIR MI VALOR ÚNICO →</button>
+  </div>
+
+  <div id="uv-result" style="display:none;" class="fade-in">
+    <div class="uv-result">
+      <div class="uv-label">Tu Valor Único</div>
+      <div class="uv-text" id="uv-statement-text"></div>
+    </div>
+    <div id="uv-ai-reflection" style="margin:1rem 0;"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goToStep(6)">SIGUIENTE: TU PROPÓSITO →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 6: PROPÓSITO -->
+<div class="screen" id="screen-6">
+  <div class="step-header">
+    <div class="step-label">Paso 6 de 6</div>
+    <div class="step-title">Tu <span>Propósito</span></div>
+    <div class="step-intro">Llegaste al momento de integrar todo. Tu propósito no es algo que encontraste — es algo que diseñaste a través de quién eres, lo que te mueve y el valor que generas en otros.</div>
+  </div>
+
+  <div class="purpose-formula">
+    <div class="formula-part">Tu Pasión</div>
+    <div class="formula-plus">+</div>
+    <div class="formula-part">Tus Fortalezas</div>
+    <div class="formula-plus">+</div>
+    <div class="formula-part">Tu Valor Único</div>
+    <div class="formula-eq">=</div>
+    <div class="formula-part" style="background:var(--yellow);color:var(--black);">TU PROPÓSITO</div>
+  </div>
+
+  <div id="purpose-generating" style="display:none;">
+    <div class="ai-wrap">
+      <div class="ai-label">Integrando tu proceso...</div>
+      <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <div id="purpose-result" style="display:none;" class="fade-in">
+    <div class="purpose-result">
+      <div class="purpose-label">✦ Tu Propósito de Vida</div>
+      <textarea class="purpose-edit-area" id="purpose-edit-text" rows="5"></textarea>
+    </div>
+    <p style="font-size:.8rem;color:var(--gray-5);margin-top:.5rem;">Puedes ajustar el texto hasta que resuene completamente contigo.</p>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="finalizePurpose()">✦ ESTE ES MI PROPÓSITO →</button>
+    </div>
+  </div>
+
+  <div id="final-screen" style="display:none;" class="fade-in"></div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+// ===========================
+// STATE
+// ===========================
+const state = {
+  why: '',
+  location: '',
+  followupAnswer: '',
+  identityResponses: [],
+  selectedValuesPerQ: [],
+  finalFourValues: [],
+  rankedValues: [],
+  passionAnswers: {q1:'',q2:'',q3:''},
+  passionStatement: '',
+  strengthScenarios: {elevator:'', trip:''},
+  strengthColor: '',
+  activeStrengths: [],
+  uvAnswers: {q1:'',q2:'',q3:'',q4:''},
+  uvStatement: '',
+  purpose: '',
+  mantra: ''
+};
+
+// Sub-state variables (tracked separately for granular restore)
+let currentQIndex = 0;
+let allCollectedValues = [];
+let finalFourValues = [];
+let rankingSlots = [null,null,null,null];
+let selectedChipsPerQ = {};
+let tempFinalFour = [];
+let activeSlotIndex = null;
+let scenarioAnswers = {elevator: null, trip: null};
+let currentIdentityPhase = 'questions'; // 'questions' | 'phase2' | 'phase3' | 'done'
+
+const IDENTITY_QUESTIONS = [
+  {
+    territory: 'Aprendizaje + Relación',
+    q1: '¿Quién fue el maestro más recordado de tu vida y qué fue lo que te enseñó — no necesariamente de su materia, sino de la vida?',
+    q2: '¿Hay algún momento donde tú hayas sido ese tipo de guía o influencia para alguien más?',
+    p1: 'Cuéntame sobre esa persona y lo que marcó...',
+    p2: 'Describe ese momento...'
+  },
+  {
+    territory: 'Valores en Conflicto + Decisión',
+    q1: '¿Cuál es tu película o historia favorita y cuál es el momento de mayor tensión dentro de ella — ese instante donde el personaje tiene que elegir entre dos cosas importantes?',
+    q2: '¿Has vivido algo parecido en tu propia vida? ¿Qué elegiste y por qué?',
+    p1: 'La película/historia y el momento de tensión...',
+    p2: 'Tu experiencia personal similar...'
+  },
+  {
+    territory: 'Lealtad + Convicción',
+    q1: '¿Qué fue lo más valioso que te dejaron tus padres o quienes te criaron — no en palabras, sino en cómo vivieron?',
+    q2: '¿Hay algo que hoy no harías aunque te costara oportunidades, porque iría en contra de eso que te inculcaron?',
+    p1: 'Lo que viste en cómo vivieron, no en lo que dijeron...',
+    p2: 'Algo que no harías sin importar el costo...'
+  },
+  {
+    territory: 'Impacto + Autenticidad',
+    q1: '¿A quién admiras… y qué parte de su vida revela algo que tú aún no estás viviendo?',
+    q2: '¿En qué momentos de tu vida te has sentido más libre, sin necesidad de impresionar a nadie?',
+    p1: 'Quién es y qué revela sobre lo que aún no estás viviendo...',
+    p2: 'Esos momentos de libertad auténtica...'
+  },
+  {
+    territory: 'Contribución + Legado',
+    q1: '¿Qué lecciones quieres asegurarte de que tus hijos — actuales o futuros — incorporen a su vida, y por qué esas específicamente?',
+    q2: null,
+    p1: 'Las lecciones y el por qué detrás de cada una...',
+    p2: null
+  }
+];
+
+const FOLLOWUP_QUESTIONS = {
+  confundido: '¿Qué área de tu vida necesita más claridad y dirección en este momento? — tu carrera, tus relaciones, tu propósito personal, o algo más?',
+  frustrado: '¿Qué crees que te ha impedido actuar sobre lo que ya sabes que quieres?',
+  realizado: '¿Qué te permitió llegar aquí? ¿Hay alguna área donde sientes que tu vida se puede direccionar mejor?'
+};
+
+const STRENGTH_PROFILES = {
+  rojo: {
+    name:'ROJO', emoji:'🔴', tagline:'Generas Avance',
+    description:'Tomas decisiones cuando otros dudan. Actúas rápido. Enfrentas lo difícil. Te enfocas en resultados.',
+    best:'En tu mejor versión: mueves a las personas a la acción.',
+    strengths:['Seguridad en mí mismo','Decisión','Orientación a resultados','Productivo bajo desafíos','Acción inmediata']
+  },
+  amarillo: {
+    name:'AMARILLO', emoji:'🟡', tagline:'Generas Energía',
+    description:'Conectas fácilmente con personas. Comunicas con impacto. Motivas ambientes. Inspiras a otros.',
+    best:'En tu mejor versión: activas e inspiras a otros.',
+    strengths:['Socializar','Comunicación','Adaptabilidad','Optimismo','Influencia','Motivación']
+  },
+  azul: {
+    name:'AZUL', emoji:'🔵', tagline:'Generas Claridad',
+    description:'Analizas antes de actuar. Organizas y estructuras. Elevas estándares. Cuidas los detalles.',
+    best:'En tu mejor versión: traes orden y precisión.',
+    strengths:['Análisis profundo','Organización','Enfoque en calidad','Precisión','Atención al detalle','Sistematización']
+  },
+  verde: {
+    name:'VERDE', emoji:'🟢', tagline:'Generas Estabilidad',
+    description:'Escuchas profundamente. Generas confianza. Sostienes relaciones. Acompañas procesos.',
+    best:'En tu mejor versión: das seguridad y sostienes a otros.',
+    strengths:['Confiabilidad','Lealtad','Sistemático','Capacidad de escucha','Mediación','Acompañamiento']
+  }
+};
+
+// ===========================
+// API CALL
+// ===========================
+async function callClaude(prompt, systemPrompt) {
+  const sys = systemPrompt || `Eres el guía del programa "Diseña Tu Propósito" de The Lab, creado por Leo Sierra. 
+Eres un asesor de vida experto — sabio, empático, directo. Priorizas claridad sobre inspiración. 
+Respondes siempre en español. Tus respuestas son cálidas pero directas, nunca genéricas. 
+Máximo 4 oraciones por respuesta a menos que se indique lo contrario.`;
+  
+  try {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: sys,
+        messages: [{role: 'user', content: prompt}]
+      })
+    });
+    const data = await res.json();
+    return data.content?.[0]?.text || '';
+  } catch(e) {
+    return 'Hubo un error al conectar con el servicio. Por favor intenta de nuevo.';
+  }
+}
+
+// ===========================
+// NAVIGATION
+// ===========================
+function updateProgress(step) {
+  const pct = (step / 6) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  const labels = ['Inicio','Ubicación','Identidad','Pasión','Fortalezas','Valor Único','Propósito'];
+  document.getElementById('stepBadge').textContent = step === 0 ? 'Inicio' : `Paso ${step} · ${labels[step]}`;
+}
+
+function startJourney() {
+  goToStep(1);
+}
+
+function goToStep(n) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const sc = document.getElementById(`screen-${n}`);
+  sc.style.display = 'block';
+  sc.classList.add('active');
+  updateProgress(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+  saveProgress();
+
+  if (n === 2) renderIdentityQuestion(0);
+  if (n === 5) injectStrengthsContextInStep5();
+  if (n === 6) generatePurpose();
+}
+
+// ===========================
+// PASO 1 — UBICACIÓN
+// ===========================
+async function submitWhy() {
+  const val = document.getElementById('why-answer').value.trim();
+  if (!val) return alert('Por favor escribe tu respuesta antes de continuar.');
+  state.why = val;
+
+  const btn = document.querySelector('#screen-1 .btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Procesando...';
+
+  const el = document.getElementById('why-ai-response');
+  el.style.display = 'block';
+  el.innerHTML = `<div class="ai-wrap"><div class="ai-label">Reflexionando...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+
+  const prompt = `El usuario respondió por qué quiere descubrir su propósito: "${val}"
+Ofrece una reflexión breve (2-3 oraciones) que:
+1. Valide la importancia de lo que expresó sin ser condescendiente
+2. Le dé contexto sobre lo que están a punto de descubrir
+3. Los prepare emocionalmente para el proceso con honestidad, no con motivación vacía`;
+
+  const response = await callClaude(prompt);
+  el.innerHTML = `<div class="ai-wrap fade-in"><div class="ai-label">✦ Reflexión</div><div class="ai-text">${response}</div></div>`;
+
+  document.getElementById('location-section').style.display = 'block';
+  btn.textContent = 'CONTINUAR →';
+  btn.disabled = false;
+  btn.style.display = 'none';
+}
+
+function selectLocation(type, btnEl) {
+  document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('selected'));
+  btnEl.classList.add('selected');
+  state.location = type;
+
+  const fs = document.getElementById('followup-section');
+  fs.style.display = 'block';
+  document.getElementById('followup-question').textContent = FOLLOWUP_QUESTIONS[type];
+  document.getElementById('followup-answer').value = '';
+  document.getElementById('location-ai-response').innerHTML = '';
+  document.getElementById('btn-to-step2').style.display = 'none';
+
+  // Add listener for textarea submit
+  const ta = document.getElementById('followup-answer');
+  ta.oninput = null;
+
+  // Show submit button
+  let existingBtn = document.getElementById('followup-submit-btn');
+  if (!existingBtn) {
+    const b = document.createElement('button');
+    b.id = 'followup-submit-btn';
+    b.className = 'btn-primary btn-row';
+    b.style.marginTop = '1rem';
+    b.textContent = 'VER MI DIAGNÓSTICO →';
+    b.onclick = submitFollowup;
+    fs.appendChild(b);
+  }
+  document.getElementById('followup-submit-btn').style.display = 'block';
+  fs.scrollIntoView({behavior:'smooth'});
+}
+
+async function submitFollowup() {
+  const val = document.getElementById('followup-answer').value.trim();
+  if (!val) return alert('Por favor responde la pregunta antes de continuar.');
+  state.followupAnswer = val;
+
+  const btn = document.getElementById('followup-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Procesando...';
+
+  const el = document.getElementById('location-ai-response');
+  el.innerHTML = `<div class="ai-wrap"><div class="ai-label">Analizando tu punto de partida...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+
+  const stateLabels = {confundido:'confundido (no sabe qué quiere)', frustrado:'frustrado (sabe qué quiere pero no actúa)', realizado:'realizado pero buscando más dirección'};
+  const prompt = `El usuario se identificó como: ${stateLabels[state.location]}.
+Su respuesta de seguimiento: "${val}"
+También escribió por qué quiere descubrir su propósito: "${state.why}"
+
+Ofrece un diagnóstico honesto y personalizado (3-4 oraciones) que:
+1. Nombre con precisión el patrón que ves en su respuesta — sin suavizarlo demasiado
+2. Le muestre qué parte del proceso de hoy va a ser especialmente importante para él/ella
+3. Termine con una frase que los ancle y los motive a seguir, no con retórica vacía`;
+
+  const response = await callClaude(prompt);
+  el.innerHTML = `<div class="ai-wrap fade-in"><div class="ai-label">✦ Tu Diagnóstico Inicial</div><div class="ai-text">${response}</div></div>`;
+
+  document.getElementById('btn-to-step2').style.display = 'block';
+  btn.style.display = 'none';
+}
+
+// ===========================
+// PASO 2 — IDENTIDAD
+// ===========================
+function renderIdentityQuestion(idx) {
+  currentQIndex = idx;
+  const q = IDENTITY_QUESTIONS[idx];
+
+  // Update progress dots
+  for (let i = 0; i < 5; i++) {
+    const d = document.getElementById(`qd-${i}`);
+    d.className = 'q-dot' + (i < idx ? ' done' : i === idx ? ' current' : '');
+  }
+
+  const el = document.getElementById('current-identity-question');
+  el.innerHTML = `
+    <div class="card active-card fade-in">
+      <div class="territory-tag">${q.territory}</div>
+      <div class="question-text">${q.q1}</div>
+      <textarea id="iq-p1" placeholder="${q.p1}" rows="3"></textarea>
+      ${q.q2 ? `
+      <div class="q-part2">
+        <div class="q-part2-label">↳ Ahora profundiza:</div>
+        <div class="question-text" style="font-size:.9rem;color:var(--gray-5);">${q.q2}</div>
+        <textarea id="iq-p2" placeholder="${q.p2}" rows="3"></textarea>
+      </div>` : ''}
+      <div class="btn-row">
+        <button class="btn-primary" onclick="submitIdentityQuestion(${idx})">EXTRAER MIS VALORES →</button>
+      </div>
+    </div>
+    <div id="chips-for-q${idx}" style="display:none;" class="fade-in"></div>
+  `;
+}
+
+async function submitIdentityQuestion(idx) {
+  const q = IDENTITY_QUESTIONS[idx];
+  const p1 = document.getElementById('iq-p1').value.trim();
+  const p2 = q.q2 ? document.getElementById('iq-p2').value.trim() : '';
+  if (!p1) return alert('Por favor responde la primera pregunta.');
+
+  const btn = document.querySelector(`#current-identity-question .btn-primary`);
+  btn.disabled = true;
+  btn.textContent = 'Extrayendo valores...';
+
+  const combined = p2 ? `Parte 1: ${p1}\nParte 2: ${p2}` : p1;
+  state.identityResponses[idx] = {territory:q.territory, q1:p1, q2:p2};
+
+  const prompt = `El usuario respondió estas preguntas de identidad (Territorio: ${q.territory}):
+${combined}
+
+Extrae entre 4 y 6 valores o características de personalidad que están implícitos en esta respuesta.
+IMPORTANTE: Responde SOLO con un JSON array de strings, sin texto adicional, sin markdown, sin explicaciones.
+Ejemplo: ["Integridad","Liderazgo","Familia","Crecimiento","Lealtad"]
+Los valores deben ser palabras o frases cortas (1-3 palabras) en español.`;
+
+  const response = await callClaude(prompt);
+  let values = [];
+  try {
+    const clean = response.replace(/```json|```/g,'').trim();
+    values = JSON.parse(clean);
+  } catch(e) {
+    values = response.match(/["']([^"']+)["']/g)?.map(v => v.replace(/["']/g,'')) || ['Crecimiento','Compromiso','Conexión'];
+  }
+
+  const chipsEl = document.getElementById(`chips-for-q${idx}`);
+  chipsEl.style.display = 'block';
+  chipsEl.innerHTML = `
+    <div class="card fade-in" style="border-color:var(--yellow);">
+      <div class="card-title">De tu respuesta emergieron estos valores</div>
+      <div class="chips-instruction">Elige los <strong>2 que más resuenan</strong> con quién realmente eres:</div>
+      <div class="chips-area" id="chips-area-${idx}">
+        ${values.map(v => `<button class="chip" data-value="${v.replace(/"/g,'&quot;')}" data-qidx="${idx}" onclick="toggleIdentityChip(this,this.dataset.value,parseInt(this.dataset.qidx))">${v}</button>`).join('')}
+      </div>
+      <div class="chips-count">Seleccionados: <strong id="chip-count-${idx}">0</strong> / 2</div>
+      <div id="chip-confirm-${idx}" style="display:none;" class="btn-row">
+        <button class="btn-primary" onclick="confirmChipsForQ(${idx})">GUARDAR Y CONTINUAR →</button>
+      </div>
+    </div>
+  `;
+  chipsEl.scrollIntoView({behavior:'smooth'});
+}
+
+function toggleIdentityChip(el, value, qIdx) {
+  if (!selectedChipsPerQ[qIdx]) selectedChipsPerQ[qIdx] = [];
+  const isSelected = el.classList.contains('selected');
+  if (!isSelected) {
+    if (selectedChipsPerQ[qIdx].length >= 2) {
+      el.style.border = '2px solid #FF4444';
+      setTimeout(() => el.style.border = '', 800);
+      return;
+    }
+    el.classList.add('selected');
+    selectedChipsPerQ[qIdx].push(value);
+  } else {
+    el.classList.remove('selected');
+    selectedChipsPerQ[qIdx] = selectedChipsPerQ[qIdx].filter(v => v !== value);
+  }
+  document.getElementById(`chip-count-${qIdx}`).textContent = selectedChipsPerQ[qIdx].length;
+  document.getElementById(`chip-confirm-${qIdx}`).style.display = selectedChipsPerQ[qIdx].length === 2 ? 'block' : 'none';
+}
+
+function confirmChipsForQ(idx) {
+  const chips = selectedChipsPerQ[idx] || [];
+  if (chips.length !== 2) return;
+  allCollectedValues = [...allCollectedValues, ...chips];
+
+  if (idx < 4) {
+    currentIdentityPhase = 'questions';
+    currentQIndex = idx + 1;
+    saveProgress();
+    renderIdentityQuestion(idx + 1);
+    document.getElementById('current-identity-question').scrollIntoView({behavior:'smooth'});
+  } else {
+    currentIdentityPhase = 'phase2';
+    saveProgress();
+    renderPhase2();
+  }
+}
+
+function renderPhase2() {
+  document.getElementById('current-identity-question').innerHTML = '';
+  document.querySelectorAll('[id^="chips-for-q"]').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.q-dot').forEach(d => d.className = 'q-dot done');
+
+  // Deduplicate
+  const unique = [...new Set(allCollectedValues)];
+  const p2 = document.getElementById('identity-phase2');
+  p2.style.display = 'block';
+  p2.innerHTML = `
+    <div class="select-4-instruction">
+      Completaste las 5 preguntas. De todas tus respuestas emergieron estos valores. <strong>Elige los 4 que más te definen</strong> — los que no son aspiracionales sino reales.
+    </div>
+    <div class="card">
+      <div class="chips-area all-chips-pool" id="all-chips-pool">
+        ${unique.map(v => `<button class="chip" data-value="${v.replace(/"/g,'&quot;')}" onclick="toggleFinalChip(this,this.dataset.value)">${v}</button>`).join('')}
+      </div>
+      <div class="chips-count">Seleccionados: <strong id="final-count">0</strong> / 4</div>
+      <div id="final-confirm-btn" style="display:none;" class="btn-row">
+        <button class="btn-primary" onclick="confirmFinalFour()">ESTOS SON MIS 4 VALORES →</button>
+      </div>
+    </div>
+  `;
+  p2.scrollIntoView({behavior:'smooth'});
+}
+
+function toggleFinalChip(el, value) {
+  const isSelected = el.classList.contains('selected');
+  if (!isSelected) {
+    if (tempFinalFour.length >= 4) {
+      el.style.border = '2px solid #FF4444';
+      setTimeout(() => el.style.border = '', 800);
+      return;
+    }
+    el.classList.add('selected');
+    tempFinalFour.push(value);
+  } else {
+    el.classList.remove('selected');
+    tempFinalFour = tempFinalFour.filter(v => v !== value);
+  }
+  document.getElementById('final-count').textContent = tempFinalFour.length;
+  document.getElementById('final-confirm-btn').style.display = tempFinalFour.length === 4 ? 'block' : 'none';
+}
+
+function confirmFinalFour() {
+  if (tempFinalFour.length !== 4) return;
+  finalFourValues = [...tempFinalFour];
+  rankingSlots = [null, null, null, null];
+  currentIdentityPhase = 'phase3';
+  saveProgress();
+  renderPhase3();
+}
+
+function renderPhase3() {
+  document.getElementById('identity-phase2').style.display = 'none';
+  const p3 = document.getElementById('identity-phase3');
+  p3.style.display = 'block';
+  p3.innerHTML = `
+    <div class="card">
+      <div class="card-title">Ahora ordénalos por importancia</div>
+      <p style="font-size:.88rem;color:var(--gray-5);margin-bottom:1rem;">Toca un slot numerado y luego el valor que quieres asignar. El #1 es tu valor más fundamental.</p>
+      <div class="rank-slots" id="rank-slots">
+        ${[0,1,2,3].map(i => `
+          <div class="rank-slot" id="rs-${i}" onclick="activateSlot(${i})">
+            <span class="slot-num">${i+1}</span>
+            <span class="slot-label" id="rs-label-${i}">— Toca para asignar —</span>
+          </div>`).join('')}
+      </div>
+      <div class="value-pool" id="value-pool">
+        ${finalFourValues.map(v => `<button class="chip" id="vp-${v.replace(/\s/g,'-')}" data-value="${v.replace(/"/g,'&quot;')}" onclick="assignToSlot(this.dataset.value)">${v}</button>`).join('')}
+      </div>
+      <div id="ranking-confirm" style="display:none;" class="btn-row">
+        <button class="btn-primary" onclick="confirmRanking()">CONFIRMAR MI IDENTIDAD →</button>
+      </div>
+    </div>
+  `;
+  p3.scrollIntoView({behavior:'smooth'});
+}
+
+function activateSlot(idx) {
+  // If slot is filled, unassign
+  if (rankingSlots[idx] !== null) {
+    const val = rankingSlots[idx];
+    rankingSlots[idx] = null;
+    const slotEl = document.getElementById(`rs-${idx}`);
+    slotEl.classList.remove('filled');
+    document.getElementById(`rs-label-${idx}`).textContent = '— Toca para asignar —';
+    // Return value to pool
+    const chipId = `vp-${val.replace(/\s/g,'-')}`;
+    const chip = document.getElementById(chipId);
+    if (chip) { chip.style.display = 'inline-flex'; chip.classList.remove('selected'); }
+    document.getElementById('ranking-confirm').style.display = 'none';
+    return;
+  }
+  activeSlotIndex = idx;
+  document.querySelectorAll('.rank-slot').forEach((s,i) => {
+    s.classList.toggle('active-slot', i === idx && rankingSlots[i] === null);
+  });
+}
+
+function assignToSlot(value) {
+  if (activeSlotIndex === null) return;
+  if (rankingSlots[activeSlotIndex] !== null) return;
+  
+  rankingSlots[activeSlotIndex] = value;
+  const slot = document.getElementById(`rs-${activeSlotIndex}`);
+  slot.classList.remove('active-slot');
+  slot.classList.add('filled');
+  document.getElementById(`rs-label-${activeSlotIndex}`).textContent = value;
+
+  // Hide chip from pool
+  const chipId = `vp-${value.replace(/\s/g,'-')}`;
+  const chip = document.getElementById(chipId);
+  if (chip) chip.style.display = 'none';
+
+  activeSlotIndex = null;
+  document.querySelectorAll('.rank-slot').forEach(s => s.classList.remove('active-slot'));
+
+  if (rankingSlots.every(s => s !== null)) {
+    document.getElementById('ranking-confirm').style.display = 'block';
+  }
+}
+
+async function confirmRanking() {
+  if (rankingSlots.some(s => s === null)) return;
+  state.rankedValues = [...rankingSlots];
+  state.finalFourValues = [...rankingSlots];
+
+  const resultEl = document.getElementById('identity-ai-result');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">Analizando tu identidad...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  document.getElementById('identity-phase3').style.display = 'none';
+
+  const answersText = state.identityResponses.map((r,i) => `[${r.territory}] ${r.q1}${r.q2 ? ' / '+r.q2 : ''}`).join('\n');
+  const prompt = `El usuario definió y ordenó sus 4 valores de identidad:
+1. ${rankingSlots[0]} (más importante)
+2. ${rankingSlots[1]}
+3. ${rankingSlots[2]}
+4. ${rankingSlots[3]}
+
+Sus respuestas de identidad:
+${answersText}
+
+Ofrece una reflexión profunda (3-4 oraciones) que:
+1. Explique lo que dice esta jerarquía de valores sobre quién es esta persona — conectada con sus respuestas reales, no genérica
+2. Señale cómo el valor #1 probablemente ha guiado sus decisiones más importantes sin que lo haya notado
+3. Cierre afirmando su identidad como base para construir su propósito`;
+
+  const response = await callClaude(prompt);
+  resultEl.innerHTML = `
+    <div class="ai-wrap fade-in">
+      <div class="ai-label">✦ Tu Identidad</div>
+      <div class="ai-text">${response}</div>
+    </div>
+    <div class="card" style="margin-top:.75rem;">
+      <div class="card-title">Tus 4 Valores — En Orden de Importancia</div>
+      <div style="display:flex;flex-direction:column;gap:.4rem;margin-top:.5rem;">
+        ${rankingSlots.map((v,i) => `
+          <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;background:${i===0?'var(--yellow)':'var(--gray-2)'};border-radius:8px;">
+            <span style="font-weight:800;font-size:.8rem;color:${i===0?'var(--black)':'var(--gray-5)'};min-width:20px;">${i+1}</span>
+            <span style="font-weight:700;font-size:.92rem;color:var(--black);">${v}</span>
+            ${i===0?'<span style="margin-left:auto;font-size:.7rem;font-weight:700;color:var(--black);letter-spacing:.08em;">PRINCIPAL</span>':''}
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('btn-to-step3').style.display = 'block';
+  currentIdentityPhase = 'done';
+  saveProgress();
+  resultEl.scrollIntoView({behavior:'smooth'});
+}
+
+// ===========================
+// PASO 3 — PASIÓN
+// ===========================
+async function generatePassion() {
+  const q1 = document.getElementById('passion-q1').value.trim();
+  const q2 = document.getElementById('passion-q2').value.trim();
+  const q3 = document.getElementById('passion-q3').value.trim();
+  if (!q1 || !q2 || !q3) return alert('Por favor responde las tres preguntas.');
+
+  state.passionAnswers = {q1, q2, q3};
+
+  const btn = document.getElementById('passion-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Descubriendo tu pasión...';
+
+  const resultEl = document.getElementById('passion-result');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">Procesando tus respuestas...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+
+  const prompt = `El usuario respondió las 3 preguntas de pasión:
+1. EXPERIENCIA REAL: "${q1}"
+2. DOLOR CONECTADO: "${q2}"
+3. VISIÓN FUTURA: "${q3}"
+
+Sus valores de identidad son: ${state.rankedValues.join(', ')}
+
+Haz dos cosas:
+1. Escribe una DECLARACIÓN DE PASIÓN en primera persona — una sola frase (máx 30 palabras) que integre la experiencia real con el dolor y la visión. Debe ser accionable y específica, no poética y genérica. FORMATO: [DECLARACIÓN]: Tu frase aquí.
+2. Escribe una reflexión breve (2-3 oraciones) sobre por qué esta pasión específica tiene raíces reales en quien es esta persona, conectando con sus valores de identidad. FORMATO: [REFLEXIÓN]: Tu reflexión aquí.`;
+
+  const response = await callClaude(prompt);
+  
+  let statement = '';
+  let reflection = '';
+  const stmMatch = response.match(/\[DECLARACIÓN\]:\s*(.+?)(?:\n|$)/s);
+  const refMatch = response.match(/\[REFLEXIÓN\]:\s*(.+)/s);
+  
+  if (stmMatch) statement = stmMatch[1].trim();
+  if (refMatch) reflection = refMatch[1].trim();
+  
+  if (!statement) {
+    const lines = response.split('\n').filter(l => l.trim());
+    statement = lines[0]?.replace(/^\[.*?\]:\s*/,'').trim() || response.substring(0,150);
+    reflection = lines.slice(1).join(' ').replace(/^\[.*?\]:\s*/,'').trim();
+  }
+
+  state.passionStatement = statement;
+
+  resultEl.innerHTML = `
+    <div class="passion-statement fade-in">
+      <div class="passion-label">✦ Tu Declaración de Pasión</div>
+      <textarea class="passion-edit" id="passion-statement-text" rows="3">${statement}</textarea>
+    </div>
+    ${reflection ? `<div class="ai-wrap fade-in" style="margin-top:.75rem;"><div class="ai-label">✦ Por qué esta pasión es tuya</div><div class="ai-text">${reflection}</div></div>` : ''}
+    <div class="btn-row">
+      <button class="btn-primary" onclick="savePassionAndContinue()">SIGUIENTE: TUS FORTALEZAS →</button>
+    </div>
+  `;
+  resultEl.scrollIntoView({behavior:'smooth'});
+  btn.style.display = 'none';
+}
+
+function savePassionAndContinue() {
+  const edited = document.getElementById('passion-statement-text')?.value?.trim();
+  if (edited) state.passionStatement = edited;
+  saveProgress();
+  goToStep(4);
+}
+
+// ===========================
+// PASO 4 — FORTALEZAS
+// ===========================
+function selectScenario(type, value, btn) {
+  const prefix = type === 'elevator' ? 'elev' : 'trip';
+  document.getElementById(`${prefix}-a`).classList.remove('selected');
+  document.getElementById(`${prefix}-b`).classList.remove('selected');
+  btn.classList.add('selected');
+  scenarioAnswers[type] = value;
+
+  if (scenarioAnswers.elevator && scenarioAnswers.trip) {
+    determineStrengthColor();
+  }
+}
+
+function determineStrengthColor() {
+  const e = scenarioAnswers.elevator;
+  const t = scenarioAnswers.trip;
+  let color = '';
+  if (e === 'extrovertido' && t === 'tareas') color = 'rojo';
+  else if (e === 'extrovertido' && t === 'personas') color = 'amarillo';
+  else if (e === 'reservado' && t === 'tareas') color = 'azul';
+  else if (e === 'reservado' && t === 'personas') color = 'verde';
+
+  state.strengthColor = color;
+  state.activeStrengths = [...STRENGTH_PROFILES[color].strengths];
+
+  const section = document.getElementById('strength-result-section');
+  section.style.display = 'block';
+
+  const profile = STRENGTH_PROFILES[color];
+  document.getElementById('strength-color-display').innerHTML = `
+    <div class="insight-box fade-in">
+      <strong>${profile.emoji} Tu Perfil: ${profile.name} — ${profile.tagline}</strong>
+      ${profile.description}<br><br>
+      <em>${profile.best}</em>
+    </div>
+    <p style="font-size:.82rem;color:var(--gray-5);margin-bottom:.5rem;">Recuerda: tienes rasgos de todos los perfiles, pero este es tu tendencia dominante.</p>
+  `;
+
+  renderStrengthPanel(color);
+  section.scrollIntoView({behavior:'smooth'});
+}
+
+function renderStrengthPanel(color) {
+  const profile = STRENGTH_PROFILES[color];
+  const panelEl = document.getElementById('strength-panel-area');
+
+  // FASE A: Bullet list + remove chips
+  panelEl.innerHTML = `
+    <div class="strength-panel fade-in" id="sp-phase-a">
+      <div class="strength-panel-title">Estas son tus fortalezas dominantes</div>
+      <p style="font-size:.85rem;color:var(--gray-5);margin-bottom:.75rem;line-height:1.5;">
+        Basado en tu perfil <strong>${profile.emoji} ${profile.name}</strong>, estas son las fortalezas que más te definen naturalmente:
+      </p>
+      <ul style="margin:.5rem 0 1rem 1rem;display:flex;flex-direction:column;gap:.4rem;">
+        ${state.activeStrengths.map(s => `
+          <li style="font-size:.92rem;color:var(--black);font-weight:500;">${s}</li>`).join('')}
+      </ul>
+      <div style="background:var(--yellow);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:.85rem;font-weight:600;color:var(--black);">
+        ¿Alguna de estas <strong>no te representa</strong>? Tócala para eliminarla.
+      </div>
+      <div class="strength-chips" id="strength-chips-container">
+        ${state.activeStrengths.map(s => `
+          <button class="s-chip active-chip" id="sc-${s.replace(/\s/g,'-')}" data-value="${s.replace(/"/g,'&quot;')}" onclick="toggleStrengthChip(this,this.dataset.value)">
+            ${s} <span class="chip-x">✕</span>
+          </button>`).join('')}
+      </div>
+      <div class="btn-row" style="margin-top:1rem;">
+        <button class="btn-primary" onclick="renderStrengthPhaseB('${color}')">VER OTRAS FORTALEZAS →</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderStrengthPhaseB(color) {
+  const otherColors = Object.keys(STRENGTH_PROFILES).filter(c => c !== color);
+  const panelEl = document.getElementById('strength-panel-area');
+
+  // Collect all strengths from other profiles, excluding already active
+  const otherStrengths = [];
+  otherColors.forEach(c => {
+    const p = STRENGTH_PROFILES[c];
+    p.strengths.forEach(s => {
+      if (!state.activeStrengths.includes(s)) {
+        otherStrengths.push({value: s, color: c, name: p.name, emoji: p.emoji});
+      }
+    });
+  });
+
+  // FASE B: Pick from other colors
+  const groupedHtml = otherColors.map(c => {
+    const p = STRENGTH_PROFILES[c];
+    const cStrengths = otherStrengths.filter(s => s.color === c);
+    if (!cStrengths.length) return '';
+    return `
+      <div style="margin-bottom:1rem;">
+        <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-5);margin-bottom:.4rem;">
+          ${p.emoji} ${p.name} — ${p.tagline}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:.35rem;">
+          ${cStrengths.map(s => `
+            <button class="s-chip" id="other-sc-${s.value.replace(/\s/g,'-')}"
+              data-value="${s.value.replace(/"/g,'&quot;')}"
+              style="border-color:var(--gray-3);color:var(--gray-5);"
+              onclick="toggleOtherStrength(this,this.dataset.value)">
+              + ${s.value}
+            </button>`).join('')}
+        </div>
+      </div>`;
+  }).join('');
+
+  // Append phase B below phase A (keep phase A visible)
+  document.getElementById('sp-phase-a').insertAdjacentHTML('afterend', `
+    <div class="strength-panel fade-in" id="sp-phase-b" style="margin-top:.75rem;">
+      <div class="strength-panel-title">Fortalezas de otros perfiles</div>
+      <p style="font-size:.85rem;color:var(--gray-5);margin-bottom:.75rem;line-height:1.5;">
+        ¿Ves algo aquí que sí te representa? Toca para agregarlo a tu perfil.
+      </p>
+      ${groupedHtml}
+      <div class="btn-row" style="margin-top:.5rem;">
+        <button class="btn-primary" onclick="renderStrengthPhaseC()">AGREGAR MIS PROPIAS →</button>
+      </div>
+    </div>
+  `);
+
+  document.getElementById('sp-phase-b').scrollIntoView({behavior:'smooth'});
+}
+
+function toggleOtherStrength(el, value) {
+  const isActive = el.classList.contains('active-chip');
+  if (!isActive) {
+    el.classList.add('active-chip');
+    el.style.borderColor = '';
+    el.style.color = '';
+    el.textContent = value + ' ✓';
+    if (!state.activeStrengths.includes(value)) state.activeStrengths.push(value);
+    // Also add to main chip container so it's removable from phase A
+    const container = document.getElementById('strength-chips-container');
+    if (container && !document.getElementById(`sc-${value.replace(/\s/g,'-')}`)) {
+      const chip = document.createElement('button');
+      chip.className = 's-chip active-chip';
+      chip.id = `sc-${value.replace(/\s/g,'-')}`;
+      chip.dataset.value = value;
+      chip.innerHTML = `${value} <span class="chip-x">✕</span>`;
+      chip.onclick = function() { toggleStrengthChip(this, value); };
+      container.appendChild(chip);
+    }
+  } else {
+    el.classList.remove('active-chip');
+    el.style.borderColor = 'var(--gray-3)';
+    el.style.color = 'var(--gray-5)';
+    el.textContent = '+ ' + value;
+    state.activeStrengths = state.activeStrengths.filter(s => s !== value);
+    const existingChip = document.getElementById(`sc-${value.replace(/\s/g,'-')}`);
+    if (existingChip) existingChip.remove();
+  }
+}
+
+function renderStrengthPhaseC() {
+  const existing = document.getElementById('sp-phase-c');
+  if (existing) { existing.scrollIntoView({behavior:'smooth'}); return; }
+
+  document.getElementById('sp-phase-b').insertAdjacentHTML('afterend', `
+    <div class="strength-panel fade-in" id="sp-phase-c" style="margin-top:.75rem;">
+      <div class="strength-panel-title">¿Algo que no está en la lista?</div>
+      <p style="font-size:.85rem;color:var(--gray-5);margin-bottom:.75rem;line-height:1.5;">
+        Si hay una fortaleza tuya que no aparece en ningún perfil, escríbela aquí.
+      </p>
+      <div class="add-strength-row">
+        <input type="text" class="add-strength-input" id="new-strength-input" placeholder="Ej: Creatividad, Resiliencia..." maxlength="30">
+        <button class="add-btn" onclick="addCustomStrength()">+ Agregar</button>
+      </div>
+      <div id="custom-added-list" style="margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.35rem;"></div>
+      <div class="btn-row" style="margin-top:1rem;">
+        <button class="btn-primary" onclick="showFinalStrengthConfirmation()">VER MI LISTA FINAL →</button>
+      </div>
+    </div>
+  `);
+
+  document.getElementById('sp-phase-c').scrollIntoView({behavior:'smooth'});
+}
+
+function addCustomStrength() {
+  const input = document.getElementById('new-strength-input');
+  const val = input.value.trim();
+  if (!val) return;
+  if (state.activeStrengths.includes(val)) { input.value = ''; return; }
+
+  state.activeStrengths.push(val);
+
+  // Add to main chip container
+  const container = document.getElementById('strength-chips-container');
+  if (container) {
+    const chip = document.createElement('button');
+    chip.className = 's-chip active-chip';
+    chip.id = `sc-${val.replace(/\s/g,'-')}`;
+    chip.dataset.value = val;
+    chip.innerHTML = `${val} <span class="chip-x">✕</span>`;
+    chip.onclick = function() { toggleStrengthChip(this, val); };
+    container.appendChild(chip);
+  }
+
+  // Show in custom list too
+  const customList = document.getElementById('custom-added-list');
+  if (customList) {
+    const tag = document.createElement('span');
+    tag.className = 'chip selected';
+    tag.textContent = val;
+    tag.style.fontSize = '.8rem';
+    customList.appendChild(tag);
+  }
+
+  input.value = '';
+}
+
+function showFinalStrengthConfirmation() {
+  const existing = document.getElementById('sp-phase-final');
+  if (existing) existing.remove();
+
+  const finalList = state.activeStrengths.filter(s => {
+    const chip = document.getElementById(`sc-${s.replace(/\s/g,'-')}`);
+    return chip ? chip.classList.contains('active-chip') : true;
+  });
+
+  // Sync state with visible active chips
+  state.activeStrengths = finalList;
+
+  if (finalList.length < 2) {
+    alert('Necesitas al menos 2 fortalezas activas para continuar.');
+    return;
+  }
+
+  document.getElementById('sp-phase-c')?.insertAdjacentHTML('afterend', `
+    <div class="strength-panel fade-in" id="sp-phase-final" style="margin-top:.75rem;border:2px solid var(--black);">
+      <div class="strength-panel-title" style="color:var(--black);">✦ Tu Lista Final de Fortalezas</div>
+      <p style="font-size:.85rem;color:var(--gray-5);margin-bottom:.75rem;line-height:1.5;">
+        Estas son las fortalezas con las que vas a avanzar. ¿Te representan?
+      </p>
+      <ul style="margin:.25rem 0 1rem 1rem;display:flex;flex-direction:column;gap:.5rem;">
+        ${finalList.map((s,i) => `
+          <li style="display:flex;align-items:center;gap:.6rem;font-size:.95rem;font-weight:600;color:var(--black);">
+            <span style="background:var(--yellow);color:var(--black);font-weight:800;font-size:.7rem;padding:2px 7px;border-radius:4px;flex-shrink:0;">${i+1}</span>
+            ${s}
+          </li>`).join('')}
+      </ul>
+      <p style="font-size:.8rem;color:var(--gray-5);margin-bottom:1rem;">Si quieres ajustar algo, regresa arriba y modifica. Si estás listo, continúa.</p>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="submitStrengths()">CONFIRMAR Y CONTINUAR →</button>
+      </div>
+    </div>
+  `);
+
+  document.getElementById('sp-phase-final').scrollIntoView({behavior:'smooth'});
+}
+
+function toggleStrengthChip(el, value) {
+  if (el.classList.contains('active-chip')) {
+    el.classList.remove('active-chip');
+    el.classList.add('inactive-chip');
+    state.activeStrengths = state.activeStrengths.filter(s => s !== value);
+  } else {
+    el.classList.remove('inactive-chip');
+    el.classList.add('active-chip');
+    if (!state.activeStrengths.includes(value)) state.activeStrengths.push(value);
+  }
+}
+
+async function submitStrengths() {
+  if (state.activeStrengths.length < 2) return alert('Por favor mantén al menos 2 fortalezas activas.');
+
+  // Show reflection questions
+  const reflEl = document.getElementById('strength-reflection-questions');
+  reflEl.style.display = 'block';
+  reflEl.innerHTML = `
+    <div class="card fade-in">
+      <div class="card-title">Conecta tus fortalezas con tu vida real</div>
+      <div style="display:flex;flex-direction:column;gap:1rem;margin-top:.5rem;">
+        <div>
+          <div class="question-text" style="font-size:.9rem;">¿En qué momentos de tu vida has visto estas fortalezas en acción?</div>
+          <textarea id="sr-q1" placeholder="Una situación específica donde estas fortalezas aparecieron..." rows="2"></textarea>
+        </div>
+        <div>
+          <div class="question-text" style="font-size:.9rem;">¿Qué resultados generaste en otros cuando actuaste desde estas fortalezas?</div>
+          <textarea id="sr-q2" placeholder="El impacto concreto que generaste..." rows="2"></textarea>
+        </div>
+        <div>
+          <div class="question-text" style="font-size:.9rem;">¿Qué tipo de problemas disfrutas resolver cuando estás usando estas fortalezas?</div>
+          <textarea id="sr-q3" placeholder="Los problemas que te energizan resolver..." rows="2"></textarea>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="generateStrengthInsight()">VER MI PERFIL COMPLETO →</button>
+      </div>
+    </div>
+  `;
+  reflEl.scrollIntoView({behavior:'smooth'});
+  // Hide the final confirmation panel's button
+  const finalPanel = document.getElementById('sp-phase-final');
+  if (finalPanel) finalPanel.querySelector('.btn-row').style.display = 'none';
+}
+
+async function generateStrengthInsight() {
+  const r1 = document.getElementById('sr-q1').value.trim();
+  const r2 = document.getElementById('sr-q2').value.trim();
+  const r3 = document.getElementById('sr-q3').value.trim();
+  if (!r1 || !r2 || !r3) return alert('Por favor responde las tres preguntas.');
+
+  const btn = document.querySelector('#strength-reflection-questions .btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Analizando...';
+
+  const aiEl = document.getElementById('strength-ai-response');
+  aiEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">Construyendo tu perfil...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+
+  const prompt = `El usuario identificó su perfil de fortalezas como ${state.strengthColor.toUpperCase()} (${STRENGTH_PROFILES[state.strengthColor].tagline}).
+Sus fortalezas activas: ${state.activeStrengths.join(', ')}
+
+Respondió sobre sus fortalezas en acción:
+- En momentos de vida: "${r1}"
+- Resultados en otros: "${r2}"
+- Problemas que disfruta: "${r3}"
+
+Escribe una reflexión personalizada (3-4 oraciones) que:
+1. Conecte sus fortalezas específicas con las situaciones reales que describió
+2. Nombre el patrón de impacto que ves — cómo genera valor en otros de manera natural
+3. Cierre con una frase que lo ancle: sus fortalezas son la forma en que ejecutará su propósito`;
+
+  const response = await callClaude(prompt);
+  aiEl.innerHTML = `
+    <div class="ai-wrap fade-in">
+      <div class="ai-label">✦ Tu Perfil de Fortalezas</div>
+      <div class="ai-text">${response}</div>
+    </div>
+    <div class="card" style="margin-top:.75rem;">
+      <div class="card-title">Tus Fortalezas Activas</div>
+      <div class="chips-area">${state.activeStrengths.map(s => `<span class="chip selected locked">${s}</span>`).join('')}</div>
+    </div>
+  `;
+
+  document.getElementById('btn-to-step5').style.display = 'block';
+  saveProgress();
+  aiEl.scrollIntoView({behavior:'smooth'});
+}
+
+// ===========================
+// PASO 5 — VALOR ÚNICO
+// ===========================
+// ===========================
+// PASO 5 — INJECT STRENGTHS CONTEXT (additive)
+// ===========================
+function injectStrengthsContextInStep5() {
+  if (!state.activeStrengths || !state.activeStrengths.length) return;
+  const card = document.getElementById('uv-q3')?.closest('.card');
+  if (!card || document.getElementById('strengths-context-hint')) return;
+
+  const hint = document.createElement('div');
+  hint.id = 'strengths-context-hint';
+  hint.style.cssText = 'background:var(--black);border-radius:8px;padding:.75rem 1rem;margin-bottom:.75rem;';
+  hint.innerHTML = `
+    <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow);margin-bottom:.4rem;">Tus fortalezas identificadas</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.3rem;">
+      ${state.activeStrengths.map(s => `
+        <span style="background:rgba(255,230,0,.15);color:var(--yellow);border:1px solid rgba(255,230,0,.3);border-radius:12px;font-size:.78rem;font-weight:600;padding:.2rem .6rem;">${s}</span>
+      `).join('')}
+    </div>
+    <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.5rem;">Úsalas como punto de partida para responder la pregunta de abajo.</div>
+  `;
+
+  card.insertBefore(hint, card.querySelector('.question-text'));
+}
+
+async function generateUniqueValue() {
+  const q1 = document.getElementById('uv-q1').value.trim();
+  const q2 = document.getElementById('uv-q2').value.trim();
+  const q3 = document.getElementById('uv-q3').value.trim();
+  const q4 = document.getElementById('uv-q4').value.trim();
+  if (!q1 || !q2 || !q3 || !q4) return alert('Por favor responde las cuatro preguntas.');
+
+  state.uvAnswers = {q1, q2, q3, q4};
+
+  const btn = document.getElementById('uv-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Definiendo tu valor único...';
+
+  const resultEl = document.getElementById('uv-result');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">Sintetizando...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+
+  const prompt = `El usuario respondió las preguntas de Valor Único:
+1. A quién sirve: "${q1}"
+2. Problema que resuelve: "${q2}"
+3. Cómo usa sus fortalezas: "${q3}"
+4. Resultado que genera: "${q4}"
+
+Sus fortalezas: ${state.activeStrengths.join(', ')}
+Su pasión: "${state.passionStatement}"
+
+Haz dos cosas:
+1. Escribe una DECLARACIÓN DE VALOR ÚNICO en una sola frase (máx 25 palabras) que nombre quién sirve, qué problema resuelve y qué resultado genera. Debe ser específica y diferencial. FORMATO: [VALOR]: Tu declaración aquí.
+2. Escribe una reflexión breve (2 oraciones) sobre por qué este valor único es genuino y diferencial para esta persona específica. FORMATO: [REFLEXIÓN]: Tu reflexión aquí.`;
+
+  const response = await callClaude(prompt);
+
+  let statement = '';
+  let reflection = '';
+  const stmMatch = response.match(/\[VALOR\]:\s*(.+?)(?:\n|$)/s);
+  const refMatch = response.match(/\[REFLEXIÓN\]:\s*(.+)/s);
+  if (stmMatch) statement = stmMatch[1].trim();
+  if (refMatch) reflection = refMatch[1].trim();
+  if (!statement) {
+    const lines = response.split('\n').filter(l => l.trim());
+    statement = lines[0]?.replace(/^\[.*?\]:\s*/,'').trim() || response.substring(0,200);
+    reflection = lines.slice(1).join(' ').replace(/^\[.*?\]:\s*/,'').trim();
+  }
+
+  state.uvStatement = statement;
+  saveProgress();
+
+  resultEl.innerHTML = `
+    <div class="uv-result fade-in">
+      <div class="uv-label">Tu Valor Único</div>
+      <div class="uv-text" id="uv-statement-text">${statement}</div>
+    </div>
+    ${reflection ? `<div class="ai-wrap fade-in" style="margin-top:.75rem;"><div class="ai-label">✦ Por qué este valor es genuinamente tuyo</div><div class="ai-text">${reflection}</div></div>` : ''}
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goToStep(6)">SIGUIENTE: TU PROPÓSITO →</button>
+    </div>
+  `;
+  resultEl.scrollIntoView({behavior:'smooth'});
+  btn.style.display = 'none';
+}
+
+// ===========================
+// PASO 6 — PROPÓSITO
+// ===========================
+async function generatePurpose() {
+  document.getElementById('purpose-generating').style.display = 'block';
+
+  const prompt = `Eres el guía experto de The Lab. El usuario completó el proceso "Diseña Tu Propósito".
+
+DATOS DEL USUARIO:
+- Valores de identidad (en orden): ${state.rankedValues.join(' > ')}
+- Pasión: "${state.passionStatement}"
+- Fortalezas: ${state.activeStrengths.join(', ')}
+- Valor único: "${state.uvStatement}"
+- A quién sirve: "${state.uvAnswers.q1}"
+- Problema que resuelve: "${state.uvAnswers.q2}"
+- Resultado que genera: "${state.uvAnswers.q4}"
+
+INSTRUCCIÓN: Escribe UNA declaración de propósito de vida en primera persona. Solo la declaración, nada más.
+
+REGLAS CRÍTICAS — léelas antes de escribir:
+
+1. INTEGRA las fortalezas en el lenguaje natural — NUNCA las listes.
+   MAL: "...haciendo uso de mis fortalezas de escucha profunda, confiabilidad y acompañamiento sistemático..."
+   BIEN: "...guiándolas con una escucha profunda y un acompañamiento confiable y consistente..."
+   
+2. NO uses estructuras rígidas como:
+   "Mi propósito es X haciendo uso de Y para lograr Z"
+   En cambio, escribe una oración fluida donde todo esté integrado.
+
+3. La frase debe sonar NATURAL al leerla en voz alta — como algo que una persona real diría de sí misma.
+
+4. Debe comunicar en una sola frase integrada:
+   → A quién sirve
+   → Cómo lo hace (con las fortalezas disueltas en el "cómo")
+   → El impacto o transformación que genera
+
+5. No uses la palabra "fortalezas" en ninguna forma.
+6. Entre 35-55 palabras.
+7. Usa el tono y lenguaje que emerge de las respuestas reales — no impongas un tono genérico.
+
+Valida antes de escribir:
+✓ ¿Las fortalezas están integradas, no listadas?
+✓ ¿Suena natural leída en voz alta?
+✓ ¿Comunica quién, cómo e impacto en una sola oración fluida?`;
+
+  const response = await callClaude(prompt);
+  state.purpose = response.trim();
+
+  document.getElementById('purpose-generating').style.display = 'none';
+  const resultEl = document.getElementById('purpose-result');
+  resultEl.style.display = 'block';
+  document.getElementById('purpose-edit-text').value = state.purpose;
+  resultEl.scrollIntoView({behavior:'smooth'});
+}
+
+async function finalizePurpose() {
+  const edited = document.getElementById('purpose-edit-text').value.trim();
+  if (edited) state.purpose = edited;
+
+  document.getElementById('purpose-result').style.display = 'none';
+  const finalEl = document.getElementById('final-screen');
+  finalEl.style.display = 'block';
+  finalEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">Preparando tu resumen...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+
+  const prompt = `El usuario finalizó su propósito de vida: "${state.purpose}"
+Sus valores: ${state.rankedValues.join(', ')}
+Su pasión: "${state.passionStatement}"
+
+Escribe un mensaje de cierre poderoso (3-4 oraciones) que:
+1. Celebre el trabajo honesto que hicieron — sin exageración
+2. Recuerde que el propósito se construye con decisiones diarias, no solo con declaraciones
+3. Invite a profundizar con un coach de The Lab para convertir esto en un plan de acción real`;
+
+  const closing = await callClaude(prompt);
+
+  finalEl.innerHTML = `
+    <div class="final-hero fade-in">
+      <h2>🎯 Tu Propósito Está Diseñado</h2>
+      <p>Este es el comienzo. Ahora viene lo importante: vivirlo.</p>
+    </div>
+
+    <div class="purpose-result fade-in" style="margin-bottom:1rem;">
+      <div class="purpose-label">✦ Tu Propósito de Vida</div>
+      <div class="purpose-text-display">${state.purpose}</div>
+    </div>
+
+    <div id="mantra-section" class="fade-in">
+      <div class="ai-wrap" style="border:1.5px solid rgba(255,230,0,.3);">
+        <div class="ai-label">⚡ Tu Propósito en Una Frase</div>
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="summary-card fade-in">
+      <div class="summary-label">Tus Valores (en orden)</div>
+      <div class="summary-value">${state.rankedValues.map((v,i) => `${i+1}. ${v}`).join(' · ')}</div>
+    </div>
+    <div class="summary-card fade-in">
+      <div class="summary-label">Tu Pasión</div>
+      <div class="summary-value">${state.passionStatement}</div>
+    </div>
+    <div class="summary-card fade-in">
+      <div class="summary-label">Tus Fortalezas</div>
+      <div class="summary-value">${state.activeStrengths.join(' · ')}</div>
+    </div>
+    <div class="summary-card fade-in">
+      <div class="summary-label">Tu Valor Único</div>
+      <div class="summary-value">${state.uvStatement}</div>
+    </div>
+
+    <div class="ai-wrap fade-in" style="margin:1rem 0;">
+      <div class="ai-label">✦ Mensaje Final</div>
+      <div class="ai-text">${closing}</div>
+    </div>
+
+    <div class="next-steps fade-in">
+      <h4>Próximos Pasos</h4>
+      <div class="next-step-item"><div class="next-step-num">1</div><div>Mantén tu propósito visible — escríbelo y ponlo donde lo veas cada día</div></div>
+      <div class="next-step-item"><div class="next-step-num">2</div><div>Identifica UNA decisión que puedes tomar esta semana que esté alineada con tu propósito</div></div>
+      <div class="next-step-item"><div class="next-step-num">3</div><div>Comparte tu propósito con alguien de confianza — verbalizarlo lo hace más real</div></div>
+      <div class="next-step-item"><div class="next-step-num">4</div><div>Trabaja con un coach para convertir tu propósito en un plan estratégico concreto</div></div>
+    </div>
+
+    <div class="cta-coach fade-in">
+      <h4>¿Listo para ir más profundo?</h4>
+      <p>El siguiente paso es trabajar uno a uno con un coach de The Lab para convertir tu propósito en decisiones y acciones concretas.</p>
+      <div class="download-row">
+        <button class="btn-secondary btn-sm" onclick="downloadResults()">📄 Descargar Resumen</button>
+        <button class="btn-primary btn-sm" onclick="contactCoach()" style="width:auto;">Hablar con un Coach →</button>
+      </div>
+      <p style="font-size:.75rem;color:#666;margin-top:.6rem;text-align:center;">Al descargar, abre el archivo y usa <strong>Archivo → Imprimir → Guardar como PDF</strong></p>
+    </div>
+
+    <div style="text-align:center;margin-top:1.5rem;">
+      <button onclick="restartTool()" style="background:transparent;border:none;font-size:.8rem;color:var(--gray-4);cursor:pointer;font-family:var(--font-body);">Comenzar de nuevo</button>
+    </div>
+  `;
+
+  saveProgress();
+  finalEl.scrollIntoView({behavior:'smooth'});
+  generateMantra();
+}
+
+// ===========================
+// MANTRA GENERATOR (additive)
+// ===========================
+async function generateMantra() {
+  try {
+    const prompt = `El usuario tiene este propósito de vida completo:
+"${state.purpose}"
+
+Tu tarea: escribe UNA frase corta — máximo 10-12 palabras — que capture la esencia de este propósito de una manera que la persona pueda memorizar y repetir en su día a día.
+
+REGLAS:
+1. Primera persona ("Existo para...", "Camino hacia...", "Soy alguien que...", o cualquier apertura que fluya)
+2. Debe ser específica a esta persona — no genérica ni motivacional vacía
+3. Debe sentirse como un mantra personal, no como un slogan
+4. Energizante, directa, memorable
+5. Máximo 12 palabras
+6. Solo la frase. Sin explicación. Sin comillas.
+
+Ejemplos del estilo correcto:
+- Ilumino el camino de quienes buscan dirección y no la encuentran solos.
+- Transformo la confusión en claridad para quienes están listos para crecer.
+- Construyo puentes entre el potencial que existe y la vida que se puede vivir.`;
+
+    const response = await callClaude(prompt);
+    const mantra = response.trim().replace(/^["']|["']$/g, '');
+    state.mantra = mantra;
+    saveProgress();
+
+    const section = document.getElementById('mantra-section');
+    if (!section) return;
+
+    section.innerHTML = `
+      <div class="mantra-card fade-in">
+        <div class="mantra-eyebrow">⚡ Tu Propósito en Una Frase</div>
+        <div class="mantra-hint">Una versión corta para llevar contigo y recordar cada día.</div>
+        <textarea class="mantra-text" id="mantra-text" rows="2">${mantra}</textarea>
+        <div class="mantra-footer">Puedes ajustar la frase hasta que resuene completamente contigo.</div>
+      </div>
+    `;
+  } catch(e) {
+    // Fail silently — do not disrupt the summary screen
+    const section = document.getElementById('mantra-section');
+    if (section) section.innerHTML = '';
+  }
+}
+
+
+async function downloadResults() {
+  const btn = document.querySelector('.download-row .btn-secondary');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Preparando...'; }
+
+  try {
+    const values = (state.rankedValues || []).map((v, i) =>
+      `<div class="value-row ${i === 0 ? 'value-primary' : ''}">
+        <span class="value-num">${i + 1}</span>
+        <span class="value-label">${v}</span>
+        ${i === 0 ? '<span class="value-tag">PRINCIPAL</span>' : ''}
+      </div>`
+    ).join('');
+
+    const strengths = (state.activeStrengths || []).map(s =>
+      `<span class="strength-tag">${s}</span>`
+    ).join('');
+
+    // Read mantra from state or DOM fallback
+    const mantraText = state.mantra ||
+      document.getElementById('mantra-text')?.value?.trim() || '';
+
+    // Identity answers
+    const identityHtml = (state.identityResponses || []).map((r, i) => {
+      if (!r) return '';
+      const TERRITORIES = [
+        'Aprendizaje + Relación','Valores en Conflicto + Decisión',
+        'Lealtad + Convicción','Impacto + Autenticidad','Contribución + Legado'
+      ];
+      return `<div class="qa-block">
+        <div class="qa-territory">${TERRITORIES[i] || `Pregunta ${i+1}`}</div>
+        <div class="qa-q">${r.q1 || ''}</div>
+        ${r.q2 ? `<div class="qa-q qa-q2">${r.q2}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mi Propósito — The Lab</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  @page{size:A4;margin:0;}
+  body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#111;background:#fff;width:210mm;}
+
+  .cover-band{background:#FFE600;padding:22mm 18mm 14mm;}
+  .cover-brand{font-size:8pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#555;margin-bottom:8mm;}
+  .cover-title{font-size:26pt;font-weight:900;color:#111;line-height:1;margin-bottom:3mm;}
+  .cover-sub{font-size:12pt;color:#333;margin-bottom:4mm;}
+  .cover-caption{font-size:8pt;color:#777;}
+
+  .content{padding:12mm 18mm 20mm;}
+
+  .mantra-band{background:#111;padding:8mm 18mm;margin-bottom:0;}
+  .mantra-eyebrow{font-size:7pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#FFE600;margin-bottom:3mm;}
+  .mantra-phrase{font-size:14pt;font-style:italic;font-weight:600;color:#FFE600;line-height:1.5;text-align:center;}
+
+  .purpose-box{border-top:2.5px solid #111;border-bottom:2.5px solid #111;padding:8mm 0;margin-bottom:10mm;}
+  .section-eyebrow{font-size:7pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8a7000;margin-bottom:3mm;}
+  .purpose-text{font-size:12pt;font-style:italic;line-height:1.65;color:#111;}
+
+  .section{margin-bottom:9mm;}
+  .section-title{font-size:7.5pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;padding-bottom:2mm;border-bottom:1.5px solid #FFE600;margin-bottom:5mm;}
+
+  .value-row{display:flex;align-items:center;gap:8px;margin-bottom:4.5px;}
+  .value-num{background:#FFE600;color:#111;font-weight:800;font-size:7pt;width:16px;height:16px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .value-label{font-size:10.5pt;font-weight:500;}
+  .value-primary .value-label{font-weight:700;}
+  .value-tag{font-size:6.5pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a7000;margin-left:4px;}
+
+  .body-text{font-size:10.5pt;line-height:1.6;color:#333;}
+  .strength-wrap{display:flex;flex-wrap:wrap;gap:5px;}
+  .strength-tag{display:inline-block;background:#f0f0e0;color:#111;font-size:8.5pt;font-weight:600;padding:3px 9px;border-radius:12px;}
+
+  .divider{border:none;border-top:2px solid #FFE600;margin:12mm 0;}
+  .part-title{font-size:11pt;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:#111;margin-bottom:8mm;padding-bottom:3mm;border-bottom:3px solid #111;}
+
+  .qa-block{margin-bottom:7mm;}
+  .qa-territory{font-size:6.5pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#111;display:inline-block;padding:2px 7px;border-radius:4px;margin-bottom:2.5mm;}
+  .qa-q{font-size:9.5pt;line-height:1.55;color:#333;padding-left:3mm;border-left:2px solid #FFE600;margin-bottom:2mm;}
+  .qa-q2{color:#555;font-style:italic;margin-top:1.5mm;}
+  .qa-label{font-size:7pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a7000;margin-bottom:1.5mm;margin-top:4mm;}
+
+  .steps-box{background:#f8f7f2;border-radius:6px;padding:7mm 8mm;margin-bottom:9mm;}
+  .steps-title{font-size:7.5pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;margin-bottom:4mm;}
+  .step-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:4mm;font-size:9pt;color:#444;line-height:1.4;}
+  .step-num{background:#FFE600;color:#111;font-weight:800;font-size:7pt;width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+  .footer{background:#FFE600;padding:3mm 18mm;display:flex;justify-content:space-between;align-items:center;margin-top:8mm;}
+  .footer-brand{font-size:7.5pt;font-weight:700;color:#555;}
+  .footer-note{font-size:7pt;color:#888;}
+
+  @media print{
+    body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover-band">
+  <div class="cover-brand">The Lab · Leo Sierra</div>
+  <div class="cover-title">PROPÓSITO</div>
+  <div class="cover-sub">Diseña una Vida Extraordinaria en 6 Pasos</div>
+  <div class="cover-caption">Resumen personal del proceso</div>
+</div>
+
+${mantraText ? `
+<div class="mantra-band">
+  <div class="mantra-eyebrow">⚡ Tu Propósito en Una Frase</div>
+  <div class="mantra-phrase">${mantraText}</div>
+</div>` : ''}
+
+<div class="content">
+
+  <!-- PART 1: SUMMARY -->
+  <div class="part-title">Parte 1 — Tu Resumen Final</div>
+
+  <div class="purpose-box">
+    <div class="section-eyebrow">✦ Mi Propósito de Vida</div>
+    <div class="purpose-text">${state.purpose || ''}</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Mis Valores — En Orden de Importancia</div>
+    ${values}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Mi Pasión</div>
+    <div class="body-text">${state.passionStatement || ''}</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Mis Fortalezas</div>
+    <div class="strength-wrap">${strengths}</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Mi Valor Único</div>
+    <div class="body-text">${state.uvStatement || ''}</div>
+  </div>
+
+  <div class="steps-box">
+    <div class="steps-title">Próximos Pasos</div>
+    <div class="step-item"><span class="step-num">1</span>Mantén tu propósito visible — escríbelo donde lo veas cada día.</div>
+    <div class="step-item"><span class="step-num">2</span>Identifica UNA decisión esta semana alineada con tu propósito.</div>
+    <div class="step-item"><span class="step-num">3</span>Comparte tu propósito con alguien de confianza.</div>
+    <div class="step-item"><span class="step-num">4</span>Trabaja con un coach para convertirlo en un plan concreto.</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PART 2: PROCESS ANSWERS -->
+  <div class="part-title">Parte 2 — Tus Respuestas del Proceso</div>
+
+  <div class="section">
+    <div class="section-title">Paso 1 — Tu Ubicación</div>
+    ${state.why ? `<div class="qa-label">¿Por qué quieres descubrir tu propósito?</div>
+    <div class="qa-q">${state.why}</div>` : ''}
+    ${state.location ? `<div class="qa-label">Estado actual</div>
+    <div class="qa-q">${state.location.charAt(0).toUpperCase() + state.location.slice(1)}</div>` : ''}
+    ${state.followupAnswer ? `<div class="qa-label">Reflexión de seguimiento</div>
+    <div class="qa-q">${state.followupAnswer}</div>` : ''}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Paso 2 — Tu Identidad</div>
+    ${identityHtml}
+    ${state.rankedValues && state.rankedValues.length ? `
+    <div class="qa-label">Valores finales (en orden)</div>
+    <div class="qa-q">${state.rankedValues.map((v,i) => `${i+1}. ${v}`).join(' · ')}</div>` : ''}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Paso 3 — Tu Pasión</div>
+    ${state.passionAnswers?.q1 ? `<div class="qa-label">¿Cuándo sentiste que estabas exactamente donde debías estar?</div>
+    <div class="qa-q">${state.passionAnswers.q1}</div>` : ''}
+    ${state.passionAnswers?.q2 ? `<div class="qa-label">¿Qué te duele ver en el mundo?</div>
+    <div class="qa-q">${state.passionAnswers.q2}</div>` : ''}
+    ${state.passionAnswers?.q3 ? `<div class="qa-label">¿Qué sueñas hacer o construir?</div>
+    <div class="qa-q">${state.passionAnswers.q3}</div>` : ''}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Paso 4 — Tus Fortalezas</div>
+    ${state.strengthColor ? `<div class="qa-label">Perfil de color</div>
+    <div class="qa-q">${state.strengthColor.charAt(0).toUpperCase() + state.strengthColor.slice(1)}</div>` : ''}
+    ${state.activeStrengths?.length ? `<div class="qa-label">Fortalezas activas</div>
+    <div class="qa-q">${state.activeStrengths.join(' · ')}</div>` : ''}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Paso 5 — Tu Valor Único</div>
+    ${state.uvAnswers?.q1 ? `<div class="qa-label">¿A quién sirves?</div>
+    <div class="qa-q">${state.uvAnswers.q1}</div>` : ''}
+    ${state.uvAnswers?.q2 ? `<div class="qa-label">¿Qué problema resuelves?</div>
+    <div class="qa-q">${state.uvAnswers.q2}</div>` : ''}
+    ${state.uvAnswers?.q3 ? `<div class="qa-label">¿Cómo usas tus fortalezas?</div>
+    <div class="qa-q">${state.uvAnswers.q3}</div>` : ''}
+    ${state.uvAnswers?.q4 ? `<div class="qa-label">¿Qué resultado concreto generas?</div>
+    <div class="qa-q">${state.uvAnswers.q4}</div>` : ''}
+  </div>
+
+</div>
+
+<div class="footer">
+  <span class="footer-brand">The Lab · Leo Sierra — Diseña Tu Propósito</span>
+  <span class="footer-note">thelab.com</span>
+</div>
+
+<script>
+  window.onload = function() { setTimeout(function(){ window.print(); }, 500); };
+<\/script>
+</body>
+</html>`;
+
+    // Use direct anchor download — no popup blocker, works from local files
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Mi-Proposito-The-Lab.html';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+  } catch(e) {
+    console.error('PDF error:', e);
+    alert('Hubo un error generando el PDF. Por favor intenta de nuevo.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '📄 Descargar Resumen'; }
+  }
+}
+
+function contactCoach() {
+  const btn = document.querySelector('.cta-coach .btn-primary.btn-sm');
+  if (document.getElementById('coach-form-inline')) {
+    document.getElementById('coach-form-inline').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  const form = document.createElement('div');
+  form.id = 'coach-form-inline';
+  form.className = 'coach-form fade-in';
+  form.innerHTML = `
+    <div class="coach-form-title">Cuéntanos sobre ti</div>
+    <div class="coach-field">
+      <label>Nombre completo</label>
+      <input type="text" id="cf-nombre" placeholder="Tu nombre..." autocomplete="name">
+    </div>
+    <div class="coach-field">
+      <label>Correo electrónico</label>
+      <input type="email" id="cf-email" placeholder="tu@email.com" autocomplete="email">
+    </div>
+    <div class="coach-field">
+      <label>Número de teléfono</label>
+      <input type="tel" id="cf-telefono" placeholder="+1 000 000 0000" autocomplete="tel">
+    </div>
+    <button class="btn-primary" style="margin-top:.5rem;" onclick="submitCoachForm(this)">ENVIAR MI INFORMACIÓN →</button>
+    <div id="cf-error" class="coach-error-msg"></div>
+  `;
+  btn.closest('.download-row').insertAdjacentElement('afterend', form);
+  form.scrollIntoView({behavior:'smooth'});
+}
+
+async function submitCoachForm(btn) {
+  const nombre   = document.getElementById('cf-nombre').value.trim();
+  const email    = document.getElementById('cf-email').value.trim();
+  const telefono = document.getElementById('cf-telefono').value.trim();
+  const errEl    = document.getElementById('cf-error');
+
+  if (!nombre || !email || !telefono) {
+    errEl.textContent = 'Por favor completa los tres campos.';
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.textContent = 'Por favor ingresa un correo válido.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  errEl.textContent = '';
+
+  try {
+    const mantraText = state.mantra ||
+      document.getElementById('mantra-text')?.value?.trim() || '';
+
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        nombre,
+        email,
+        telefono,
+        proposito:  state.purpose        || '',
+        mantra:     mantraText,
+        valores:    state.rankedValues    || [],
+        pasion:     state.passionStatement|| '',
+        fortalezas: state.activeStrengths || [],
+        valorUnico: state.uvStatement     || ''
+      })
+    });
+
+    if (res.ok) {
+      document.getElementById('coach-form-inline').innerHTML = `
+        <div class="coach-success">
+          ✦ ¡Gracias, ${nombre}! Nos pondremos en contacto contigo pronto.<br>
+          <span style="font-size:.8rem;opacity:.7;font-weight:400;margin-top:.3rem;display:block;">Revisa tu correo ${email} — te enviamos una copia de tu propósito.</span>
+        </div>`;
+    } else {
+      throw new Error('Error del servidor');
+    }
+  } catch(e) {
+    console.error('Email error:', e);
+    errEl.textContent = 'Hubo un error al enviar. Por favor intenta de nuevo.';
+    btn.disabled = false;
+    btn.textContent = 'ENVIAR MI INFORMACIÓN →';
+  }
+}
+
+function restartTool() {
+  if (!confirm('¿Estás seguro? Perderás todo tu progreso.')) return;
+  localStorage.removeItem('thelab-proposito-state');
+  location.reload();
+}
+
+// ===========================
+// PERSISTENCE
+// ===========================
+function saveProgress() {
+  try {
+    const currentStep = parseInt(document.querySelector('.screen.active')?.id?.replace('screen-','')) || 0;
+    localStorage.setItem('thelab-proposito-state', JSON.stringify({
+      state,
+      currentStep,
+      subState: {
+        identityPhase: currentIdentityPhase,
+        identityQIndex: currentQIndex,
+        allCollectedValues,
+        selectedChipsPerQ,
+        tempFinalFour,
+        finalFourValues,
+        rankingSlots,
+        scenarioAnswers
+      }
+    }));
+  } catch(e) {}
+}
+
+function resumeSession() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('thelab-proposito-state'));
+    if (!saved || saved.currentStep === 0) return;
+
+    // Restore main state
+    Object.assign(state, saved.state);
+
+    // Restore sub-state variables
+    if (saved.subState) {
+      const s = saved.subState;
+      currentIdentityPhase = s.identityPhase || 'questions';
+      currentQIndex        = s.identityQIndex || 0;
+      allCollectedValues   = s.allCollectedValues || [];
+      selectedChipsPerQ    = s.selectedChipsPerQ || {};
+      tempFinalFour        = s.tempFinalFour || [];
+      finalFourValues      = s.finalFourValues || [];
+      rankingSlots         = s.rankingSlots || [null,null,null,null];
+      scenarioAnswers      = s.scenarioAnswers || {elevator:null, trip:null};
+    }
+
+    document.getElementById('resumeBanner').style.display = 'none';
+    const n = saved.currentStep;
+
+    // Show the correct screen
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.style.display = 'none';
+    });
+    const sc = document.getElementById(`screen-${n}`);
+    sc.style.display = 'block';
+    sc.classList.add('active');
+    updateProgress(n);
+    window.scrollTo({top:0, behavior:'smooth'});
+
+    // Restore step-specific UI
+    if (n === 2) {
+      if (currentIdentityPhase === 'phase2') renderPhase2();
+      else if (currentIdentityPhase === 'phase3') renderPhase3();
+      else renderIdentityQuestion(currentQIndex);
+    } else if (n === 6) {
+      generatePurpose();
+    }
+
+  } catch(e) { console.error('Resume error:', e); }
+}
+
+// ===========================
+// ACCESS CODES (additive)
+// ===========================
+const ACCESS_CODES = [
+  'TLAB-A3K9','TLAB-B7M2','TLAB-C4P8','TLAB-D6Q1','TLAB-E2R5',
+  'TLAB-F9W4','TLAB-G1N7','TLAB-H5T3','TLAB-J8V6','TLAB-K2X0',
+  'TLAB-L4Y8','TLAB-M7Z3','TLAB-N1Q6','TLAB-P3R9','TLAB-Q6S2',
+  'TLAB-R8U5','TLAB-S0W7','TLAB-T4X1','TLAB-U9Y4','TLAB-V2Z6',
+  'TLAB-W5A8','TLAB-X7B3','TLAB-Y0C9','TLAB-Z3D4','TLAB-A6E7',
+  'TLAB-B1F2','TLAB-C9G5','TLAB-D4H8','TLAB-E7J1','TLAB-F2K6',
+  'TLAB-G8L3','TLAB-H0M9','TLAB-J5N4','TLAB-K3P7','TLAB-L6Q0',
+  'TLAB-M2R8','TLAB-N7S1','TLAB-P4T6','TLAB-Q9U3','TLAB-R1V5',
+  'TLAB-S6W0','TLAB-T8X4','TLAB-U3Y7','TLAB-V5Z2','TLAB-W0A6',
+  'TLAB-X2B9','TLAB-Y7C1','TLAB-Z4D8','TLAB-A9E3','TLAB-B5F0'
+];
+
+function getUsedCodes() {
+  try { return JSON.parse(localStorage.getItem('thelab-used-codes') || '[]'); }
+  catch(e) { return []; }
+}
+
+function markCodeUsed(code) {
+  try {
+    const used = getUsedCodes();
+    if (!used.includes(code)) {
+      used.push(code);
+      localStorage.setItem('thelab-used-codes', JSON.stringify(used));
+    }
+  } catch(e) {}
+}
+
+function validateAccessCode() {
+  const raw   = document.getElementById('access-code-input').value.trim().toUpperCase();
+  const errEl = document.getElementById('access-error');
+
+  if (!raw) { errEl.textContent = 'Por favor ingresa tu código de acceso.'; return; }
+  if (!ACCESS_CODES.includes(raw)) {
+    errEl.textContent = 'Código incorrecto. Verifica e intenta de nuevo.';
+    return;
+  }
+  if (getUsedCodes().includes(raw)) {
+    errEl.textContent = 'Este código ya fue utilizado. Contacta a The Lab para obtener uno nuevo.';
+    return;
+  }
+
+  markCodeUsed(raw);
+  sessionStorage.setItem('thelab-access-granted', 'true');
+  document.getElementById('screen-access').style.display = 'none';
+  document.getElementById('screen-0').style.display = 'block';
+  document.getElementById('screen-0').classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// Check for saved progress on load
+window.addEventListener('load', () => {
+  try {
+    // Check if already validated this session
+    const validated = sessionStorage.getItem('thelab-access-granted');
+    if (validated === 'true') {
+      // Skip access screen — show resume banner if progress exists
+      document.getElementById('screen-access').style.display = 'none';
+      document.getElementById('screen-0').style.display = 'block';
+      document.getElementById('screen-0').classList.add('active');
+      const saved = JSON.parse(localStorage.getItem('thelab-proposito-state'));
+      if (saved && saved.currentStep > 0) {
+        document.getElementById('resumeBanner').style.display = 'flex';
+      }
+      return;
+    }
+    // First visit — show access screen (default visible), hide rest
+    const saved = JSON.parse(localStorage.getItem('thelab-proposito-state'));
+    if (saved && saved.currentStep > 0) {
+      // Has saved progress — still require code unless session is active
+      document.getElementById('resumeBanner').style.display = 'flex';
+    }
+  } catch(e) {}
+});
+</script>
+</body>
+</html>
