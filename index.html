@@ -26,8 +26,8 @@ body{font-family:var(--font-body);background:var(--gray-1);min-height:100vh;colo
 /* HEADER */
 .app-header{background:var(--yellow);padding:1.25rem 1.5rem 1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.1);}
 .header-inner{max-width:660px;margin:0 auto;}
-.header-top{display:flex;align-items:center;gap:12px;margin-bottom:0.75rem;}
-.logo-wrap{display:flex;align-items:center;gap:10px;flex:1;}
+.header-top{display:flex;align-items:center;gap:8px;margin-bottom:0.75rem;overflow:visible;}
+.logo-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:0;overflow:hidden;}
 .logo-svg{width:40px;height:40px;flex-shrink:0;}
 .header-titles{}
 .header-sub{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;line-height:1;}
@@ -260,6 +260,11 @@ textarea::placeholder{color:var(--gray-4);}
 .coach-success{background:var(--black);color:var(--yellow);border-radius:var(--radius);padding:1rem 1.25rem;font-size:.9rem;font-weight:600;text-align:center;margin-top:.75rem;}
 .coach-error-msg{color:#CC2200;font-size:.82rem;font-weight:600;margin-top:.5rem;}
 
+/* LANG TOGGLE */
+.lang-toggle{display:flex;align-items:center;gap:2px;background:rgba(0,0,0,0.15);border-radius:20px;padding:3px;flex-shrink:0;margin-left:4px;}
+.lang-btn{background:transparent;border:none;border-radius:16px;padding:4px 10px;font-size:.75rem;font-weight:800;cursor:pointer;color:var(--black);opacity:.5;transition:all .2s;letter-spacing:.05em;line-height:1;}
+.lang-btn.active{background:var(--black);color:var(--yellow);opacity:1;}
+
 /* ANIMATIONS */
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 .fade-in{animation:fadeIn .4s ease;}
@@ -290,6 +295,10 @@ textarea::placeholder{color:var(--gray-4);}
         </div>
       </div>
       <div class="step-badge" id="stepBadge">Inicio</div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="lang-es" onclick="setLanguage('es')">ES</button>
+        <button class="lang-btn" id="lang-en" onclick="setLanguage('en')">EN</button>
+      </div>
     </div>
     <div class="progress-track">
       <div class="progress-fill" id="progressFill" style="width:0%"></div>
@@ -631,6 +640,189 @@ textarea::placeholder{color:var(--gray-4);}
 
 <script>
 // ===========================
+// LANGUAGE SYSTEM (additive)
+// ===========================
+let currentLang = 'es';
+
+const STRINGS = {
+  es: {
+    // Header
+    headerSub: 'The Lab · Leo Sierra',
+    headerMain: 'PROPÓSITO: Diseña una Vida Extraordinaria',
+    stepInit: 'Inicio',
+    stepLabels: ['Inicio','Ubicación','Identidad','Pasión','Fortalezas','Valor Único','Propósito'],
+    // Access screen
+    accessBrand: 'The Lab · Leo Sierra',
+    accessTitle: 'Diseña Tu Propósito',
+    accessSub: 'Ingresa tu código de acceso personal para comenzar el proceso.',
+    accessPlaceholder: 'TLAB-XXXX',
+    accessBtn: 'INGRESAR →',
+    accessHint: 'Si no tienes un código, contacta a The Lab para obtener acceso.',
+    accessErrEmpty: 'Por favor ingresa tu código de acceso.',
+    accessErrInvalid: 'Código incorrecto. Verifica e intenta de nuevo.',
+    accessErrUsed: 'Este código ya fue utilizado. Contacta a The Lab para obtener uno nuevo.',
+    // Resume banner
+    resumeMsg: 'Tienes progreso guardado. ¿Continuar?',
+    resumeBtn: 'Continuar →',
+    // Welcome
+    welcomeTitle: 'Diseña Tu Propósito en 6 Pasos',
+    welcomeDesc: 'Un proceso guiado para descubrir quién eres, qué te mueve y cómo puedes generar un impacto real en el mundo.',
+    welcomeBtn: 'COMENZAR MI PROCESO →',
+    welcomeSectionTitle: 'Qué vas a descubrir en este proceso',
+    welcomeSteps: ['Tu Ubicación — Dónde estás realmente hoy','Tu Identidad — Los valores que realmente te gobiernan','Tu Pasión — Lo que te mueve desde adentro','Tus Fortalezas — Cómo generas valor naturalmente','Tu Valor Único — El impacto que solo tú puedes generar','Tu Propósito — La declaración que lo integra todo'],
+    // Step labels
+    stepOf: 'Paso {n} de 6',
+    // AI system prompt
+    aiSystem: `Eres el guía del programa "Diseña Tu Propósito" de The Lab, creado por Leo Sierra. Eres un asesor de vida experto — sabio, empático, directo. Priorizas claridad sobre inspiración. Respondes siempre en español. Tus respuestas son cálidas pero directas, nunca genéricas. Máximo 4 oraciones por respuesta a menos que se indique lo contrario.`,
+    // Error message
+    connError: 'Hubo un error al conectar con el servicio. Por favor intenta de nuevo.',
+    // Coach form
+    coachFormTitle: 'Cuéntanos sobre ti',
+    coachNameLabel: 'Nombre completo',
+    coachNamePlaceholder: 'Tu nombre...',
+    coachEmailLabel: 'Correo electrónico',
+    coachEmailPlaceholder: 'tu@email.com',
+    coachPhoneLabel: 'Número de teléfono',
+    coachPhonePlaceholder: '+1 000 000 0000',
+    coachSubmitBtn: 'ENVIAR MI INFORMACIÓN →',
+    coachSendingBtn: 'Enviando...',
+    coachErrFields: 'Por favor completa los tres campos.',
+    coachErrEmail: 'Por favor ingresa un correo válido.',
+    coachErrSend: 'Hubo un error al enviar. Por favor intenta de nuevo.',
+    coachSuccessMsg: (nombre, email) => `✦ ¡Gracias, ${nombre}! Nos pondremos en contacto contigo pronto.<br><span style="font-size:.8rem;opacity:.7;font-weight:400;margin-top:.3rem;display:block;">Revisa tu correo ${email} — te enviamos una copia de tu propósito.</span>`,
+    // Download
+    downloadBtn: '📄 Descargar Resumen',
+    downloadHint: 'Al descargar, abre el archivo y usa <strong>Archivo → Imprimir → Guardar como PDF</strong>',
+    downloadPreparing: '⏳ Preparando...',
+  },
+  en: {
+    // Header
+    headerSub: 'The Lab · Leo Sierra',
+    headerMain: 'PURPOSE: Design an Extraordinary Life',
+    stepInit: 'Start',
+    stepLabels: ['Start','Location','Identity','Passion','Strengths','Unique Value','Purpose'],
+    // Access screen
+    accessBrand: 'The Lab · Leo Sierra',
+    accessTitle: 'Design Your Purpose',
+    accessSub: 'Enter your personal access code to begin the process.',
+    accessPlaceholder: 'TLAB-XXXX',
+    accessBtn: 'ENTER →',
+    accessHint: "If you don't have a code, contact The Lab to get access.",
+    accessErrEmpty: 'Please enter your access code.',
+    accessErrInvalid: 'Incorrect code. Please verify and try again.',
+    accessErrUsed: 'This code has already been used. Contact The Lab for a new one.',
+    // Resume banner
+    resumeMsg: 'You have saved progress. Continue?',
+    resumeBtn: 'Continue →',
+    // Welcome
+    welcomeTitle: 'Design Your Purpose in 6 Steps',
+    welcomeDesc: 'A guided process to discover who you are, what moves you, and how you can generate real impact in the world.',
+    welcomeBtn: 'BEGIN MY PROCESS →',
+    welcomeSectionTitle: 'What you will discover in this process',
+    welcomeSteps: ['Your Location — Where you truly are today','Your Identity — The values that truly govern you','Your Passion — What moves you from within','Your Strengths — How you naturally generate value','Your Unique Value — The impact only you can generate','Your Purpose — The declaration that integrates it all'],
+    // Step labels
+    stepOf: 'Step {n} of 6',
+    // AI system prompt
+    aiSystem: `You are the guide for The Lab's "Design Your Purpose" program, created by Leo Sierra. You are an expert life advisor — wise, empathetic, direct. You prioritize clarity over inspiration. You always respond in English. Your responses are warm but direct, never generic. Maximum 4 sentences per response unless otherwise indicated.`,
+    // Error message
+    connError: 'There was an error connecting to the service. Please try again.',
+    // Coach form
+    coachFormTitle: 'Tell us about yourself',
+    coachNameLabel: 'Full name',
+    coachNamePlaceholder: 'Your name...',
+    coachEmailLabel: 'Email address',
+    coachEmailPlaceholder: 'you@email.com',
+    coachPhoneLabel: 'Phone number',
+    coachPhonePlaceholder: '+1 000 000 0000',
+    coachSubmitBtn: 'SEND MY INFORMATION →',
+    coachSendingBtn: 'Sending...',
+    coachErrFields: 'Please complete all three fields.',
+    coachErrEmail: 'Please enter a valid email address.',
+    coachErrSend: 'There was an error sending. Please try again.',
+    coachSuccessMsg: (nombre, email) => `✦ Thank you, ${nombre}! We will be in touch soon.<br><span style="font-size:.8rem;opacity:.7;font-weight:400;margin-top:.3rem;display:block;">Check your email ${email} — we sent you a copy of your purpose.</span>`,
+    // Download
+    downloadBtn: '📄 Download Summary',
+    downloadHint: 'After downloading, open the file and use <strong>File → Print → Save as PDF</strong>',
+    downloadPreparing: '⏳ Preparing...',
+  }
+};
+
+// Helper: returns text in current language
+function t(esText, enText) {
+  return currentLang === 'en' ? enText : esText;
+}
+
+// ===========================
+// LANGUAGE SWITCHER (additive)
+// ===========================
+function setLanguage(lang) {
+  currentLang = lang;
+
+  // Update toggle buttons
+  document.getElementById('lang-es').classList.toggle('active', lang === 'es');
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+
+  const s = STRINGS[lang];
+
+  // Header
+  const headerMain = document.querySelector('.header-main');
+  if (headerMain) headerMain.textContent = s.headerMain;
+
+  // Access screen
+  const accessTitle = document.querySelector('.access-title');
+  if (accessTitle) accessTitle.textContent = s.accessTitle;
+  const accessSub = document.querySelector('.access-sub');
+  if (accessSub) accessSub.textContent = s.accessSub;
+  const accessInput = document.getElementById('access-code-input');
+  if (accessInput) accessInput.placeholder = s.accessPlaceholder;
+  const accessBtn = document.querySelector('#screen-access .btn-primary');
+  if (accessBtn) accessBtn.textContent = s.accessBtn;
+  const accessHint = document.querySelector('.access-hint');
+  if (accessHint) accessHint.textContent = s.accessHint;
+
+  // Resume banner
+  const resumeMsg = document.querySelector('.resume-banner p');
+  if (resumeMsg) resumeMsg.textContent = s.resumeMsg;
+  const resumeBtn = document.querySelector('.resume-banner button');
+  if (resumeBtn) resumeBtn.textContent = s.resumeBtn;
+
+  // Welcome screen
+  const welcomeTitle = document.querySelector('.welcome-hero h1');
+  if (welcomeTitle) welcomeTitle.textContent = s.welcomeTitle;
+  const welcomeDesc = document.querySelector('.welcome-hero > p');
+  if (welcomeDesc) welcomeDesc.textContent = s.welcomeDesc;
+  const welcomeBtn = document.querySelector('.welcome-hero .btn-yellow');
+  if (welcomeBtn) welcomeBtn.textContent = s.welcomeBtn;
+
+  // Step badge (re-run updateProgress with current step)
+  const currentStep = parseInt(document.querySelector('.screen.active')?.id?.replace('screen-','')) || 0;
+  if (currentStep === 0) {
+    document.getElementById('stepBadge').textContent = s.stepInit;
+  } else {
+    document.getElementById('stepBadge').textContent = `${s.stepOf.replace('{n}', currentStep)} · ${s.stepLabels[currentStep]}`;
+  }
+
+  // Persist language choice
+  try { sessionStorage.setItem('thelab-lang', lang); } catch(e) {}
+}
+
+// Auto-detect language from browser
+function autoDetectLanguage() {
+  // Check if user previously chose a language
+  try {
+    const saved = sessionStorage.getItem('thelab-lang');
+    if (saved === 'es' || saved === 'en') {
+      setLanguage(saved);
+      return;
+    }
+  } catch(e) {}
+  // Auto-detect from browser
+  const browserLang = navigator.language || navigator.userLanguage || 'es';
+  const lang = browserLang.toLowerCase().startsWith('en') ? 'en' : 'es';
+  setLanguage(lang);
+}
+
+// ===========================
 // STATE
 // ===========================
 const state = {
@@ -738,10 +930,7 @@ const STRENGTH_PROFILES = {
 // API CALL
 // ===========================
 async function callClaude(prompt, systemPrompt) {
-  const sys = systemPrompt || `Eres el guía del programa "Diseña Tu Propósito" de The Lab, creado por Leo Sierra. 
-Eres un asesor de vida experto — sabio, empático, directo. Priorizas claridad sobre inspiración. 
-Respondes siempre en español. Tus respuestas son cálidas pero directas, nunca genéricas. 
-Máximo 4 oraciones por respuesta a menos que se indique lo contrario.`;
+  const sys = systemPrompt || STRINGS[currentLang].aiSystem;
   
   try {
     const res = await fetch('/api/claude', {
@@ -757,7 +946,7 @@ Máximo 4 oraciones por respuesta a menos que se indique lo contrario.`;
     const data = await res.json();
     return data.content?.[0]?.text || '';
   } catch(e) {
-    return 'Hubo un error al conectar con el servicio. Por favor intenta de nuevo.';
+    return STRINGS[currentLang].connError;
   }
 }
 
@@ -767,8 +956,12 @@ Máximo 4 oraciones por respuesta a menos que se indique lo contrario.`;
 function updateProgress(step) {
   const pct = (step / 6) * 100;
   document.getElementById('progressFill').style.width = pct + '%';
-  const labels = ['Inicio','Ubicación','Identidad','Pasión','Fortalezas','Valor Único','Propósito'];
-  document.getElementById('stepBadge').textContent = step === 0 ? 'Inicio' : `Paso ${step} · ${labels[step]}`;
+  const s = STRINGS[currentLang];
+  if (step === 0) {
+    document.getElementById('stepBadge').textContent = s.stepInit;
+  } else {
+    document.getElementById('stepBadge').textContent = `${s.stepOf.replace('{n}', step)} · ${s.stepLabels[step]}`;
+  }
 }
 
 function startJourney() {
@@ -2109,24 +2302,25 @@ function contactCoach() {
     document.getElementById('coach-form-inline').scrollIntoView({behavior:'smooth'});
     return;
   }
+  const s = STRINGS[currentLang];
   const form = document.createElement('div');
   form.id = 'coach-form-inline';
   form.className = 'coach-form fade-in';
   form.innerHTML = `
-    <div class="coach-form-title">Cuéntanos sobre ti</div>
+    <div class="coach-form-title">${s.coachFormTitle}</div>
     <div class="coach-field">
-      <label>Nombre completo</label>
-      <input type="text" id="cf-nombre" placeholder="Tu nombre..." autocomplete="name">
+      <label>${s.coachNameLabel}</label>
+      <input type="text" id="cf-nombre" placeholder="${s.coachNamePlaceholder}" autocomplete="name">
     </div>
     <div class="coach-field">
-      <label>Correo electrónico</label>
-      <input type="email" id="cf-email" placeholder="tu@email.com" autocomplete="email">
+      <label>${s.coachEmailLabel}</label>
+      <input type="email" id="cf-email" placeholder="${s.coachEmailPlaceholder}" autocomplete="email">
     </div>
     <div class="coach-field">
-      <label>Número de teléfono</label>
-      <input type="tel" id="cf-telefono" placeholder="+1 000 000 0000" autocomplete="tel">
+      <label>${s.coachPhoneLabel}</label>
+      <input type="tel" id="cf-telefono" placeholder="${s.coachPhonePlaceholder}" autocomplete="tel">
     </div>
-    <button class="btn-primary" style="margin-top:.5rem;" onclick="submitCoachForm(this)">ENVIAR MI INFORMACIÓN →</button>
+    <button class="btn-primary" style="margin-top:.5rem;" onclick="submitCoachForm(this)">${s.coachSubmitBtn}</button>
     <div id="cf-error" class="coach-error-msg"></div>
   `;
   btn.closest('.download-row').insertAdjacentElement('afterend', form);
@@ -2138,18 +2332,19 @@ async function submitCoachForm(btn) {
   const email    = document.getElementById('cf-email').value.trim();
   const telefono = document.getElementById('cf-telefono').value.trim();
   const errEl    = document.getElementById('cf-error');
+  const s        = STRINGS[currentLang];
 
   if (!nombre || !email || !telefono) {
-    errEl.textContent = 'Por favor completa los tres campos.';
+    errEl.textContent = s.coachErrFields;
     return;
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errEl.textContent = 'Por favor ingresa un correo válido.';
+    errEl.textContent = s.coachErrEmail;
     return;
   }
 
   btn.disabled = true;
-  btn.textContent = 'Enviando...';
+  btn.textContent = s.coachSendingBtn;
   errEl.textContent = '';
 
   try {
@@ -2168,24 +2363,22 @@ async function submitCoachForm(btn) {
         valores:    state.rankedValues    || [],
         pasion:     state.passionStatement|| '',
         fortalezas: state.activeStrengths || [],
-        valorUnico: state.uvStatement     || ''
+        valorUnico: state.uvStatement     || '',
+        lang:       currentLang
       })
     });
 
     if (res.ok) {
       document.getElementById('coach-form-inline').innerHTML = `
-        <div class="coach-success">
-          ✦ ¡Gracias, ${nombre}! Nos pondremos en contacto contigo pronto.<br>
-          <span style="font-size:.8rem;opacity:.7;font-weight:400;margin-top:.3rem;display:block;">Revisa tu correo ${email} — te enviamos una copia de tu propósito.</span>
-        </div>`;
+        <div class="coach-success">${s.coachSuccessMsg(nombre, email)}</div>`;
     } else {
       throw new Error('Error del servidor');
     }
   } catch(e) {
     console.error('Email error:', e);
-    errEl.textContent = 'Hubo un error al enviar. Por favor intenta de nuevo.';
+    errEl.textContent = s.coachErrSend;
     btn.disabled = false;
-    btn.textContent = 'ENVIAR MI INFORMACIÓN →';
+    btn.textContent = s.coachSubmitBtn;
   }
 }
 
@@ -2341,6 +2534,8 @@ window.addEventListener('load', () => {
       document.getElementById('resumeBanner').style.display = 'flex';
     }
   } catch(e) {}
+  // Auto-detect language AFTER all existing load logic
+  autoDetectLanguage();
 });
 </script>
 </body>
