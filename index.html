@@ -802,8 +802,272 @@ function setLanguage(lang) {
     document.getElementById('stepBadge').textContent = `${s.stepOf.replace('{n}', currentStep)} · ${s.stepLabels[currentStep]}`;
   }
 
+  // Update all static step content
+  updateStepContent(lang);
+
   // Persist language choice
   try { sessionStorage.setItem('thelab-lang', lang); } catch(e) {}
+}
+
+// Updates all static step HTML text — additive, only touches textContent/innerHTML of text nodes
+function updateStepContent(lang) {
+  const isEN = lang === 'en';
+
+  // Helper: safely set textContent if element exists
+  function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+  function setHTML(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  }
+  // Helper: set text on first matching selector
+  function setQueryText(sel, text) {
+    const el = document.querySelector(sel);
+    if (el) el.textContent = text;
+  }
+  function setQueryHTML(sel, html) {
+    const el = document.querySelector(sel);
+    if (el) el.innerHTML = html;
+  }
+  function setAttr(sel, attr, val) {
+    const el = document.querySelector(sel);
+    if (el) el.setAttribute(attr, val);
+  }
+
+  // ── STEP 1 ──────────────────────────────────────────
+  setQueryText('#screen-1 .step-label', isEN ? 'Step 1 of 6' : 'Paso 1 de 6');
+  setQueryHTML('#screen-1 .step-title', isEN ? 'Your <span>Location</span>' : 'Tu <span>Ubicación</span>');
+  setQueryText('#screen-1 .step-intro', isEN
+    ? 'Before plotting any route, you need to know exactly where you are. Without this honest diagnosis, any direction becomes noise.'
+    : 'Antes de trazar cualquier ruta, necesitas saber exactamente dónde estás. Sin este diagnóstico honesto, cualquier dirección se convierte en ruido.');
+  setQueryHTML('#screen-1 .quote-block p', isEN
+    ? '"To develop your potential, you must know where you want to go and where you are now."'
+    : '"Para desarrollar tu potencial, debes saber dónde quieres ir y dónde te encuentras ahora."');
+  setQueryText('#screen-1 .card-title', isEN ? 'Reflection question' : 'Pregunta de reflexión');
+  setQueryText('#screen-1 .question-text', isEN
+    ? 'At this moment in your life, why do you feel it is important to discover your purpose?'
+    : 'En este momento de tu vida, ¿por qué sientes que es importante descubrir tu propósito?');
+  setAttr('#why-answer', 'placeholder', isEN
+    ? 'Write honestly. There is no right or wrong answer...'
+    : 'Escribe con honestidad. No hay respuesta correcta o incorrecta...');
+  setQueryText('#screen-1 .btn-primary', isEN ? 'CONTINUE →' : 'CONTINUAR →');
+
+  // Location options
+  const locBtns = document.querySelectorAll('#screen-1 .loc-btn');
+  if (locBtns.length >= 3) {
+    locBtns[0].querySelector('.loc-label').textContent = isEN ? 'Confused' : 'Confundido';
+    locBtns[0].querySelector('.loc-desc').textContent  = isEN ? "I don't know what I'd like to do" : 'No sé lo que me gustaría hacer';
+    locBtns[1].querySelector('.loc-label').textContent = isEN ? 'Frustrated' : 'Frustrado';
+    locBtns[1].querySelector('.loc-desc').textContent  = isEN ? 'I know what I want but I don\'t do it' : 'Sé lo que quiero, pero no lo hago';
+    locBtns[2].querySelector('.loc-label').textContent = isEN ? 'Fulfilled' : 'Realizado';
+    locBtns[2].querySelector('.loc-desc').textContent  = isEN ? 'I know what I want and I do it' : 'Sé lo que quiero y lo hago';
+  }
+  setAttr('#followup-answer', 'placeholder', isEN ? 'Your answer...' : 'Tu respuesta...');
+  setQueryText('#btn-to-step2 .btn-primary', isEN ? 'NEXT: YOUR IDENTITY →' : 'SIGUIENTE: TU IDENTIDAD →');
+
+  // ── STEP 2 ──────────────────────────────────────────
+  setQueryText('#screen-2 .step-label', isEN ? 'Step 2 of 6' : 'Paso 2 de 6');
+  setQueryHTML('#screen-2 .step-title', isEN ? 'Your <span>Identity</span>' : 'Tu <span>Identidad</span>');
+  setQueryText('#screen-2 .step-intro', isEN
+    ? 'Your identity is not defined by what you admire in others — it is revealed in the decisions you have made, the values you do not negotiate, and the moments when you were completely yourself.'
+    : 'Tu identidad no se define por lo que admiras en otros — se revela en las decisiones que has tomado, los valores que no negocias, y los momentos donde fuiste completamente tú mismo.');
+  setQueryHTML('#screen-2 .quote-block p', isEN
+    ? '"Create the highest possible vision based on your identity, because you become what you believe, not what you know."'
+    : '"Crea la más alta visión posible basada en tu identidad, porque te conviertes en lo que crees, no en lo que sabes."');
+  setQueryText('#btn-to-step3 .btn-primary', isEN ? 'NEXT: YOUR PASSION →' : 'SIGUIENTE: TU PASIÓN →');
+
+  // ── STEP 3 ──────────────────────────────────────────
+  setQueryText('#screen-3 .step-label', isEN ? 'Step 3 of 6' : 'Paso 3 de 6');
+  setQueryHTML('#screen-3 .step-title', isEN ? 'Your <span>Passion</span>' : 'Tu <span>Pasión</span>');
+  setQueryText('#screen-3 .step-intro', isEN
+    ? 'Passion is not a superficial emotion. It is internal direction. It is the force that connects what moves you with what you are capable of doing.'
+    : 'La pasión no es emoción superficial. Es dirección interna. Es la fuerza que conecta lo que te mueve con lo que eres capaz de hacer.');
+  setQueryHTML('#screen-3 .quote-block p', isEN
+    ? '"The courage of a great leader to fulfill their vision comes from passion, not position."'
+    : '"El coraje de un gran líder para cumplir su visión proviene de la pasión, no de la posición."');
+
+  // Passion question cards
+  const pq1card = document.getElementById('passion-q1-card');
+  if (pq1card) {
+    pq1card.querySelector('.territory-tag').textContent = isEN ? 'Real Experience' : 'Experiencia Real';
+    pq1card.querySelector('.question-text').textContent = isEN
+      ? 'When have you helped someone or contributed to something and felt you were exactly where you were meant to be? Describe that moment.'
+      : '¿Cuándo has ayudado a alguien o contribuido a algo y sentiste que estabas exactamente donde debías estar? Describe ese momento.';
+    pq1card.querySelector('textarea').placeholder = isEN
+      ? 'Be specific. What were you doing? How did you feel? What impact did you generate?...'
+      : 'Sé específico. ¿Qué estabas haciendo? ¿Cómo te sentiste? ¿Qué impacto generaste?...';
+  }
+  const pq2card = document.getElementById('passion-q2-card');
+  if (pq2card) {
+    pq2card.querySelector('.territory-tag').textContent = isEN ? 'Connected Pain' : 'Dolor Conectado';
+    pq2card.querySelector('.question-text').textContent = isEN
+      ? 'What hurts you most to see in the world, in your community, or in the people around you?'
+      : '¿Qué es lo que más te duele ver en el mundo, en tu comunidad, o en las personas que te rodean?';
+    pq2card.querySelector('textarea').placeholder = isEN
+      ? "Don't think about generic injustices. What specific pain moves you to want to do something?..."
+      : 'No pienses en injusticias genéricas. ¿Qué dolor específico te mueve a querer hacer algo?...';
+  }
+  const pq3card = document.getElementById('passion-q3-card');
+  if (pq3card) {
+    pq3card.querySelector('.territory-tag').textContent = isEN ? 'Future Vision' : 'Visión Futura';
+    pq3card.querySelector('.question-text').textContent = isEN
+      ? 'What do you dream of doing or building? What do you envision yourself doing in the future?'
+      : '¿Qué sueñas hacer o construir? ¿Qué te visualizas haciendo en el futuro?';
+    pq3card.querySelector('textarea').placeholder = isEN
+      ? 'Imagine there are no obstacles. What would you be building or doing?...'
+      : 'Imagina que no hay obstáculos. ¿Qué estarías construyendo o haciendo?...';
+  }
+  const passionBtn = document.getElementById('passion-submit-btn');
+  if (passionBtn) passionBtn.textContent = isEN ? 'DISCOVER MY PASSION →' : 'DESCUBRIR MI PASIÓN →';
+
+  const passionLabel = document.querySelector('.passion-label');
+  if (passionLabel) passionLabel.textContent = isEN ? '✦ My Passion Statement' : '✦ Tu Declaración de Pasión';
+
+  // ── STEP 4 ──────────────────────────────────────────
+  setQueryText('#screen-4 .step-label', isEN ? 'Step 4 of 6' : 'Paso 4 de 6');
+  setQueryHTML('#screen-4 .step-title', isEN ? 'Your <span>Strengths</span>' : 'Tus <span>Fortalezas</span>');
+  setQueryText('#screen-4 .step-intro', isEN
+    ? 'Your strengths are not just things you do well. They are patterns. They are the way you naturally generate results in others. When you understand them well, you stop forcing yourself and start operating from your design.'
+    : 'Tus fortalezas no son solo cosas que haces bien. Son patrones. Son la manera en la que naturalmente generas resultados en otros. Cuando las entiendes bien, dejas de forzarte y empiezas a operar desde tu diseño.');
+  const insightBox = document.querySelector('#screen-4 .insight-box');
+  if (insightBox) insightBox.innerHTML = isEN
+    ? `<strong>Key Idea</strong>Not everyone wins the same way. Some advance by making decisions. Others by connecting people. Others by sustaining processes. Others by bringing order and clarity. The question is not: "What am I good at?" — the real question is: <strong>"How do I naturally generate value?"</strong>`
+    : `<strong>Idea Clave</strong>No todos ganamos de la misma manera. Algunos avanzan tomando decisiones. Otros conectando personas. Otros sosteniendo procesos. Otros trayendo orden y claridad. La pregunta no es: "¿En qué soy bueno?" — la verdadera pregunta es: <strong>"¿Cómo genero valor de forma natural?"</strong>`;
+
+  // Strength scenarios
+  const s4cards = document.querySelectorAll('#strength-scenarios .card');
+  if (s4cards.length >= 2) {
+    s4cards[0].querySelector('.card-title').innerHTML = isEN ? 'Scenario <span>1</span> — The Elevator' : 'Escenario <span>1</span> — El Ascensor';
+    s4cards[0].querySelector('.question-text').textContent = isEN
+      ? 'If you enter an elevator with strangers, what do you naturally do?'
+      : 'Si entras a un ascensor con personas desconocidas, ¿qué haces naturalmente?';
+    const elevBtns = s4cards[0].querySelectorAll('.loc-btn');
+    if (elevBtns.length >= 2) {
+      elevBtns[0].querySelector('.loc-label').textContent = isEN ? 'Option A' : 'Opción A';
+      elevBtns[0].querySelector('.loc-desc').textContent  = isEN ? 'You enter with presence — you comment something, interact, seek connection' : 'Entras con presencia — comentas algo, interactúas, buscas conexión';
+      elevBtns[1].querySelector('.loc-label').textContent = isEN ? 'Option B' : 'Opción B';
+      elevBtns[1].querySelector('.loc-desc').textContent  = isEN ? 'You stay reserved — focused on your own things, no interaction' : 'Te mantienes reservado — enfocado en lo tuyo, sin interacción';
+    }
+    s4cards[1].querySelector('.card-title').innerHTML = isEN ? 'Scenario <span>2</span> — The Trip' : 'Escenario <span>2</span> — El Viaje';
+    s4cards[1].querySelector('.question-text').textContent = isEN
+      ? 'If you are about to take a trip, what excites you most when preparing?'
+      : 'Si vas a hacer un viaje, ¿qué te emociona más al prepararte?';
+    const tripBtns = s4cards[1].querySelectorAll('.loc-btn');
+    if (tripBtns.length >= 2) {
+      tripBtns[0].querySelector('.loc-label').textContent = isEN ? 'Option A' : 'Opción A';
+      tripBtns[0].querySelector('.loc-desc').textContent  = isEN ? 'Having everything organized and under control — itinerary, logistics, details' : 'Tener todo organizado y bajo control — itinerario, logística, detalles';
+      tripBtns[1].querySelector('.loc-label').textContent = isEN ? 'Option B' : 'Opción B';
+      tripBtns[1].querySelector('.loc-desc').textContent  = isEN ? 'The experience, the people and the moments — what will be lived' : 'La experiencia, las personas y los momentos — lo que se va a vivir';
+    }
+  }
+  setQueryText('#btn-to-step5 .btn-primary', isEN ? 'NEXT: YOUR UNIQUE VALUE →' : 'SIGUIENTE: TU VALOR ÚNICO →');
+
+  // ── STEP 5 ──────────────────────────────────────────
+  setQueryText('#screen-5 .step-label', isEN ? 'Step 5 of 6' : 'Paso 5 de 6');
+  setQueryHTML('#screen-5 .step-title', isEN ? 'Your <span>Unique Value</span>' : 'Tu <span>Valor Único</span>');
+  setQueryText('#screen-5 .step-intro', isEN
+    ? 'Your value is not in what you do. It is in the problem you can solve for others — in a way that no one else can replicate exactly.'
+    : 'Tu valor no está en lo que haces. Está en el problema que puedes resolver para otros — de una manera que nadie más puede replicar exactamente igual.');
+  setQueryHTML('#screen-5 .quote-block p', isEN
+    ? '"Do what you can, with what you have, from where you are."'
+    : '"Haz lo que puedas, con lo que tengas, desde donde estés."');
+
+  const uvCards = document.querySelectorAll('#screen-5 .card');
+  const uvData = isEN ? [
+    ['Define who you serve', 'What type of person, group or organization do you feel most inclined to help?', "Don't think about 'everyone'. Be specific — individuals, organizations, families, communities, your industry..."],
+    ['Identify the real problem', 'What problem, pain or need do you see repeatedly in those people?', "Value doesn't start with what you do. It starts with what others need..."],
+    ['Connect your strengths', 'How would you use these strengths to help solve that problem?', 'This is where everything before makes sense...'],
+    ['Define the result', 'What concrete change or result do people experience after you intervene?', "People don't look for services… they look for results. What is yours?..."]
+  ] : [
+    ['Define a quién sirves', '¿A qué tipo de persona, grupo u organización sientes una mayor inclinación a ayudar?', "No pienses en 'todo el mundo'. Sé específico — individuos, organizaciones, familias, comunidades, tu industria..."],
+    ['Identifica el problema real', '¿Qué problema, dolor o necesidad ves repetidamente en esas personas?', 'El valor no empieza con lo que haces. Empieza con lo que otros necesitan...'],
+    ['Conecta tus fortalezas', '¿Cómo usarías estas fortalezas para ayudar a resolver ese problema?', 'Aquí es donde todo lo anterior cobra sentido...'],
+    ['Define el resultado', '¿Qué cambio o resultado concreto experimentan las personas después de que tú intervienes?', 'La gente no busca servicios… busca resultados. ¿Cuál es el tuyo?...']
+  ];
+  uvCards.forEach((card, i) => {
+    if (uvData[i]) {
+      const tag = card.querySelector('.territory-tag');
+      const qt = card.querySelector('.question-text');
+      const ta = card.querySelector('textarea');
+      if (tag) tag.textContent = uvData[i][0];
+      if (qt) qt.textContent = uvData[i][1];
+      if (ta) ta.placeholder = uvData[i][2];
+    }
+  });
+  const uvSubmitBtn = document.getElementById('uv-submit-btn');
+  if (uvSubmitBtn) uvSubmitBtn.textContent = isEN ? 'DEFINE MY UNIQUE VALUE →' : 'DEFINIR MI VALOR ÚNICO →';
+  setQueryText('#uv-result .uv-label', isEN ? 'Your Unique Value' : 'Tu Valor Único');
+
+  // ── STEP 6 ──────────────────────────────────────────
+  setQueryText('#screen-6 .step-label', isEN ? 'Step 6 of 6' : 'Paso 6 de 6');
+  setQueryHTML('#screen-6 .step-title', isEN ? 'Your <span>Purpose</span>' : 'Tu <span>Propósito</span>');
+  setQueryText('#screen-6 .step-intro', isEN
+    ? 'You have reached the moment to integrate everything. Your purpose is not something you found — it is something you designed through who you are, what moves you, and the value you generate in others.'
+    : 'Llegaste al momento de integrar todo. Tu propósito no es algo que encontraste — es algo que diseñaste a través de quién eres, lo que te mueve y el valor que generas en otros.');
+
+  const formulaParts = document.querySelectorAll('.formula-part');
+  if (formulaParts.length >= 4) {
+    formulaParts[0].textContent = isEN ? 'Your Passion' : 'Tu Pasión';
+    formulaParts[1].textContent = isEN ? 'Your Strengths' : 'Tus Fortalezas';
+    formulaParts[2].textContent = isEN ? 'Your Unique Value' : 'Tu Valor Único';
+    formulaParts[3].textContent = isEN ? 'YOUR PURPOSE' : 'TU PROPÓSITO';
+  }
+  setQueryText('#purpose-generating .ai-label', isEN ? 'Integrating your process...' : 'Integrando tu proceso...');
+  setQueryText('.purpose-label', isEN ? '✦ My Life Purpose' : '✦ Tu Propósito de Vida');
+  setQueryText('#screen-6 > p', isEN
+    ? 'You can adjust the text until it resonates completely with you.'
+    : 'Puedes ajustar el texto hasta que resuene completamente contigo.');
+  setQueryText('#screen-6 .btn-primary', isEN ? '✦ THIS IS MY PURPOSE →' : '✦ ESTE ES MI PROPÓSITO →');
+
+  // Download button
+  const dlBtn = document.querySelector('.download-row .btn-secondary');
+  if (dlBtn) dlBtn.textContent = isEN ? '📄 Download Summary' : '📄 Descargar Resumen';
+  const dlHint = document.querySelector('.cta-coach > p + p, .download-row + p');
+  if (dlHint) dlHint.innerHTML = isEN
+    ? 'After downloading, open the file and use <strong>File → Print → Save as PDF</strong>'
+    : 'Al descargar, abre el archivo y usa <strong>Archivo → Imprimir → Guardar como PDF</strong>';
+
+  // CTA coach section
+  setQueryText('.cta-coach h4', isEN ? 'Ready to go deeper?' : '¿Listo para ir más profundo?');
+  setQueryText('.cta-coach p', isEN
+    ? 'The next step is to work one-on-one with a The Lab coach to turn your purpose into concrete decisions and actions.'
+    : 'El siguiente paso es trabajar uno a uno con un coach de The Lab para convertir tu propósito en decisiones y acciones concretas.');
+  const coachBtn = document.querySelector('.cta-coach .btn-primary.btn-sm');
+  if (coachBtn) coachBtn.textContent = isEN ? 'Talk to a Coach →' : 'Hablar con un Coach →';
+
+  // Restart button
+  setQueryText('[onclick="restartTool()"]', isEN ? 'Start over' : 'Comenzar de nuevo');
+
+  // Mantra section labels (if visible)
+  setQueryText('.mantra-eyebrow', isEN ? '⚡ Your Purpose in One Sentence' : '⚡ Tu Propósito en Una Frase');
+  setQueryText('.mantra-hint', isEN
+    ? 'A short version to carry with you and remember every day.'
+    : 'Una versión corta para llevar contigo y recordar cada día.');
+  setQueryText('.mantra-footer', isEN
+    ? 'You can adjust the phrase until it resonates completely with you.'
+    : 'Puedes ajustar la frase hasta que resuene completamente contigo.');
+
+  // Next steps list
+  const nextStepItems = document.querySelectorAll('.next-step-item');
+  const nextStepsEN = [
+    'Keep your purpose visible — write it where you see it every day.',
+    'Identify ONE decision this week aligned with your purpose.',
+    'Share your purpose with someone you trust.',
+    'Work with a coach to turn it into a concrete action plan.'
+  ];
+  const nextStepsES = [
+    'Mantén tu propósito visible — escríbelo donde lo veas cada día.',
+    'Identifica UNA decisión esta semana alineada con tu propósito.',
+    'Comparte tu propósito con alguien de confianza.',
+    'Trabaja con un coach para convertirlo en un plan concreto.'
+  ];
+  nextStepItems.forEach((item, i) => {
+    const textNode = item.lastChild;
+    const steps = isEN ? nextStepsEN : nextStepsES;
+    if (steps[i] && textNode) textNode.textContent = steps[i];
+  });
 }
 
 // Auto-detect language from browser
@@ -893,10 +1157,56 @@ const IDENTITY_QUESTIONS = [
   }
 ];
 
+// English version of identity questions (additive — originals untouched)
+const IDENTITY_QUESTIONS_EN = [
+  {
+    territory: 'Learning + Relationship',
+    q1: 'Who was the most memorable teacher in your life and what did they teach you — not necessarily about their subject, but about life?',
+    q2: 'Is there a moment where you have been that kind of guide or influence for someone else?',
+    p1: 'Tell me about that person and what left a mark...',
+    p2: 'Describe that moment...'
+  },
+  {
+    territory: 'Values in Conflict + Decision',
+    q1: 'What is your favorite film or story and what is the moment of greatest tension in it — that instant where the character has to choose between two important things?',
+    q2: 'Have you lived something similar in your own life? What did you choose and why?',
+    p1: 'The film/story and the moment of tension...',
+    p2: 'Your similar personal experience...'
+  },
+  {
+    territory: 'Loyalty + Conviction',
+    q1: 'What was the most valuable thing your parents or those who raised you left you — not in words, but in how they lived?',
+    q2: 'Is there something you would not do today even if it cost you opportunities, because it would go against what they instilled in you?',
+    p1: 'What you saw in how they lived, not what they said...',
+    p2: 'Something you would not do regardless of the cost...'
+  },
+  {
+    territory: 'Impact + Authenticity',
+    q1: 'Who do you admire… and what part of their life reveals something you are not yet living yourself?',
+    q2: 'In what moments of your life have you felt most free, without needing to impress anyone?',
+    p1: 'Who they are and what it reveals about what you are not yet living...',
+    p2: 'Those moments of authentic freedom...'
+  },
+  {
+    territory: 'Contribution + Legacy',
+    q1: 'What lessons do you want to make sure your children — current or future — incorporate into their lives, and why those specifically?',
+    q2: null,
+    p1: 'The lessons and the why behind each one...',
+    p2: null
+  }
+];
+
 const FOLLOWUP_QUESTIONS = {
   confundido: '¿Qué área de tu vida necesita más claridad y dirección en este momento? — tu carrera, tus relaciones, tu propósito personal, o algo más?',
   frustrado: '¿Qué crees que te ha impedido actuar sobre lo que ya sabes que quieres?',
   realizado: '¿Qué te permitió llegar aquí? ¿Hay alguna área donde sientes que tu vida se puede direccionar mejor?'
+};
+
+// English followup questions (additive)
+const FOLLOWUP_QUESTIONS_EN = {
+  confundido: 'What area of your life needs more clarity and direction right now? — your career, your relationships, your personal purpose, or something else?',
+  frustrado: 'What do you think has prevented you from acting on what you already know you want?',
+  realizado: 'What allowed you to get here? Is there any area where you feel your life could have better direction?'
 };
 
 const STRENGTH_PROFILES = {
@@ -926,9 +1236,44 @@ const STRENGTH_PROFILES = {
   }
 };
 
-// ===========================
-// API CALL
-// ===========================
+// English strength profiles (additive)
+const STRENGTH_PROFILES_EN = {
+  rojo: {
+    name:'RED', emoji:'🔴', tagline:'You Generate Momentum',
+    description:'You make decisions when others hesitate. You act quickly. You face the difficult. You focus on results.',
+    best:'At your best: you move people to action.',
+    strengths:['Self-confidence','Decisiveness','Results-oriented','Productive under pressure','Immediate action']
+  },
+  amarillo: {
+    name:'YELLOW', emoji:'🟡', tagline:'You Generate Energy',
+    description:'You connect easily with people. You communicate with impact. You motivate environments. You inspire others.',
+    best:'At your best: you activate and inspire others.',
+    strengths:['Socializing','Communication','Adaptability','Optimism','Influence','Motivation']
+  },
+  azul: {
+    name:'BLUE', emoji:'🔵', tagline:'You Generate Clarity',
+    description:'You analyze before acting. You organize and structure. You raise standards. You care for details.',
+    best:'At your best: you bring order and precision.',
+    strengths:['Deep analysis','Organization','Quality focus','Precision','Attention to detail','Systematization']
+  },
+  verde: {
+    name:'GREEN', emoji:'🟢', tagline:'You Generate Stability',
+    description:'You listen deeply. You build trust. You sustain relationships. You accompany processes.',
+    best:'At your best: you provide security and sustain others.',
+    strengths:['Reliability','Loyalty','Systematic','Listening ability','Mediation','Accompaniment']
+  }
+};
+
+// Language-aware data accessors (additive)
+function getIdentityQuestions() {
+  return currentLang === 'en' ? IDENTITY_QUESTIONS_EN : IDENTITY_QUESTIONS;
+}
+function getFollowupQuestions() {
+  return currentLang === 'en' ? FOLLOWUP_QUESTIONS_EN : FOLLOWUP_QUESTIONS;
+}
+function getStrengthProfiles() {
+  return currentLang === 'en' ? STRENGTH_PROFILES_EN : STRENGTH_PROFILES;
+}
 async function callClaude(prompt, systemPrompt) {
   const sys = systemPrompt || STRINGS[currentLang].aiSystem;
   
@@ -1023,7 +1368,7 @@ function selectLocation(type, btnEl) {
 
   const fs = document.getElementById('followup-section');
   fs.style.display = 'block';
-  document.getElementById('followup-question').textContent = FOLLOWUP_QUESTIONS[type];
+  document.getElementById('followup-question').textContent = getFollowupQuestions()[type];
   document.getElementById('followup-answer').value = '';
   document.getElementById('location-ai-response').innerHTML = '';
   document.getElementById('btn-to-step2').style.display = 'none';
@@ -1081,7 +1426,8 @@ Ofrece un diagnóstico honesto y personalizado (3-4 oraciones) que:
 // ===========================
 function renderIdentityQuestion(idx) {
   currentQIndex = idx;
-  const q = IDENTITY_QUESTIONS[idx];
+  const q = getIdentityQuestions()[idx];
+  const s = STRINGS[currentLang];
 
   // Update progress dots
   for (let i = 0; i < 5; i++) {
@@ -1110,7 +1456,7 @@ function renderIdentityQuestion(idx) {
 }
 
 async function submitIdentityQuestion(idx) {
-  const q = IDENTITY_QUESTIONS[idx];
+  const q = getIdentityQuestions()[idx];
   const p1 = document.getElementById('iq-p1').value.trim();
   const p2 = q.q2 ? document.getElementById('iq-p2').value.trim() : '';
   if (!p1) return alert('Por favor responde la primera pregunta.');
@@ -1461,19 +1807,23 @@ function determineStrengthColor() {
   else if (e === 'reservado' && t === 'personas') color = 'verde';
 
   state.strengthColor = color;
-  state.activeStrengths = [...STRENGTH_PROFILES[color].strengths];
+  state.activeStrengths = [...getStrengthProfiles()[color].strengths];
 
   const section = document.getElementById('strength-result-section');
   section.style.display = 'block';
 
-  const profile = STRENGTH_PROFILES[color];
+  const profile = getStrengthProfiles()[color];
+  const profileLabel = currentLang === 'en' ? 'Your Profile' : 'Tu Perfil';
+  const profileReminder = currentLang === 'en'
+    ? 'Remember: you have traits from all profiles, but this is your dominant tendency.'
+    : 'Recuerda: tienes rasgos de todos los perfiles, pero este es tu tendencia dominante.';
   document.getElementById('strength-color-display').innerHTML = `
     <div class="insight-box fade-in">
-      <strong>${profile.emoji} Tu Perfil: ${profile.name} — ${profile.tagline}</strong>
+      <strong>${profile.emoji} ${profileLabel}: ${profile.name} — ${profile.tagline}</strong>
       ${profile.description}<br><br>
       <em>${profile.best}</em>
     </div>
-    <p style="font-size:.82rem;color:var(--gray-5);margin-bottom:.5rem;">Recuerda: tienes rasgos de todos los perfiles, pero este es tu tendencia dominante.</p>
+    <p style="font-size:.82rem;color:var(--gray-5);margin-bottom:.5rem;">${profileReminder}</p>
   `;
 
   renderStrengthPanel(color);
@@ -1481,22 +1831,23 @@ function determineStrengthColor() {
 }
 
 function renderStrengthPanel(color) {
-  const profile = STRENGTH_PROFILES[color];
+  const profile = getStrengthProfiles()[color];
   const panelEl = document.getElementById('strength-panel-area');
+  const isEN = currentLang === 'en';
 
   // FASE A: Bullet list + remove chips
   panelEl.innerHTML = `
     <div class="strength-panel fade-in" id="sp-phase-a">
-      <div class="strength-panel-title">Estas son tus fortalezas dominantes</div>
+      <div class="strength-panel-title">${isEN ? 'These are your dominant strengths' : 'Estas son tus fortalezas dominantes'}</div>
       <p style="font-size:.85rem;color:var(--gray-5);margin-bottom:.75rem;line-height:1.5;">
-        Basado en tu perfil <strong>${profile.emoji} ${profile.name}</strong>, estas son las fortalezas que más te definen naturalmente:
+        ${isEN ? `Based on your <strong>${profile.emoji} ${profile.name}</strong> profile, these are the strengths that most naturally define you:` : `Basado en tu perfil <strong>${profile.emoji} ${profile.name}</strong>, estas son las fortalezas que más te definen naturalmente:`}
       </p>
       <ul style="margin:.5rem 0 1rem 1rem;display:flex;flex-direction:column;gap:.4rem;">
         ${state.activeStrengths.map(s => `
           <li style="font-size:.92rem;color:var(--black);font-weight:500;">${s}</li>`).join('')}
       </ul>
       <div style="background:var(--yellow);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:.85rem;font-weight:600;color:var(--black);">
-        ¿Alguna de estas <strong>no te representa</strong>? Tócala para eliminarla.
+        ${isEN ? 'Does any of these <strong>not represent you</strong>? Tap it to remove it.' : '¿Alguna de estas <strong>no te representa</strong>? Tócala para eliminarla.'}
       </div>
       <div class="strength-chips" id="strength-chips-container">
         ${state.activeStrengths.map(s => `
@@ -1505,20 +1856,22 @@ function renderStrengthPanel(color) {
           </button>`).join('')}
       </div>
       <div class="btn-row" style="margin-top:1rem;">
-        <button class="btn-primary" onclick="renderStrengthPhaseB('${color}')">VER OTRAS FORTALEZAS →</button>
+        <button class="btn-primary" onclick="renderStrengthPhaseB('${color}')">${isEN ? 'SEE OTHER STRENGTHS →' : 'VER OTRAS FORTALEZAS →'}</button>
       </div>
     </div>
   `;
 }
 
 function renderStrengthPhaseB(color) {
-  const otherColors = Object.keys(STRENGTH_PROFILES).filter(c => c !== color);
+  const profiles = getStrengthProfiles();
+  const otherColors = Object.keys(profiles).filter(c => c !== color);
   const panelEl = document.getElementById('strength-panel-area');
+  const isEN = currentLang === 'en';
 
   // Collect all strengths from other profiles, excluding already active
   const otherStrengths = [];
   otherColors.forEach(c => {
-    const p = STRENGTH_PROFILES[c];
+    const p = profiles[c];
     p.strengths.forEach(s => {
       if (!state.activeStrengths.includes(s)) {
         otherStrengths.push({value: s, color: c, name: p.name, emoji: p.emoji});
@@ -1528,7 +1881,7 @@ function renderStrengthPhaseB(color) {
 
   // FASE B: Pick from other colors
   const groupedHtml = otherColors.map(c => {
-    const p = STRENGTH_PROFILES[c];
+    const p = profiles[c];
     const cStrengths = otherStrengths.filter(s => s.color === c);
     if (!cStrengths.length) return '';
     return `
@@ -1551,13 +1904,13 @@ function renderStrengthPhaseB(color) {
   // Append phase B below phase A (keep phase A visible)
   document.getElementById('sp-phase-a').insertAdjacentHTML('afterend', `
     <div class="strength-panel fade-in" id="sp-phase-b" style="margin-top:.75rem;">
-      <div class="strength-panel-title">Fortalezas de otros perfiles</div>
+      <div class="strength-panel-title">${isEN ? 'Strengths from other profiles' : 'Fortalezas de otros perfiles'}</div>
       <p style="font-size:.85rem;color:var(--gray-5);margin-bottom:.75rem;line-height:1.5;">
-        ¿Ves algo aquí que sí te representa? Toca para agregarlo a tu perfil.
+        ${isEN ? 'Do you see something here that represents you? Tap to add it to your profile.' : '¿Ves algo aquí que sí te representa? Toca para agregarlo a tu perfil.'}
       </p>
       ${groupedHtml}
       <div class="btn-row" style="margin-top:.5rem;">
-        <button class="btn-primary" onclick="renderStrengthPhaseC()">AGREGAR MIS PROPIAS →</button>
+        <button class="btn-primary" onclick="renderStrengthPhaseC()">${isEN ? 'ADD MY OWN →' : 'AGREGAR MIS PROPIAS →'}</button>
       </div>
     </div>
   `);
@@ -1598,16 +1951,17 @@ function toggleOtherStrength(el, value) {
 function renderStrengthPhaseC() {
   const existing = document.getElementById('sp-phase-c');
   if (existing) { existing.scrollIntoView({behavior:'smooth'}); return; }
+  const isEN = currentLang === 'en';
 
   document.getElementById('sp-phase-b').insertAdjacentHTML('afterend', `
     <div class="strength-panel fade-in" id="sp-phase-c" style="margin-top:.75rem;">
-      <div class="strength-panel-title">¿Algo que no está en la lista?</div>
+      <div class="strength-panel-title">${isEN ? 'Something not on the list?' : '¿Algo que no está en la lista?'}</div>
       <p style="font-size:.85rem;color:var(--gray-5);margin-bottom:.75rem;line-height:1.5;">
-        Si hay una fortaleza tuya que no aparece en ningún perfil, escríbela aquí.
+        ${isEN ? 'If there is a strength of yours that does not appear in any profile, write it here.' : 'Si hay una fortaleza tuya que no aparece en ningún perfil, escríbela aquí.'}
       </p>
       <div class="add-strength-row">
-        <input type="text" class="add-strength-input" id="new-strength-input" placeholder="Ej: Creatividad, Resiliencia..." maxlength="30">
-        <button class="add-btn" onclick="addCustomStrength()">+ Agregar</button>
+        <input type="text" class="add-strength-input" id="new-strength-input" placeholder="${isEN ? 'e.g. Creativity, Resilience...' : 'Ej: Creatividad, Resiliencia...'}" maxlength="30">
+        <button class="add-btn" onclick="addCustomStrength()">+ ${isEN ? 'Add' : 'Agregar'}</button>
       </div>
       <div id="custom-added-list" style="margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.35rem;"></div>
       <div class="btn-row" style="margin-top:1rem;">
@@ -1655,6 +2009,7 @@ function addCustomStrength() {
 function showFinalStrengthConfirmation() {
   const existing = document.getElementById('sp-phase-final');
   if (existing) existing.remove();
+  const isEN = currentLang === 'en';
 
   const finalList = state.activeStrengths.filter(s => {
     const chip = document.getElementById(`sc-${s.replace(/\s/g,'-')}`);
@@ -1665,15 +2020,15 @@ function showFinalStrengthConfirmation() {
   state.activeStrengths = finalList;
 
   if (finalList.length < 2) {
-    alert('Necesitas al menos 2 fortalezas activas para continuar.');
+    alert(isEN ? 'You need at least 2 active strengths to continue.' : 'Necesitas al menos 2 fortalezas activas para continuar.');
     return;
   }
 
   document.getElementById('sp-phase-c')?.insertAdjacentHTML('afterend', `
     <div class="strength-panel fade-in" id="sp-phase-final" style="margin-top:.75rem;border:2px solid var(--black);">
-      <div class="strength-panel-title" style="color:var(--black);">✦ Tu Lista Final de Fortalezas</div>
+      <div class="strength-panel-title" style="color:var(--black);">✦ ${isEN ? 'Your Final Strengths List' : 'Tu Lista Final de Fortalezas'}</div>
       <p style="font-size:.85rem;color:var(--gray-5);margin-bottom:.75rem;line-height:1.5;">
-        Estas son las fortalezas con las que vas a avanzar. ¿Te representan?
+        ${isEN ? 'These are the strengths you will move forward with. Do they represent you?' : 'Estas son las fortalezas con las que vas a avanzar. ¿Te representan?'}
       </p>
       <ul style="margin:.25rem 0 1rem 1rem;display:flex;flex-direction:column;gap:.5rem;">
         ${finalList.map((s,i) => `
@@ -1682,9 +2037,9 @@ function showFinalStrengthConfirmation() {
             ${s}
           </li>`).join('')}
       </ul>
-      <p style="font-size:.8rem;color:var(--gray-5);margin-bottom:1rem;">Si quieres ajustar algo, regresa arriba y modifica. Si estás listo, continúa.</p>
+      <p style="font-size:.8rem;color:var(--gray-5);margin-bottom:1rem;">${isEN ? 'If you want to adjust something, go back up and modify. If you are ready, continue.' : 'Si quieres ajustar algo, regresa arriba y modifica. Si estás listo, continúa.'}</p>
       <div class="btn-row">
-        <button class="btn-primary" onclick="submitStrengths()">CONFIRMAR Y CONTINUAR →</button>
+        <button class="btn-primary" onclick="submitStrengths()">${isEN ? 'CONFIRM AND CONTINUE →' : 'CONFIRMAR Y CONTINUAR →'}</button>
       </div>
     </div>
   `);
@@ -1705,30 +2060,31 @@ function toggleStrengthChip(el, value) {
 }
 
 async function submitStrengths() {
-  if (state.activeStrengths.length < 2) return alert('Por favor mantén al menos 2 fortalezas activas.');
+  const isEN = currentLang === 'en';
+  if (state.activeStrengths.length < 2) return alert(isEN ? 'Please keep at least 2 active strengths.' : 'Por favor mantén al menos 2 fortalezas activas.');
 
   // Show reflection questions
   const reflEl = document.getElementById('strength-reflection-questions');
   reflEl.style.display = 'block';
   reflEl.innerHTML = `
     <div class="card fade-in">
-      <div class="card-title">Conecta tus fortalezas con tu vida real</div>
+      <div class="card-title">${isEN ? 'Connect your strengths to your real life' : 'Conecta tus fortalezas con tu vida real'}</div>
       <div style="display:flex;flex-direction:column;gap:1rem;margin-top:.5rem;">
         <div>
-          <div class="question-text" style="font-size:.9rem;">¿En qué momentos de tu vida has visto estas fortalezas en acción?</div>
-          <textarea id="sr-q1" placeholder="Una situación específica donde estas fortalezas aparecieron..." rows="2"></textarea>
+          <div class="question-text" style="font-size:.9rem;">${isEN ? 'In what moments of your life have you seen these strengths in action?' : '¿En qué momentos de tu vida has visto estas fortalezas en acción?'}</div>
+          <textarea id="sr-q1" placeholder="${isEN ? 'A specific situation where these strengths appeared...' : 'Una situación específica donde estas fortalezas aparecieron...'}" rows="2"></textarea>
         </div>
         <div>
-          <div class="question-text" style="font-size:.9rem;">¿Qué resultados generaste en otros cuando actuaste desde estas fortalezas?</div>
-          <textarea id="sr-q2" placeholder="El impacto concreto que generaste..." rows="2"></textarea>
+          <div class="question-text" style="font-size:.9rem;">${isEN ? 'What results did you generate in others when you acted from these strengths?' : '¿Qué resultados generaste en otros cuando actuaste desde estas fortalezas?'}</div>
+          <textarea id="sr-q2" placeholder="${isEN ? 'The concrete impact you generated...' : 'El impacto concreto que generaste...'}" rows="2"></textarea>
         </div>
         <div>
-          <div class="question-text" style="font-size:.9rem;">¿Qué tipo de problemas disfrutas resolver cuando estás usando estas fortalezas?</div>
-          <textarea id="sr-q3" placeholder="Los problemas que te energizan resolver..." rows="2"></textarea>
+          <div class="question-text" style="font-size:.9rem;">${isEN ? 'What kind of problems do you enjoy solving when you are using these strengths?' : '¿Qué tipo de problemas disfrutas resolver cuando estás usando estas fortalezas?'}</div>
+          <textarea id="sr-q3" placeholder="${isEN ? 'The problems that energize you to solve...' : 'Los problemas que te energizan resolver...'}" rows="2"></textarea>
         </div>
       </div>
       <div class="btn-row">
-        <button class="btn-primary" onclick="generateStrengthInsight()">VER MI PERFIL COMPLETO →</button>
+        <button class="btn-primary" onclick="generateStrengthInsight()">${isEN ? 'SEE MY COMPLETE PROFILE →' : 'VER MI PERFIL COMPLETO →'}</button>
       </div>
     </div>
   `;
@@ -1742,16 +2098,19 @@ async function generateStrengthInsight() {
   const r1 = document.getElementById('sr-q1').value.trim();
   const r2 = document.getElementById('sr-q2').value.trim();
   const r3 = document.getElementById('sr-q3').value.trim();
-  if (!r1 || !r2 || !r3) return alert('Por favor responde las tres preguntas.');
+  const isEN = currentLang === 'en';
+  if (!r1 || !r2 || !r3) return alert(isEN ? 'Please answer all three questions.' : 'Por favor responde las tres preguntas.');
 
   const btn = document.querySelector('#strength-reflection-questions .btn-primary');
   btn.disabled = true;
-  btn.textContent = 'Analizando...';
+  btn.textContent = isEN ? 'Analyzing...' : 'Analizando...';
 
   const aiEl = document.getElementById('strength-ai-response');
-  aiEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">Construyendo tu perfil...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  aiEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">${isEN ? 'Building your profile...' : 'Construyendo tu perfil...'}</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
 
-  const prompt = `El usuario identificó su perfil de fortalezas como ${state.strengthColor.toUpperCase()} (${STRENGTH_PROFILES[state.strengthColor].tagline}).
+  const profile = getStrengthProfiles()[state.strengthColor];
+  const prompt = t(
+    `El usuario identificó su perfil de fortalezas como ${state.strengthColor.toUpperCase()} (${profile.tagline}).
 Sus fortalezas activas: ${state.activeStrengths.join(', ')}
 
 Respondió sobre sus fortalezas en acción:
@@ -1762,16 +2121,29 @@ Respondió sobre sus fortalezas en acción:
 Escribe una reflexión personalizada (3-4 oraciones) que:
 1. Conecte sus fortalezas específicas con las situaciones reales que describió
 2. Nombre el patrón de impacto que ves — cómo genera valor en otros de manera natural
-3. Cierre con una frase que lo ancle: sus fortalezas son la forma en que ejecutará su propósito`;
+3. Cierre con una frase que lo ancle: sus fortalezas son la forma en que ejecutará su propósito`,
+    `The user identified their strength profile as ${state.strengthColor.toUpperCase()} (${profile.tagline}).
+Their active strengths: ${state.activeStrengths.join(', ')}
+
+They answered about their strengths in action:
+- In life moments: "${r1}"
+- Results in others: "${r2}"
+- Problems they enjoy: "${r3}"
+
+Write a personalized reflection (3-4 sentences) that:
+1. Connects their specific strengths to the real situations they described
+2. Names the impact pattern you see — how they naturally generate value in others
+3. Closes with a phrase that anchors them: their strengths are the way they will execute their purpose`
+  );
 
   const response = await callClaude(prompt);
   aiEl.innerHTML = `
     <div class="ai-wrap fade-in">
-      <div class="ai-label">✦ Tu Perfil de Fortalezas</div>
+      <div class="ai-label">✦ ${isEN ? 'Your Strengths Profile' : 'Tu Perfil de Fortalezas'}</div>
       <div class="ai-text">${response}</div>
     </div>
     <div class="card" style="margin-top:.75rem;">
-      <div class="card-title">Tus Fortalezas Activas</div>
+      <div class="card-title">${isEN ? 'Your Active Strengths' : 'Tus Fortalezas Activas'}</div>
       <div class="chips-area">${state.activeStrengths.map(s => `<span class="chip selected locked">${s}</span>`).join('')}</div>
     </div>
   `;
@@ -2383,7 +2755,10 @@ async function submitCoachForm(btn) {
 }
 
 function restartTool() {
-  if (!confirm('¿Estás seguro? Perderás todo tu progreso.')) return;
+  const msg = currentLang === 'en'
+    ? 'Are you sure? You will lose all your progress.'
+    : '¿Estás seguro? Perderás todo tu progreso.';
+  if (!confirm(msg)) return;
   localStorage.removeItem('thelab-proposito-state');
   location.reload();
 }
