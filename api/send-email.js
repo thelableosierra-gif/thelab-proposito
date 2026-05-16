@@ -1,270 +1,139 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { nombre, email, telefono, proposito, mantra, valores, pasion, fortalezas, valorUnico, lang } = req.body;
+  const { nombre, email, telefono, proposito, pasion, mantra, valores, fortalezas, valorUnico, lang } = req.body;
 
-  if (!nombre || !email || !telefono) {
-    return res.status(400).json({ error: 'Faltan campos requeridos' });
+  if (!nombre || !email) {
+    return res.status(400).json({ error: "Faltan campos requeridos" });
   }
 
-  // Language-aware labels
-  const isEN = lang === 'en';
-  const labels = {
-    brandTag:     isEN ? 'The Lab · Leo Sierra' : 'The Lab · Leo Sierra',
-    participant:  isEN ? 'Participant' : 'Participante',
-    mantraLabel:  isEN ? '⚡ Purpose in One Sentence' : '⚡ Propósito en Una Frase',
-    purposeLabel: isEN ? '✦ My Life Purpose' : '✦ Mi Propósito de Vida',
-    valuesLabel:  isEN ? 'My Values' : 'Mis Valores',
-    mainTag:      isEN ? 'MAIN' : 'PRINCIPAL',
-    passionLabel: isEN ? 'My Passion' : 'Mi Pasión',
-    strengthsLbl: isEN ? 'My Strengths' : 'Mis Fortalezas',
-    uvLabel:      isEN ? 'My Unique Value' : 'Mi Valor Único',
-    nextSteps:    isEN ? 'Next Steps' : 'Próximos Pasos',
-    steps: isEN ? [
-      'Keep your purpose visible — write it where you see it every day.',
-      'Identify ONE decision this week aligned with your purpose.',
-      'Share your purpose with someone you trust.',
-      'Work with a coach to turn it into a concrete action plan.'
-    ] : [
-      'Mantén tu propósito visible — escríbelo donde lo veas cada día.',
-      'Identifica UNA decisión esta semana alineada con tu propósito.',
-      'Comparte tu propósito con alguien de confianza.',
-      'Trabaja con un coach para convertirlo en un plan concreto.'
-    ],
-    subjectToLeo: isEN ? `New participant: ${nombre} — Design Your Purpose` : `Nuevo participante: ${nombre} — Diseña Tu Propósito`,
-    subjectToUser: isEN ? 'Your Life Purpose — The Lab' : 'Tu Propósito de Vida — The Lab',
-    footer: isEN ? 'The Lab · Leo Sierra — Design Your Purpose' : 'The Lab · Leo Sierra — Diseña Tu Propósito',
-  };
+  const isEN = lang === "en";
+  const valoresStr = Array.isArray(valores) ? valores.join(", ") : (valores || "");
+  const fortalezasStr = Array.isArray(fortalezas) ? fortalezas.join(", ") : (fortalezas || "");
 
-  const summaryHtml = `
-    <div style="font-family:Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;color:#111;">
-      <div style="background:#FFE600;padding:32px 32px 24px;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#555;margin-bottom:8px;">${labels.brandTag}</div>
-        <div style="font-size:28px;font-weight:900;color:#111;line-height:1;">${isEN ? 'PURPOSE' : 'PROPÓSITO'}</div>
-        <div style="font-size:13px;color:#333;margin-top:4px;">${isEN ? 'Design an Extraordinary Life in 6 Steps' : 'Diseña una Vida Extraordinaria en 6 Pasos'}</div>
-      </div>
-      <div style="background:#111;padding:20px 32px;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#FFE600;margin-bottom:6px;">${labels.participant}</div>
-        <div style="font-size:16px;font-weight:700;color:#fff;">${nombre}</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:2px;">${email} · ${telefono}</div>
-      </div>
-      <div style="padding:32px;">
-        ${mantra ? `
-        <div style="border:2px solid #FFE600;border-radius:10px;padding:20px;margin-bottom:24px;text-align:center;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8a7000;margin-bottom:10px;">${labels.mantraLabel}</div>
-          <div style="font-size:17px;font-style:italic;font-weight:600;color:#111;line-height:1.5;">${mantra}</div>
-        </div>` : ''}
-        <div style="border-top:3px solid #111;border-bottom:3px solid #111;padding:20px 0;margin-bottom:24px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8a7000;margin-bottom:10px;">${labels.purposeLabel}</div>
-          <div style="font-size:15px;font-style:italic;line-height:1.7;color:#111;">${proposito || ''}</div>
-        </div>
-        ${valores && valores.length ? `
-        <div style="margin-bottom:20px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;border-bottom:2px solid #FFE600;padding-bottom:6px;margin-bottom:12px;">${labels.valuesLabel}</div>
-          ${valores.map((v, i) => `
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-              <span style="background:#FFE600;color:#111;font-weight:800;font-size:10px;width:18px;height:18px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;">${i+1}</span>
-              <span style="font-size:13px;font-weight:${i===0?'700':'400'};color:#111;">${v}${i===0?` <span style="font-size:9px;color:#8a7000;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-left:6px;">${labels.mainTag}</span>`:''}</span>
-            </div>`).join('')}
-        </div>` : ''}
-        ${pasion ? `
-        <div style="margin-bottom:20px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;border-bottom:2px solid #FFE600;padding-bottom:6px;margin-bottom:12px;">${labels.passionLabel}</div>
-          <div style="font-size:13px;line-height:1.6;color:#333;">${pasion}</div>
-        </div>` : ''}
-        ${fortalezas && fortalezas.length ? `
-        <div style="margin-bottom:20px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;border-bottom:2px solid #FFE600;padding-bottom:6px;margin-bottom:12px;">${labels.strengthsLbl}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;">
-            ${fortalezas.map(f => `<span style="background:#f0f0e0;color:#111;font-size:11px;font-weight:600;padding:4px 10px;border-radius:12px;">${f}</span>`).join('')}
-          </div>
-        </div>` : ''}
-        ${valorUnico ? `
-        <div style="margin-bottom:24px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;border-bottom:2px solid #FFE600;padding-bottom:6px;margin-bottom:12px;">${labels.uvLabel}</div>
-          <div style="font-size:13px;line-height:1.6;color:#333;">${valorUnico}</div>
-        </div>` : ''}
-        <div style="background:#f8f7f2;border-radius:8px;padding:20px;margin-bottom:8px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;margin-bottom:12px;">${labels.nextSteps}</div>
-          ${labels.steps.map((s,i) => `
-          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;">
-            <span style="background:#FFE600;color:#111;font-weight:800;font-size:9px;width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">${i+1}</span>
-            <span style="font-size:12px;color:#444;line-height:1.4;">${s}</span>
-          </div>`).join('')}
-        </div>
-      </div>
-      <div style="background:#FFE600;padding:12px 32px;display:flex;justify-content:space-between;">
-        <span style="font-size:10px;font-weight:700;color:#555;">${labels.footer}</span>
-        <span style="font-size:10px;color:#888;">thelab-proposito.vercel.app</span>
-      </div>
-    </div>
-  `;
+  function buildHTML(isParticipant) {
+    const labelTitle = isEN ? "Life Purpose Summary" : "Resumen de Proposito de Vida";
+    const labelParticipant = isEN ? "PARTICIPANT" : "PARTICIPANTE";
+    const labelMantra = isEN ? "PURPOSE IN ONE SENTENCE" : "PROPOSITO EN UNA FRASE";
+    const labelPurpose = isEN ? "MY LIFE PURPOSE" : "MI PROPOSITO DE VIDA";
+    const labelPassion = isEN ? "MY PASSION" : "MI PASION";
+    const labelValues = isEN ? "MY VALUES" : "MIS VALORES";
+    const labelStrengths = isEN ? "MY STRENGTHS" : "MIS FORTALEZAS";
+    const labelUnique = isEN ? "MY UNIQUE VALUE" : "MI VALOR UNICO";
+    const labelCTA = isEN ? "Ready to go deeper?" : "Listo para ir mas profundo?";
+    const labelCTABody = isEN
+      ? "Work one-on-one with a The Lab coach to turn your purpose into concrete decisions and actions."
+      : "Trabaja uno a uno con un coach de The Lab para convertir tu proposito en decisiones y acciones concretas.";
+    const labelGreeting = isEN ? "Here is your life purpose summary." : "Aqui esta tu resumen de proposito de vida.";
+
+    let html = "<div style='font-family:sans-serif;max-width:620px;margin:0 auto;color:#111'>";
+
+    html += "<div style='background:#f5c800;padding:24px 32px'>";
+    html += "<p style='margin:0;font-size:12px;letter-spacing:2px;font-weight:700'>THE LAB &middot; LEO SIERRA</p>";
+    html += "<h1 style='margin:6px 0 0;font-size:22px'>" + labelTitle + "</h1>";
+    html += "</div>";
+
+    html += "<div style='background:#111;padding:16px 32px'>";
+    html += "<p style='margin:0;color:#f5c800;font-size:12px;letter-spacing:1px'>" + labelParticipant + "</p>";
+    html += "<p style='margin:4px 0 0;color:#fff;font-size:16px;font-weight:600'>" + nombre + "</p>";
+    html += "<p style='margin:2px 0 0;color:#aaa;font-size:13px'>" + email + (telefono ? " &middot; " + telefono : "") + "</p>";
+    html += "</div>";
+
+    html += "<div style='padding:32px'>";
+    html += "<p style='color:#444'>" + labelGreeting + "</p>";
+
+    if (mantra) {
+      html += "<div style='background:#f9f5e0;border-left:4px solid #f5c800;padding:20px;margin:16px 0;border-radius:4px'>";
+      html += "<p style='margin:0 0 6px;font-size:11px;letter-spacing:2px;color:#888;font-weight:700'>" + labelMantra + "</p>";
+      html += "<p style='margin:0;font-size:17px;font-weight:700;line-height:1.5'>"" + mantra + ""</p>";
+      html += "</div>";
+    }
+
+    if (proposito) {
+      html += "<div style='margin-bottom:20px'>";
+      html += "<p style='margin:0 0 6px;font-size:11px;letter-spacing:2px;color:#888;font-weight:700'>" + labelPurpose + "</p>";
+      html += "<p style='margin:0;font-size:15px;line-height:1.7;background:#f9f9f9;padding:16px;border-radius:4px'>" + proposito + "</p>";
+      html += "</div>";
+    }
+
+    if (pasion) {
+      html += "<div style='margin-bottom:16px'>";
+      html += "<p style='margin:0 0 6px;font-size:11px;letter-spacing:2px;color:#888;font-weight:700'>" + labelPassion + "</p>";
+      html += "<p style='margin:0;font-size:14px;color:#333;line-height:1.6'>" + pasion + "</p>";
+      html += "</div>";
+    }
+
+    if (valoresStr) {
+      html += "<div style='margin-bottom:16px'>";
+      html += "<p style='margin:0 0 6px;font-size:11px;letter-spacing:2px;color:#888;font-weight:700'>" + labelValues + "</p>";
+      html += "<p style='margin:0;font-size:14px;color:#333'>" + valoresStr + "</p>";
+      html += "</div>";
+    }
+
+    if (fortalezasStr) {
+      html += "<div style='margin-bottom:16px'>";
+      html += "<p style='margin:0 0 6px;font-size:11px;letter-spacing:2px;color:#888;font-weight:700'>" + labelStrengths + "</p>";
+      html += "<p style='margin:0;font-size:14px;color:#333'>" + fortalezasStr + "</p>";
+      html += "</div>";
+    }
+
+    if (valorUnico) {
+      html += "<div style='margin-bottom:16px'>";
+      html += "<p style='margin:0 0 6px;font-size:11px;letter-spacing:2px;color:#888;font-weight:700'>" + labelUnique + "</p>";
+      html += "<p style='margin:0;font-size:14px;color:#333;line-height:1.6'>" + valorUnico + "</p>";
+      html += "</div>";
+    }
+
+    if (isParticipant) {
+      html += "<div style='background:#111;padding:20px;border-radius:6px;margin-top:16px'>";
+      html += "<p style='margin:0 0 8px;color:#f5c800;font-weight:700;font-size:15px'>" + labelCTA + "</p>";
+      html += "<p style='margin:0;color:#ccc;font-size:13px;line-height:1.6'>" + labelCTABody + "</p>";
+      html += "</div>";
+    }
+
+    html += "</div>";
+    html += "<div style='background:#f5f5f5;padding:16px 32px;text-align:center'>";
+    html += "<p style='margin:0;font-size:11px;color:#999'>The Lab &middot; Leo Sierra &middot; jointhelab.org</p>";
+    html += "</div></div>";
+
+    return html;
+  }
+
+  const FROM = "The Lab <noreply@jointhelab.org>";
+  const subjectParticipant = isEN ? "Your Life Purpose - The Lab" : "Tu Proposito de Vida - The Lab";
+  const subjectLab = "Nuevo participante: " + nombre + " - Disena Tu Proposito";
 
   try {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'The Lab <onboarding@resend.dev>',
-        to: ['thelab.leosierra@gmail.com'],
-        subject: labels.subjectToLeo,
-        html: summaryHtml
-      })
+    const r1 = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + process.env.RESEND_API_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: FROM, to: [email], subject: subjectParticipant, html: buildHTML(true) })
     });
 
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'The Lab <onboarding@resend.dev>',
-        to: [email],
-        subject: labels.subjectToUser,
-        html: summaryHtml
-      })
+    if (!r1.ok) {
+      const e = await r1.json();
+      console.error("Participant email error:", e);
+      return res.status(500).json({ error: "Error enviando email al participante", detail: e });
+    }
+
+    const r2 = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + process.env.RESEND_API_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: FROM, to: ["thelab.leosierra@gmail.com"], subject: subjectLab, html: buildHTML(false) })
     });
+
+    if (!r2.ok) {
+      const e = await r2.json();
+      console.error("Lab notification error:", e);
+      return res.status(500).json({ error: "Error enviando notificacion a The Lab", detail: e });
+    }
 
     return res.status(200).json({ ok: true });
 
   } catch (error) {
-    console.error('Resend error:', error);
-    return res.status(500).json({ error: 'Error enviando email' });
-  }
-}
-
-  if (!nombre || !email || !telefono) {
-    return res.status(400).json({ error: 'Faltan campos requeridos' });
-  }
-
-  const summaryHtml = `
-    <div style="font-family:Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;color:#111;">
-
-      <!-- HEADER -->
-      <div style="background:#FFE600;padding:32px 32px 24px;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#555;margin-bottom:8px;">The Lab · Leo Sierra</div>
-        <div style="font-size:28px;font-weight:900;color:#111;line-height:1;">PROPÓSITO</div>
-        <div style="font-size:13px;color:#333;margin-top:4px;">Diseña una Vida Extraordinaria en 6 Pasos</div>
-      </div>
-
-      <!-- PARTICIPANT INFO -->
-      <div style="background:#111;padding:20px 32px;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#FFE600;margin-bottom:6px;">Participante</div>
-        <div style="font-size:16px;font-weight:700;color:#fff;">${nombre}</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:2px;">${email} · ${telefono}</div>
-      </div>
-
-      <div style="padding:32px;">
-
-        <!-- MANTRA -->
-        ${mantra ? `
-        <div style="border:2px solid #FFE600;border-radius:10px;padding:20px;margin-bottom:24px;text-align:center;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8a7000;margin-bottom:10px;">⚡ Propósito en Una Frase</div>
-          <div style="font-size:17px;font-style:italic;font-weight:600;color:#111;line-height:1.5;">${mantra}</div>
-        </div>` : ''}
-
-        <!-- PROPÓSITO -->
-        <div style="border-top:3px solid #111;border-bottom:3px solid #111;padding:20px 0;margin-bottom:24px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8a7000;margin-bottom:10px;">✦ Mi Propósito de Vida</div>
-          <div style="font-size:15px;font-style:italic;line-height:1.7;color:#111;">${proposito || ''}</div>
-        </div>
-
-        <!-- VALORES -->
-        ${valores && valores.length ? `
-        <div style="margin-bottom:20px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;border-bottom:2px solid #FFE600;padding-bottom:6px;margin-bottom:12px;">Mis Valores</div>
-          ${valores.map((v, i) => `
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-              <span style="background:#FFE600;color:#111;font-weight:800;font-size:10px;width:18px;height:18px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;">${i+1}</span>
-              <span style="font-size:13px;font-weight:${i===0?'700':'400'};color:#111;">${v}${i===0?' <span style="font-size:9px;color:#8a7000;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-left:6px;">PRINCIPAL</span>':''}</span>
-            </div>`).join('')}
-        </div>` : ''}
-
-        <!-- PASIÓN -->
-        ${pasion ? `
-        <div style="margin-bottom:20px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;border-bottom:2px solid #FFE600;padding-bottom:6px;margin-bottom:12px;">Mi Pasión</div>
-          <div style="font-size:13px;line-height:1.6;color:#333;">${pasion}</div>
-        </div>` : ''}
-
-        <!-- FORTALEZAS -->
-        ${fortalezas && fortalezas.length ? `
-        <div style="margin-bottom:20px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;border-bottom:2px solid #FFE600;padding-bottom:6px;margin-bottom:12px;">Mis Fortalezas</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;">
-            ${fortalezas.map(f => `<span style="background:#f0f0e0;color:#111;font-size:11px;font-weight:600;padding:4px 10px;border-radius:12px;">${f}</span>`).join('')}
-          </div>
-        </div>` : ''}
-
-        <!-- VALOR ÚNICO -->
-        ${valorUnico ? `
-        <div style="margin-bottom:24px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;border-bottom:2px solid #FFE600;padding-bottom:6px;margin-bottom:12px;">Mi Valor Único</div>
-          <div style="font-size:13px;line-height:1.6;color:#333;">${valorUnico}</div>
-        </div>` : ''}
-
-        <!-- NEXT STEPS -->
-        <div style="background:#f8f7f2;border-radius:8px;padding:20px;margin-bottom:8px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7000;margin-bottom:12px;">Próximos Pasos</div>
-          ${['Mantén tu propósito visible — escríbelo donde lo veas cada día.','Identifica UNA decisión esta semana alineada con tu propósito.','Comparte tu propósito con alguien de confianza.','Trabaja con un coach para convertirlo en un plan concreto.'].map((s,i) => `
-          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;">
-            <span style="background:#FFE600;color:#111;font-weight:800;font-size:9px;width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">${i+1}</span>
-            <span style="font-size:12px;color:#444;line-height:1.4;">${s}</span>
-          </div>`).join('')}
-        </div>
-
-      </div>
-
-      <!-- FOOTER -->
-      <div style="background:#FFE600;padding:12px 32px;display:flex;justify-content:space-between;">
-        <span style="font-size:10px;font-weight:700;color:#555;">The Lab · Leo Sierra — Diseña Tu Propósito</span>
-        <span style="font-size:10px;color:#888;">thelab-proposito.vercel.app</span>
-      </div>
-
-    </div>
-  `;
-
-  try {
-    // Send to Leo
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'The Lab <onboarding@resend.dev>',
-        to: ['thelab.leosierra@gmail.com'],
-        subject: `Nuevo participante: ${nombre} — Diseña Tu Propósito`,
-        html: summaryHtml
-      })
-    });
-
-    // Send copy to participant
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'The Lab <onboarding@resend.dev>',
-        to: [email],
-        subject: `Tu Propósito de Vida — The Lab`,
-        html: summaryHtml
-      })
-    });
-
-    return res.status(200).json({ ok: true });
-
-  } catch (error) {
-    console.error('Resend error:', error);
-    return res.status(500).json({ error: 'Error enviando email' });
+    console.error("Send email exception:", error);
+    return res.status(500).json({ error: "Error enviando email" });
   }
 }
