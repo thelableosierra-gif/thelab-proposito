@@ -1335,28 +1335,35 @@ function goToStep(n) {
 // ===========================
 async function submitWhy() {
   const val = document.getElementById('why-answer').value.trim();
-  if (!val) return alert('Por favor escribe tu respuesta antes de continuar.');
+  if (!val) return alert(t('Por favor escribe tu respuesta antes de continuar.','Please write your answer before continuing.'));
   state.why = val;
 
   const btn = document.querySelector('#screen-1 .btn-primary');
   btn.disabled = true;
-  btn.textContent = 'Procesando...';
+  btn.textContent = t('Procesando...','Processing...');
 
   const el = document.getElementById('why-ai-response');
   el.style.display = 'block';
-  el.innerHTML = `<div class="ai-wrap"><div class="ai-label">Reflexionando...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  el.innerHTML = `<div class="ai-wrap"><div class="ai-label">${t('Reflexionando...','Reflecting...')}</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
 
-  const prompt = `El usuario respondió por qué quiere descubrir su propósito: "${val}"
+  const prompt = t(
+    `El usuario respondió por qué quiere descubrir su propósito: "${val}"
 Ofrece una reflexión breve (2-3 oraciones) que:
 1. Valide la importancia de lo que expresó sin ser condescendiente
 2. Le dé contexto sobre lo que están a punto de descubrir
-3. Los prepare emocionalmente para el proceso con honestidad, no con motivación vacía`;
+3. Los prepare emocionalmente para el proceso con honestidad, no con motivación vacía`,
+    `The user responded about why they want to discover their purpose: "${val}"
+Offer a brief reflection (2-3 sentences) that:
+1. Validates the importance of what they expressed without being condescending
+2. Gives context about what they are about to discover
+3. Emotionally prepares them for the process with honesty, not empty motivation`
+  );
 
   const response = await callClaude(prompt);
-  el.innerHTML = `<div class="ai-wrap fade-in"><div class="ai-label">✦ Reflexión</div><div class="ai-text">${response}</div></div>`;
+  el.innerHTML = `<div class="ai-wrap fade-in"><div class="ai-label">✦ ${t('Reflexión','Reflection')}</div><div class="ai-text">${response}</div></div>`;
 
   document.getElementById('location-section').style.display = 'block';
-  btn.textContent = 'CONTINUAR →';
+  btn.textContent = t('CONTINUAR →','CONTINUE →');
   btn.disabled = false;
   btn.style.display = 'none';
 }
@@ -1384,7 +1391,7 @@ function selectLocation(type, btnEl) {
     b.id = 'followup-submit-btn';
     b.className = 'btn-primary btn-row';
     b.style.marginTop = '1rem';
-    b.textContent = 'VER MI DIAGNÓSTICO →';
+    b.textContent = t('VER MI DIAGNÓSTICO →','SEE MY DIAGNOSIS →');
     b.onclick = submitFollowup;
     fs.appendChild(b);
   }
@@ -1394,28 +1401,41 @@ function selectLocation(type, btnEl) {
 
 async function submitFollowup() {
   const val = document.getElementById('followup-answer').value.trim();
-  if (!val) return alert('Por favor responde la pregunta antes de continuar.');
+  if (!val) return alert(t('Por favor responde la pregunta antes de continuar.','Please answer the question before continuing.'));
   state.followupAnswer = val;
 
   const btn = document.getElementById('followup-submit-btn');
   btn.disabled = true;
-  btn.textContent = 'Procesando...';
+  btn.textContent = t('Procesando...','Processing...');
 
   const el = document.getElementById('location-ai-response');
-  el.innerHTML = `<div class="ai-wrap"><div class="ai-label">Analizando tu punto de partida...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  el.innerHTML = `<div class="ai-wrap"><div class="ai-label">${t('Analizando tu punto de partida...','Analyzing your starting point...')}</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
 
-  const stateLabels = {confundido:'confundido (no sabe qué quiere)', frustrado:'frustrado (sabe qué quiere pero no actúa)', realizado:'realizado pero buscando más dirección'};
-  const prompt = `El usuario se identificó como: ${stateLabels[state.location]}.
+  const stateLabels = currentLang === 'en'
+    ? {confundido:'confused (does not know what they want)', frustrado:'frustrated (knows what they want but does not act)', realizado:'fulfilled but seeking better direction'}
+    : {confundido:'confundido (no sabe qué quiere)', frustrado:'frustrado (sabe qué quiere pero no actúa)', realizado:'realizado pero buscando más dirección'};
+
+  const prompt = t(
+    `El usuario se identificó como: ${stateLabels[state.location]}.
 Su respuesta de seguimiento: "${val}"
 También escribió por qué quiere descubrir su propósito: "${state.why}"
 
 Ofrece un diagnóstico honesto y personalizado (3-4 oraciones) que:
 1. Nombre con precisión el patrón que ves en su respuesta — sin suavizarlo demasiado
 2. Le muestre qué parte del proceso de hoy va a ser especialmente importante para él/ella
-3. Termine con una frase que los ancle y los motive a seguir, no con retórica vacía`;
+3. Termine con una frase que los ancle y los motive a seguir, no con retórica vacía`,
+    `The user identified as: ${stateLabels[state.location]}.
+Their follow-up response: "${val}"
+They also wrote why they want to discover their purpose: "${state.why}"
+
+Offer an honest and personalized diagnosis (3-4 sentences) that:
+1. Precisely names the pattern you see in their response — without softening it too much
+2. Shows them which part of today's process will be especially important for them
+3. Ends with a phrase that anchors and motivates them to continue, not with empty rhetoric`
+  );
 
   const response = await callClaude(prompt);
-  el.innerHTML = `<div class="ai-wrap fade-in"><div class="ai-label">✦ Tu Diagnóstico Inicial</div><div class="ai-text">${response}</div></div>`;
+  el.innerHTML = `<div class="ai-wrap fade-in"><div class="ai-label">✦ ${t('Tu Diagnóstico Inicial','Your Initial Diagnosis')}</div><div class="ai-text">${response}</div></div>`;
 
   document.getElementById('btn-to-step2').style.display = 'block';
   btn.style.display = 'none';
@@ -1443,12 +1463,12 @@ function renderIdentityQuestion(idx) {
       <textarea id="iq-p1" placeholder="${q.p1}" rows="3"></textarea>
       ${q.q2 ? `
       <div class="q-part2">
-        <div class="q-part2-label">↳ Ahora profundiza:</div>
+        <div class="q-part2-label">↳ ${t('Ahora profundiza:','Now go deeper:')}</div>
         <div class="question-text" style="font-size:.9rem;color:var(--gray-5);">${q.q2}</div>
         <textarea id="iq-p2" placeholder="${q.p2}" rows="3"></textarea>
       </div>` : ''}
       <div class="btn-row">
-        <button class="btn-primary" onclick="submitIdentityQuestion(${idx})">EXTRAER MIS VALORES →</button>
+        <button class="btn-primary" onclick="submitIdentityQuestion(${idx})">${t('EXTRAER MIS VALORES →','EXTRACT MY VALUES →')}</button>
       </div>
     </div>
     <div id="chips-for-q${idx}" style="display:none;" class="fade-in"></div>
@@ -1459,22 +1479,32 @@ async function submitIdentityQuestion(idx) {
   const q = getIdentityQuestions()[idx];
   const p1 = document.getElementById('iq-p1').value.trim();
   const p2 = q.q2 ? document.getElementById('iq-p2').value.trim() : '';
-  if (!p1) return alert('Por favor responde la primera pregunta.');
+  if (!p1) return alert(t('Por favor responde la primera pregunta.','Please answer the first question.'));
 
   const btn = document.querySelector(`#current-identity-question .btn-primary`);
   btn.disabled = true;
-  btn.textContent = 'Extrayendo valores...';
+  btn.textContent = t('Extrayendo valores...','Extracting values...');
 
   const combined = p2 ? `Parte 1: ${p1}\nParte 2: ${p2}` : p1;
   state.identityResponses[idx] = {territory:q.territory, q1:p1, q2:p2};
 
-  const prompt = `El usuario respondió estas preguntas de identidad (Territorio: ${q.territory}):
+  const isEN = currentLang === 'en';
+  const prompt = t(
+    `El usuario respondió estas preguntas de identidad (Territorio: ${q.territory}):
 ${combined}
 
 Extrae entre 4 y 6 valores o características de personalidad que están implícitos en esta respuesta.
 IMPORTANTE: Responde SOLO con un JSON array de strings, sin texto adicional, sin markdown, sin explicaciones.
 Ejemplo: ["Integridad","Liderazgo","Familia","Crecimiento","Lealtad"]
-Los valores deben ser palabras o frases cortas (1-3 palabras) en español.`;
+Los valores deben ser palabras o frases cortas (1-3 palabras) en español.`,
+    `The user answered these identity questions (Territory: ${q.territory}):
+${combined}
+
+Extract between 4 and 6 values or personality traits that are implicit in this response.
+IMPORTANT: Respond ONLY with a JSON array of strings, no additional text, no markdown, no explanations.
+Example: ["Integrity","Leadership","Family","Growth","Loyalty"]
+Values must be short words or phrases (1-3 words) in English.`
+  );
 
   const response = await callClaude(prompt);
   let values = [];
@@ -1482,21 +1512,21 @@ Los valores deben ser palabras o frases cortas (1-3 palabras) en español.`;
     const clean = response.replace(/```json|```/g,'').trim();
     values = JSON.parse(clean);
   } catch(e) {
-    values = response.match(/["']([^"']+)["']/g)?.map(v => v.replace(/["']/g,'')) || ['Crecimiento','Compromiso','Conexión'];
+    values = response.match(/["']([^"']+)["']/g)?.map(v => v.replace(/["']/g,'')) || (isEN ? ['Growth','Commitment','Connection'] : ['Crecimiento','Compromiso','Conexión']);
   }
 
   const chipsEl = document.getElementById(`chips-for-q${idx}`);
   chipsEl.style.display = 'block';
   chipsEl.innerHTML = `
     <div class="card fade-in" style="border-color:var(--yellow);">
-      <div class="card-title">De tu respuesta emergieron estos valores</div>
-      <div class="chips-instruction">Elige los <strong>2 que más resuenan</strong> con quién realmente eres:</div>
+      <div class="card-title">${isEN ? 'From your answer these values emerged' : 'De tu respuesta emergieron estos valores'}</div>
+      <div class="chips-instruction">${isEN ? 'Choose the <strong>2 that resonate most</strong> with who you really are:' : 'Elige los <strong>2 que más resuenan</strong> con quién realmente eres:'}</div>
       <div class="chips-area" id="chips-area-${idx}">
         ${values.map(v => `<button class="chip" data-value="${v.replace(/"/g,'&quot;')}" data-qidx="${idx}" onclick="toggleIdentityChip(this,this.dataset.value,parseInt(this.dataset.qidx))">${v}</button>`).join('')}
       </div>
-      <div class="chips-count">Seleccionados: <strong id="chip-count-${idx}">0</strong> / 2</div>
+      <div class="chips-count">${isEN ? 'Selected:' : 'Seleccionados:'} <strong id="chip-count-${idx}">0</strong> / 2</div>
       <div id="chip-confirm-${idx}" style="display:none;" class="btn-row">
-        <button class="btn-primary" onclick="confirmChipsForQ(${idx})">GUARDAR Y CONTINUAR →</button>
+        <button class="btn-primary" onclick="confirmChipsForQ(${idx})">${isEN ? 'SAVE AND CONTINUE →' : 'GUARDAR Y CONTINUAR →'}</button>
       </div>
     </div>
   `;
@@ -1549,17 +1579,20 @@ function renderPhase2() {
   const unique = [...new Set(allCollectedValues)];
   const p2 = document.getElementById('identity-phase2');
   p2.style.display = 'block';
+  const isEN = currentLang === 'en';
   p2.innerHTML = `
     <div class="select-4-instruction">
-      Completaste las 5 preguntas. De todas tus respuestas emergieron estos valores. <strong>Elige los 4 que más te definen</strong> — los que no son aspiracionales sino reales.
+      ${isEN
+        ? 'You completed the 5 questions. From all your answers these values emerged. <strong>Choose the 4 that most define you</strong> — the ones that are real, not aspirational.'
+        : 'Completaste las 5 preguntas. De todas tus respuestas emergieron estos valores. <strong>Elige los 4 que más te definen</strong> — los que no son aspiracionales sino reales.'}
     </div>
     <div class="card">
       <div class="chips-area all-chips-pool" id="all-chips-pool">
         ${unique.map(v => `<button class="chip" data-value="${v.replace(/"/g,'&quot;')}" onclick="toggleFinalChip(this,this.dataset.value)">${v}</button>`).join('')}
       </div>
-      <div class="chips-count">Seleccionados: <strong id="final-count">0</strong> / 4</div>
+      <div class="chips-count">${isEN ? 'Selected:' : 'Seleccionados:'} <strong id="final-count">0</strong> / 4</div>
       <div id="final-confirm-btn" style="display:none;" class="btn-row">
-        <button class="btn-primary" onclick="confirmFinalFour()">ESTOS SON MIS 4 VALORES →</button>
+        <button class="btn-primary" onclick="confirmFinalFour()">${isEN ? 'THESE ARE MY 4 VALUES →' : 'ESTOS SON MIS 4 VALORES →'}</button>
       </div>
     </div>
   `;
@@ -1597,22 +1630,23 @@ function renderPhase3() {
   document.getElementById('identity-phase2').style.display = 'none';
   const p3 = document.getElementById('identity-phase3');
   p3.style.display = 'block';
+  const isEN3 = currentLang === 'en';
   p3.innerHTML = `
     <div class="card">
-      <div class="card-title">Ahora ordénalos por importancia</div>
-      <p style="font-size:.88rem;color:var(--gray-5);margin-bottom:1rem;">Toca un slot numerado y luego el valor que quieres asignar. El #1 es tu valor más fundamental.</p>
+      <div class="card-title">${isEN3 ? 'Now order them by importance' : 'Ahora ordénalos por importancia'}</div>
+      <p style="font-size:.88rem;color:var(--gray-5);margin-bottom:1rem;">${isEN3 ? 'Tap a numbered slot and then the value you want to assign. #1 is your most fundamental value.' : 'Toca un slot numerado y luego el valor que quieres asignar. El #1 es tu valor más fundamental.'}</p>
       <div class="rank-slots" id="rank-slots">
         ${[0,1,2,3].map(i => `
           <div class="rank-slot" id="rs-${i}" onclick="activateSlot(${i})">
             <span class="slot-num">${i+1}</span>
-            <span class="slot-label" id="rs-label-${i}">— Toca para asignar —</span>
+            <span class="slot-label" id="rs-label-${i}">— ${isEN3 ? 'Tap to assign' : 'Toca para asignar'} —</span>
           </div>`).join('')}
       </div>
       <div class="value-pool" id="value-pool">
         ${finalFourValues.map(v => `<button class="chip" id="vp-${v.replace(/\s/g,'-')}" data-value="${v.replace(/"/g,'&quot;')}" onclick="assignToSlot(this.dataset.value)">${v}</button>`).join('')}
       </div>
       <div id="ranking-confirm" style="display:none;" class="btn-row">
-        <button class="btn-primary" onclick="confirmRanking()">CONFIRMAR MI IDENTIDAD →</button>
+        <button class="btn-primary" onclick="confirmRanking()">${isEN3 ? 'CONFIRM MY IDENTITY →' : 'CONFIRMAR MI IDENTIDAD →'}</button>
       </div>
     </div>
   `;
@@ -1626,7 +1660,7 @@ function activateSlot(idx) {
     rankingSlots[idx] = null;
     const slotEl = document.getElementById(`rs-${idx}`);
     slotEl.classList.remove('filled');
-    document.getElementById(`rs-label-${idx}`).textContent = '— Toca para asignar —';
+    document.getElementById(`rs-label-${idx}`).textContent = `— ${t('Toca para asignar','Tap to assign')} —`;
     // Return value to pool
     const chipId = `vp-${val.replace(/\s/g,'-')}`;
     const chip = document.getElementById(chipId);
@@ -1670,11 +1704,13 @@ async function confirmRanking() {
 
   const resultEl = document.getElementById('identity-ai-result');
   resultEl.style.display = 'block';
-  resultEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">Analizando tu identidad...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  resultEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">${t('Analizando tu identidad...','Analyzing your identity...')}</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
   document.getElementById('identity-phase3').style.display = 'none';
 
   const answersText = state.identityResponses.map((r,i) => `[${r.territory}] ${r.q1}${r.q2 ? ' / '+r.q2 : ''}`).join('\n');
-  const prompt = `El usuario definió y ordenó sus 4 valores de identidad:
+  const isEN = currentLang === 'en';
+  const prompt = t(
+    `El usuario definió y ordenó sus 4 valores de identidad:
 1. ${rankingSlots[0]} (más importante)
 2. ${rankingSlots[1]}
 3. ${rankingSlots[2]}
@@ -1686,22 +1722,36 @@ ${answersText}
 Ofrece una reflexión profunda (3-4 oraciones) que:
 1. Explique lo que dice esta jerarquía de valores sobre quién es esta persona — conectada con sus respuestas reales, no genérica
 2. Señale cómo el valor #1 probablemente ha guiado sus decisiones más importantes sin que lo haya notado
-3. Cierre afirmando su identidad como base para construir su propósito`;
+3. Cierre afirmando su identidad como base para construir su propósito`,
+    `The user defined and ranked their 4 identity values:
+1. ${rankingSlots[0]} (most important)
+2. ${rankingSlots[1]}
+3. ${rankingSlots[2]}
+4. ${rankingSlots[3]}
+
+Their identity responses:
+${answersText}
+
+Offer a deep reflection (3-4 sentences) that:
+1. Explains what this hierarchy of values says about who this person is — connected to their real responses, not generic
+2. Points out how value #1 has probably guided their most important decisions without them noticing
+3. Closes affirming their identity as the foundation for building their purpose`
+  );
 
   const response = await callClaude(prompt);
   resultEl.innerHTML = `
     <div class="ai-wrap fade-in">
-      <div class="ai-label">✦ Tu Identidad</div>
+      <div class="ai-label">✦ ${isEN ? 'Your Identity' : 'Tu Identidad'}</div>
       <div class="ai-text">${response}</div>
     </div>
     <div class="card" style="margin-top:.75rem;">
-      <div class="card-title">Tus 4 Valores — En Orden de Importancia</div>
+      <div class="card-title">${isEN ? 'Your 4 Values — In Order of Importance' : 'Tus 4 Valores — En Orden de Importancia'}</div>
       <div style="display:flex;flex-direction:column;gap:.4rem;margin-top:.5rem;">
         ${rankingSlots.map((v,i) => `
           <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;background:${i===0?'var(--yellow)':'var(--gray-2)'};border-radius:8px;">
             <span style="font-weight:800;font-size:.8rem;color:${i===0?'var(--black)':'var(--gray-5)'};min-width:20px;">${i+1}</span>
             <span style="font-weight:700;font-size:.92rem;color:var(--black);">${v}</span>
-            ${i===0?'<span style="margin-left:auto;font-size:.7rem;font-weight:700;color:var(--black);letter-spacing:.08em;">PRINCIPAL</span>':''}
+            ${i===0?`<span style="margin-left:auto;font-size:.7rem;font-weight:700;color:var(--black);letter-spacing:.08em;">${isEN?'MAIN':'PRINCIPAL'}</span>`:''}
           </div>`).join('')}
       </div>
     </div>
@@ -1720,19 +1770,21 @@ async function generatePassion() {
   const q1 = document.getElementById('passion-q1').value.trim();
   const q2 = document.getElementById('passion-q2').value.trim();
   const q3 = document.getElementById('passion-q3').value.trim();
-  if (!q1 || !q2 || !q3) return alert('Por favor responde las tres preguntas.');
+  if (!q1 || !q2 || !q3) return alert(t('Por favor responde las tres preguntas.','Please answer all three questions.'));
 
   state.passionAnswers = {q1, q2, q3};
 
   const btn = document.getElementById('passion-submit-btn');
   btn.disabled = true;
-  btn.textContent = 'Descubriendo tu pasión...';
+  btn.textContent = t('Descubriendo tu pasión...','Discovering your passion...');
 
   const resultEl = document.getElementById('passion-result');
   resultEl.style.display = 'block';
-  resultEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">Procesando tus respuestas...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  resultEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">${t('Procesando tus respuestas...','Processing your responses...')}</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
 
-  const prompt = `El usuario respondió las 3 preguntas de pasión:
+  const isEN = currentLang === 'en';
+  const prompt = t(
+    `El usuario respondió las 3 preguntas de pasión:
 1. EXPERIENCIA REAL: "${q1}"
 2. DOLOR CONECTADO: "${q2}"
 3. VISIÓN FUTURA: "${q3}"
@@ -1741,34 +1793,52 @@ Sus valores de identidad son: ${state.rankedValues.join(', ')}
 
 Haz dos cosas:
 1. Escribe una DECLARACIÓN DE PASIÓN en primera persona — una sola frase (máx 30 palabras) que integre la experiencia real con el dolor y la visión. Debe ser accionable y específica, no poética y genérica. FORMATO: [DECLARACIÓN]: Tu frase aquí.
-2. Escribe una reflexión breve (2-3 oraciones) sobre por qué esta pasión específica tiene raíces reales en quien es esta persona, conectando con sus valores de identidad. FORMATO: [REFLEXIÓN]: Tu reflexión aquí.`;
+2. Escribe una reflexión breve (2-3 oraciones) sobre por qué esta pasión específica tiene raíces reales en quien es esta persona, conectando con sus valores de identidad. FORMATO: [REFLEXIÓN]: Tu reflexión aquí.`,
+    `The user answered the 3 passion questions:
+1. REAL EXPERIENCE: "${q1}"
+2. CONNECTED PAIN: "${q2}"
+3. FUTURE VISION: "${q3}"
+
+Their identity values are: ${state.rankedValues.join(', ')}
+
+Do two things:
+1. Write a PASSION STATEMENT in first person — a single sentence (max 30 words) that integrates the real experience with the pain and the vision. It must be actionable and specific, not poetic and generic. FORMAT: [STATEMENT]: Your sentence here.
+2. Write a brief reflection (2-3 sentences) about why this specific passion has real roots in who this person is, connecting with their identity values. FORMAT: [REFLECTION]: Your reflection here.`
+  );
 
   const response = await callClaude(prompt);
   
   let statement = '';
   let reflection = '';
-  const stmMatch = response.match(/\[DECLARACIÓN\]:\s*(.+?)(?:\n|$)/s);
-  const refMatch = response.match(/\[REFLEXIÓN\]:\s*(.+)/s);
-  
-  if (stmMatch) statement = stmMatch[1].trim();
-  if (refMatch) reflection = refMatch[1].trim();
+
+  if (isEN) {
+    const stmMatch = response.match(/\[STATEMENT\]:\s*(.+?)(?:\n|$)/s);
+    const refMatch = response.match(/\[REFLECTION\]:\s*(.+)/s);
+    if (stmMatch) statement = stmMatch[1].trim();
+    if (refMatch) reflection = refMatch[1].trim();
+  } else {
+    const stmMatch = response.match(/\[DECLARACIÓN\]:\s*(.+?)(?:\n|$)/s);
+    const refMatch = response.match(/\[REFLEXIÓN\]:\s*(.+)/s);
+    if (stmMatch) statement = stmMatch[1].trim();
+    if (refMatch) reflection = refMatch[1].trim();
+  }
   
   if (!statement) {
     const lines = response.split('\n').filter(l => l.trim());
-    statement = lines[0]?.replace(/^\[.*?\]:\s*/,'').trim() || response.substring(0,150);
-    reflection = lines.slice(1).join(' ').replace(/^\[.*?\]:\s*/,'').trim();
+    statement = lines[0]?.replace(/^\[.*?\]:\s*/,'').replace(/\*\*/g,'').trim() || response.substring(0,150);
+    reflection = lines.slice(1).join(' ').replace(/^\[.*?\]:\s*/,'').replace(/\*\*/g,'').trim();
   }
 
   state.passionStatement = statement;
 
   resultEl.innerHTML = `
     <div class="passion-statement fade-in">
-      <div class="passion-label">✦ Tu Declaración de Pasión</div>
+      <div class="passion-label">✦ ${isEN ? 'My Passion Statement' : 'Tu Declaración de Pasión'}</div>
       <textarea class="passion-edit" id="passion-statement-text" rows="3">${statement}</textarea>
     </div>
-    ${reflection ? `<div class="ai-wrap fade-in" style="margin-top:.75rem;"><div class="ai-label">✦ Por qué esta pasión es tuya</div><div class="ai-text">${reflection}</div></div>` : ''}
+    ${reflection ? `<div class="ai-wrap fade-in" style="margin-top:.75rem;"><div class="ai-label">✦ ${isEN ? 'Why this passion is yours' : 'Por qué esta pasión es tuya'}</div><div class="ai-text">${reflection}</div></div>` : ''}
     <div class="btn-row">
-      <button class="btn-primary" onclick="savePassionAndContinue()">SIGUIENTE: TUS FORTALEZAS →</button>
+      <button class="btn-primary" onclick="savePassionAndContinue()">${isEN ? 'NEXT: YOUR STRENGTHS →' : 'SIGUIENTE: TUS FORTALEZAS →'}</button>
     </div>
   `;
   resultEl.scrollIntoView({behavior:'smooth'});
@@ -2167,14 +2237,15 @@ function injectStrengthsContextInStep5() {
   const hint = document.createElement('div');
   hint.id = 'strengths-context-hint';
   hint.style.cssText = 'background:var(--black);border-radius:8px;padding:.75rem 1rem;margin-bottom:.75rem;';
+  const isEN = currentLang === 'en';
   hint.innerHTML = `
-    <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow);margin-bottom:.4rem;">Tus fortalezas identificadas</div>
+    <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow);margin-bottom:.4rem;">${isEN ? 'Your identified strengths' : 'Tus fortalezas identificadas'}</div>
     <div style="display:flex;flex-wrap:wrap;gap:.3rem;">
       ${state.activeStrengths.map(s => `
         <span style="background:rgba(255,230,0,.15);color:var(--yellow);border:1px solid rgba(255,230,0,.3);border-radius:12px;font-size:.78rem;font-weight:600;padding:.2rem .6rem;">${s}</span>
       `).join('')}
     </div>
-    <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.5rem;">Úsalas como punto de partida para responder la pregunta de abajo.</div>
+    <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.5rem;">${isEN ? 'Use them as a starting point to answer the question below.' : 'Úsalas como punto de partida para responder la pregunta de abajo.'}</div>
   `;
 
   card.insertBefore(hint, card.querySelector('.question-text'));
@@ -2185,19 +2256,21 @@ async function generateUniqueValue() {
   const q2 = document.getElementById('uv-q2').value.trim();
   const q3 = document.getElementById('uv-q3').value.trim();
   const q4 = document.getElementById('uv-q4').value.trim();
-  if (!q1 || !q2 || !q3 || !q4) return alert('Por favor responde las cuatro preguntas.');
+  if (!q1 || !q2 || !q3 || !q4) return alert(t('Por favor responde las cuatro preguntas.','Please answer all four questions.'));
 
   state.uvAnswers = {q1, q2, q3, q4};
 
   const btn = document.getElementById('uv-submit-btn');
   btn.disabled = true;
-  btn.textContent = 'Definiendo tu valor único...';
+  btn.textContent = t('Definiendo tu valor único...','Defining your unique value...');
 
   const resultEl = document.getElementById('uv-result');
   resultEl.style.display = 'block';
-  resultEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">Sintetizando...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  resultEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">${t('Sintetizando...','Synthesizing...')}</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
 
-  const prompt = `El usuario respondió las preguntas de Valor Único:
+  const isEN = currentLang === 'en';
+  const prompt = t(
+    `El usuario respondió las preguntas de Valor Único:
 1. A quién sirve: "${q1}"
 2. Problema que resuelve: "${q2}"
 3. Cómo usa sus fortalezas: "${q3}"
@@ -2208,20 +2281,40 @@ Su pasión: "${state.passionStatement}"
 
 Haz dos cosas:
 1. Escribe una DECLARACIÓN DE VALOR ÚNICO en una sola frase (máx 25 palabras) que nombre quién sirve, qué problema resuelve y qué resultado genera. Debe ser específica y diferencial. FORMATO: [VALOR]: Tu declaración aquí.
-2. Escribe una reflexión breve (2 oraciones) sobre por qué este valor único es genuino y diferencial para esta persona específica. FORMATO: [REFLEXIÓN]: Tu reflexión aquí.`;
+2. Escribe una reflexión breve (2 oraciones) sobre por qué este valor único es genuino y diferencial para esta persona específica. FORMATO: [REFLEXIÓN]: Tu reflexión aquí.`,
+    `The user answered the Unique Value questions:
+1. Who they serve: "${q1}"
+2. Problem they solve: "${q2}"
+3. How they use their strengths: "${q3}"
+4. Result they generate: "${q4}"
+
+Their strengths: ${state.activeStrengths.join(', ')}
+Their passion: "${state.passionStatement}"
+
+Do two things:
+1. Write a UNIQUE VALUE STATEMENT in a single sentence (max 25 words) that names who they serve, what problem they solve, and what result they generate. It must be specific and differential. FORMAT: [VALUE]: Your statement here.
+2. Write a brief reflection (2 sentences) about why this unique value is genuine and differential for this specific person. FORMAT: [REFLECTION]: Your reflection here.`
+  );
 
   const response = await callClaude(prompt);
 
   let statement = '';
   let reflection = '';
-  const stmMatch = response.match(/\[VALOR\]:\s*(.+?)(?:\n|$)/s);
-  const refMatch = response.match(/\[REFLEXIÓN\]:\s*(.+)/s);
-  if (stmMatch) statement = stmMatch[1].trim();
-  if (refMatch) reflection = refMatch[1].trim();
+  if (isEN) {
+    const stmMatch = response.match(/\[VALUE\]:\s*(.+?)(?:\n|$)/s);
+    const refMatch = response.match(/\[REFLECTION\]:\s*(.+)/s);
+    if (stmMatch) statement = stmMatch[1].trim();
+    if (refMatch) reflection = refMatch[1].trim();
+  } else {
+    const stmMatch = response.match(/\[VALOR\]:\s*(.+?)(?:\n|$)/s);
+    const refMatch = response.match(/\[REFLEXIÓN\]:\s*(.+)/s);
+    if (stmMatch) statement = stmMatch[1].trim();
+    if (refMatch) reflection = refMatch[1].trim();
+  }
   if (!statement) {
     const lines = response.split('\n').filter(l => l.trim());
-    statement = lines[0]?.replace(/^\[.*?\]:\s*/,'').trim() || response.substring(0,200);
-    reflection = lines.slice(1).join(' ').replace(/^\[.*?\]:\s*/,'').trim();
+    statement = lines[0]?.replace(/^\[.*?\]:\s*/,'').replace(/\*\*/g,'').trim() || response.substring(0,200);
+    reflection = lines.slice(1).join(' ').replace(/^\[.*?\]:\s*/,'').replace(/\*\*/g,'').trim();
   }
 
   state.uvStatement = statement;
@@ -2229,12 +2322,12 @@ Haz dos cosas:
 
   resultEl.innerHTML = `
     <div class="uv-result fade-in">
-      <div class="uv-label">Tu Valor Único</div>
+      <div class="uv-label">${isEN ? 'Your Unique Value' : 'Tu Valor Único'}</div>
       <div class="uv-text" id="uv-statement-text">${statement}</div>
     </div>
-    ${reflection ? `<div class="ai-wrap fade-in" style="margin-top:.75rem;"><div class="ai-label">✦ Por qué este valor es genuinamente tuyo</div><div class="ai-text">${reflection}</div></div>` : ''}
+    ${reflection ? `<div class="ai-wrap fade-in" style="margin-top:.75rem;"><div class="ai-label">✦ ${isEN ? 'Why this value is genuinely yours' : 'Por qué este valor es genuinamente tuyo'}</div><div class="ai-text">${reflection}</div></div>` : ''}
     <div class="btn-row">
-      <button class="btn-primary" onclick="goToStep(6)">SIGUIENTE: TU PROPÓSITO →</button>
+      <button class="btn-primary" onclick="goToStep(6)">${isEN ? 'NEXT: YOUR PURPOSE →' : 'SIGUIENTE: TU PROPÓSITO →'}</button>
     </div>
   `;
   resultEl.scrollIntoView({behavior:'smooth'});
@@ -2247,7 +2340,9 @@ Haz dos cosas:
 async function generatePurpose() {
   document.getElementById('purpose-generating').style.display = 'block';
 
-  const prompt = `Eres el guía experto de The Lab. El usuario completó el proceso "Diseña Tu Propósito".
+  const isEN = currentLang === 'en';
+  const prompt = t(
+    `Eres el guía experto de The Lab. El usuario completó el proceso "Diseña Tu Propósito".
 
 DATOS DEL USUARIO:
 - Valores de identidad (en orden): ${state.rankedValues.join(' > ')}
@@ -2284,7 +2379,46 @@ REGLAS CRÍTICAS — léelas antes de escribir:
 Valida antes de escribir:
 ✓ ¿Las fortalezas están integradas, no listadas?
 ✓ ¿Suena natural leída en voz alta?
-✓ ¿Comunica quién, cómo e impacto en una sola oración fluida?`;
+✓ ¿Comunica quién, cómo e impacto en una sola oración fluida?`,
+    `You are The Lab's expert guide. The user completed the "Design Your Purpose" process.
+
+USER DATA:
+- Identity values (in order): ${state.rankedValues.join(' > ')}
+- Passion: "${state.passionStatement}"
+- Strengths: ${state.activeStrengths.join(', ')}
+- Unique value: "${state.uvStatement}"
+- Who they serve: "${state.uvAnswers.q1}"
+- Problem they solve: "${state.uvAnswers.q2}"
+- Result they generate: "${state.uvAnswers.q4}"
+
+INSTRUCTION: Write ONE life purpose statement in first person. Only the statement, nothing else.
+
+CRITICAL RULES — read before writing:
+
+1. INTEGRATE strengths into natural language — NEVER list them.
+   BAD: "...making use of my strengths of deep listening, reliability and systematic accompaniment..."
+   GOOD: "...guiding them with deep listening and reliable, consistent accompaniment..."
+   
+2. DO NOT use rigid structures like:
+   "My purpose is X making use of Y to achieve Z"
+   Instead, write a fluid sentence where everything is integrated.
+
+3. The sentence must sound NATURAL when read aloud — like something a real person would say about themselves.
+
+4. Must communicate in a single integrated sentence:
+   → Who they serve
+   → How they do it (with strengths dissolved into the "how")
+   → The impact or transformation they generate
+
+5. Do not use the word "strengths" in any form.
+6. Between 35-55 words.
+7. Use the tone and language that emerges from the real responses — do not impose a generic tone.
+
+Validate before writing:
+✓ Are the strengths integrated, not listed?
+✓ Does it sound natural read aloud?
+✓ Does it communicate who, how and impact in a single fluid sentence?`
+  );
 
   const response = await callClaude(prompt);
   state.purpose = response.trim();
@@ -2303,79 +2437,90 @@ async function finalizePurpose() {
   document.getElementById('purpose-result').style.display = 'none';
   const finalEl = document.getElementById('final-screen');
   finalEl.style.display = 'block';
-  finalEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">Preparando tu resumen...</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  finalEl.innerHTML = `<div class="ai-wrap"><div class="ai-label">${t('Preparando tu resumen...','Preparing your summary...')}</div><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
 
-  const prompt = `El usuario finalizó su propósito de vida: "${state.purpose}"
+  const isEN = currentLang === 'en';
+  const prompt = t(
+    `El usuario finalizó su propósito de vida: "${state.purpose}"
 Sus valores: ${state.rankedValues.join(', ')}
 Su pasión: "${state.passionStatement}"
 
 Escribe un mensaje de cierre poderoso (3-4 oraciones) que:
 1. Celebre el trabajo honesto que hicieron — sin exageración
 2. Recuerde que el propósito se construye con decisiones diarias, no solo con declaraciones
-3. Invite a profundizar con un coach de The Lab para convertir esto en un plan de acción real`;
+3. Invite a profundizar con un coach de The Lab para convertir esto en un plan de acción real`,
+    `The user finalized their life purpose: "${state.purpose}"
+Their values: ${state.rankedValues.join(', ')}
+Their passion: "${state.passionStatement}"
+
+Write a powerful closing message (3-4 sentences) that:
+1. Celebrates the honest work they did — without exaggeration
+2. Reminds them that purpose is built with daily decisions, not just declarations
+3. Invites them to go deeper with a The Lab coach to turn this into a real action plan`
+  );
 
   const closing = await callClaude(prompt);
 
   finalEl.innerHTML = `
     <div class="final-hero fade-in">
-      <h2>🎯 Tu Propósito Está Diseñado</h2>
-      <p>Este es el comienzo. Ahora viene lo importante: vivirlo.</p>
+      <h2>🎯 ${isEN ? 'Your Purpose Is Designed' : 'Tu Propósito Está Diseñado'}</h2>
+      <p>${isEN ? 'This is the beginning. Now comes what matters: living it.' : 'Este es el comienzo. Ahora viene lo importante: vivirlo.'}</p>
     </div>
 
     <div class="purpose-result fade-in" style="margin-bottom:1rem;">
-      <div class="purpose-label">✦ Tu Propósito de Vida</div>
+      <div class="purpose-label">✦ ${isEN ? 'My Life Purpose' : 'Tu Propósito de Vida'}</div>
       <div class="purpose-text-display">${state.purpose}</div>
     </div>
 
     <div id="mantra-section" class="fade-in">
       <div class="ai-wrap" style="border:1.5px solid rgba(255,230,0,.3);">
-        <div class="ai-label">⚡ Tu Propósito en Una Frase</div>
+        <div class="ai-label">⚡ ${isEN ? 'Your Purpose in One Sentence' : 'Tu Propósito en Una Frase'}</div>
         <div class="typing-dots"><span></span><span></span><span></span></div>
       </div>
     </div>
 
     <div class="summary-card fade-in">
-      <div class="summary-label">Tus Valores (en orden)</div>
+      <div class="summary-label">${isEN ? 'Your Values (in order)' : 'Tus Valores (en orden)'}</div>
       <div class="summary-value">${state.rankedValues.map((v,i) => `${i+1}. ${v}`).join(' · ')}</div>
     </div>
     <div class="summary-card fade-in">
-      <div class="summary-label">Tu Pasión</div>
+      <div class="summary-label">${isEN ? 'Your Passion' : 'Tu Pasión'}</div>
       <div class="summary-value">${state.passionStatement}</div>
     </div>
     <div class="summary-card fade-in">
-      <div class="summary-label">Tus Fortalezas</div>
+      <div class="summary-label">${isEN ? 'Your Strengths' : 'Tus Fortalezas'}</div>
       <div class="summary-value">${state.activeStrengths.join(' · ')}</div>
     </div>
     <div class="summary-card fade-in">
-      <div class="summary-label">Tu Valor Único</div>
+      <div class="summary-label">${isEN ? 'Your Unique Value' : 'Tu Valor Único'}</div>
       <div class="summary-value">${state.uvStatement}</div>
     </div>
 
     <div class="ai-wrap fade-in" style="margin:1rem 0;">
-      <div class="ai-label">✦ Mensaje Final</div>
+      <div class="ai-label">✦ ${isEN ? 'Final Message' : 'Mensaje Final'}</div>
       <div class="ai-text">${closing}</div>
     </div>
 
     <div class="next-steps fade-in">
-      <h4>Próximos Pasos</h4>
-      <div class="next-step-item"><div class="next-step-num">1</div><div>Mantén tu propósito visible — escríbelo y ponlo donde lo veas cada día</div></div>
-      <div class="next-step-item"><div class="next-step-num">2</div><div>Identifica UNA decisión que puedes tomar esta semana que esté alineada con tu propósito</div></div>
-      <div class="next-step-item"><div class="next-step-num">3</div><div>Comparte tu propósito con alguien de confianza — verbalizarlo lo hace más real</div></div>
-      <div class="next-step-item"><div class="next-step-num">4</div><div>Trabaja con un coach para convertir tu propósito en un plan estratégico concreto</div></div>
+      <h4>${isEN ? 'Next Steps' : 'Próximos Pasos'}</h4>
+      <div class="next-step-item"><div class="next-step-num">1</div><div>${isEN ? 'Keep your purpose visible — write it where you see it every day.' : 'Mantén tu propósito visible — escríbelo y ponlo donde lo veas cada día.'}</div></div>
+      <div class="next-step-item"><div class="next-step-num">2</div><div>${isEN ? 'Identify ONE decision you can make this week aligned with your purpose.' : 'Identifica UNA decisión que puedes tomar esta semana que esté alineada con tu propósito.'}</div></div>
+      <div class="next-step-item"><div class="next-step-num">3</div><div>${isEN ? 'Share your purpose with someone you trust — saying it out loud makes it more real.' : 'Comparte tu propósito con alguien de confianza — verbalizarlo lo hace más real.'}</div></div>
+      <div class="next-step-item"><div class="next-step-num">4</div><div>${isEN ? 'Work with a coach to turn your purpose into a concrete strategic plan.' : 'Trabaja con un coach para convertir tu propósito en un plan estratégico concreto.'}</div></div>
     </div>
 
     <div class="cta-coach fade-in">
-      <h4>¿Listo para ir más profundo?</h4>
-      <p>El siguiente paso es trabajar uno a uno con un coach de The Lab para convertir tu propósito en decisiones y acciones concretas.</p>
+      <h4>${isEN ? 'Ready to go deeper?' : '¿Listo para ir más profundo?'}</h4>
+      <p>${isEN ? 'The next step is to work one-on-one with a The Lab coach to turn your purpose into concrete decisions and actions.' : 'El siguiente paso es trabajar uno a uno con un coach de The Lab para convertir tu propósito en decisiones y acciones concretas.'}</p>
       <div class="download-row">
-        <button class="btn-secondary btn-sm" onclick="downloadResults()">📄 Descargar Resumen</button>
-        <button class="btn-primary btn-sm" onclick="contactCoach()" style="width:auto;">Hablar con un Coach →</button>
+        <button class="btn-secondary btn-sm" onclick="downloadResults()">📄 ${isEN ? 'Download Summary' : 'Descargar Resumen'}</button>
+        <button class="btn-primary btn-sm" onclick="contactCoach()" style="width:auto;">${isEN ? 'Talk to a Coach →' : 'Hablar con un Coach →'}</button>
       </div>
-      <p style="font-size:.75rem;color:#666;margin-top:.6rem;text-align:center;">Al descargar, abre el archivo y usa <strong>Archivo → Imprimir → Guardar como PDF</strong></p>
+      <p style="font-size:.75rem;color:#666;margin-top:.6rem;text-align:center;">${isEN ? 'After downloading, open the file and use <strong>File → Print → Save as PDF</strong>' : 'Al descargar, abre el archivo y usa <strong>Archivo → Imprimir → Guardar como PDF</strong>'}</p>
     </div>
 
     <div style="text-align:center;margin-top:1.5rem;">
-      <button onclick="restartTool()" style="background:transparent;border:none;font-size:.8rem;color:var(--gray-4);cursor:pointer;font-family:var(--font-body);">Comenzar de nuevo</button>
+      <button onclick="restartTool()" style="background:transparent;border:none;font-size:.8rem;color:var(--gray-4);cursor:pointer;font-family:var(--font-body);">${isEN ? 'Start over' : 'Comenzar de nuevo'}</button>
     </div>
   `;
 
@@ -2389,7 +2534,9 @@ Escribe un mensaje de cierre poderoso (3-4 oraciones) que:
 // ===========================
 async function generateMantra() {
   try {
-    const prompt = `El usuario tiene este propósito de vida completo:
+    const isEN = currentLang === 'en';
+    const prompt = t(
+      `El usuario tiene este propósito de vida completo:
 "${state.purpose}"
 
 Tu tarea: escribe UNA frase corta — máximo 10-12 palabras — que capture la esencia de este propósito de una manera que la persona pueda memorizar y repetir en su día a día.
@@ -2405,7 +2552,25 @@ REGLAS:
 Ejemplos del estilo correcto:
 - Ilumino el camino de quienes buscan dirección y no la encuentran solos.
 - Transformo la confusión en claridad para quienes están listos para crecer.
-- Construyo puentes entre el potencial que existe y la vida que se puede vivir.`;
+- Construyo puentes entre el potencial que existe y la vida que se puede vivir.`,
+      `The user has this complete life purpose:
+"${state.purpose}"
+
+Your task: write ONE short sentence — maximum 10-12 words — that captures the essence of this purpose in a way the person can memorize and repeat every day.
+
+RULES:
+1. First person ("I exist to...", "I walk toward...", "I am someone who...", or any opening that flows)
+2. Must be specific to this person — not generic or empty motivation
+3. Must feel like a personal mantra, not a slogan
+4. Energizing, direct, memorable
+5. Maximum 12 words
+6. Only the sentence. No explanation. No quotes.
+
+Examples of the correct style:
+- I light the path for those seeking direction and cannot find it alone.
+- I transform confusion into clarity for those ready to grow.
+- I build bridges between the potential that exists and the life that can be lived.`
+    );
 
     const response = await callClaude(prompt);
     const mantra = response.trim().replace(/^["']|["']$/g, '');
@@ -2417,14 +2582,13 @@ Ejemplos del estilo correcto:
 
     section.innerHTML = `
       <div class="mantra-card fade-in">
-        <div class="mantra-eyebrow">⚡ Tu Propósito en Una Frase</div>
-        <div class="mantra-hint">Una versión corta para llevar contigo y recordar cada día.</div>
+        <div class="mantra-eyebrow">⚡ ${isEN ? 'Your Purpose in One Sentence' : 'Tu Propósito en Una Frase'}</div>
+        <div class="mantra-hint">${isEN ? 'A short version to carry with you and remember every day.' : 'Una versión corta para llevar contigo y recordar cada día.'}</div>
         <textarea class="mantra-text" id="mantra-text" rows="2">${mantra}</textarea>
-        <div class="mantra-footer">Puedes ajustar la frase hasta que resuene completamente contigo.</div>
+        <div class="mantra-footer">${isEN ? 'You can adjust the phrase until it resonates completely with you.' : 'Puedes ajustar la frase hasta que resuene completamente contigo.'}</div>
       </div>
     `;
   } catch(e) {
-    // Fail silently — do not disrupt the summary screen
     const section = document.getElementById('mantra-section');
     if (section) section.innerHTML = '';
   }
@@ -2433,7 +2597,7 @@ Ejemplos del estilo correcto:
 
 async function downloadResults() {
   const btn = document.querySelector('.download-row .btn-secondary');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Preparando...'; }
+  if (btn) { btn.disabled = true; btn.textContent = t('⏳ Preparando...','⏳ Preparing...'); }
 
   try {
     const values = (state.rankedValues || []).map((v, i) =>
@@ -2452,25 +2616,25 @@ async function downloadResults() {
     const mantraText = state.mantra ||
       document.getElementById('mantra-text')?.value?.trim() || '';
 
-    // Identity answers
+    const isEN = currentLang === 'en';
+    const TERRITORIES_ES = ['Aprendizaje + Relación','Valores en Conflicto + Decisión','Lealtad + Convicción','Impacto + Autenticidad','Contribución + Legado'];
+    const TERRITORIES_EN = ['Learning + Relationship','Values in Conflict + Decision','Loyalty + Conviction','Impact + Authenticity','Contribution + Legacy'];
+    const TERRITORIES = isEN ? TERRITORIES_EN : TERRITORIES_ES;
+
     const identityHtml = (state.identityResponses || []).map((r, i) => {
       if (!r) return '';
-      const TERRITORIES = [
-        'Aprendizaje + Relación','Valores en Conflicto + Decisión',
-        'Lealtad + Convicción','Impacto + Autenticidad','Contribución + Legado'
-      ];
       return `<div class="qa-block">
-        <div class="qa-territory">${TERRITORIES[i] || `Pregunta ${i+1}`}</div>
+        <div class="qa-territory">${TERRITORIES[i] || `${isEN?'Question':'Pregunta'} ${i+1}`}</div>
         <div class="qa-q">${r.q1 || ''}</div>
         ${r.q2 ? `<div class="qa-q qa-q2">${r.q2}</div>` : ''}
       </div>`;
     }).join('');
 
     const html = `<!DOCTYPE html>
-<html lang="es">
+<html lang="${isEN?'en':'es'}">
 <head>
 <meta charset="UTF-8">
-<title>Mi Propósito — The Lab</title>
+<title>${isEN?'My Purpose — The Lab':'Mi Propósito — The Lab'}</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   @page{size:A4;margin:0;}
@@ -2533,112 +2697,112 @@ async function downloadResults() {
 <!-- COVER -->
 <div class="cover-band">
   <div class="cover-brand">The Lab · Leo Sierra</div>
-  <div class="cover-title">PROPÓSITO</div>
-  <div class="cover-sub">Diseña una Vida Extraordinaria en 6 Pasos</div>
-  <div class="cover-caption">Resumen personal del proceso</div>
+  <div class="cover-title">${isEN?'PURPOSE':'PROPÓSITO'}</div>
+  <div class="cover-sub">${isEN?'Design an Extraordinary Life in 6 Steps':'Diseña una Vida Extraordinaria en 6 Pasos'}</div>
+  <div class="cover-caption">${isEN?'Personal process summary':'Resumen personal del proceso'}</div>
 </div>
 
 ${mantraText ? `
 <div class="mantra-band">
-  <div class="mantra-eyebrow">⚡ Tu Propósito en Una Frase</div>
+  <div class="mantra-eyebrow">⚡ ${isEN?'Your Purpose in One Sentence':'Tu Propósito en Una Frase'}</div>
   <div class="mantra-phrase">${mantraText}</div>
 </div>` : ''}
 
 <div class="content">
 
   <!-- PART 1: SUMMARY -->
-  <div class="part-title">Parte 1 — Tu Resumen Final</div>
+  <div class="part-title">${isEN?'Part 1 — Your Final Summary':'Parte 1 — Tu Resumen Final'}</div>
 
   <div class="purpose-box">
-    <div class="section-eyebrow">✦ Mi Propósito de Vida</div>
+    <div class="section-eyebrow">✦ ${isEN?'My Life Purpose':'Mi Propósito de Vida'}</div>
     <div class="purpose-text">${state.purpose || ''}</div>
   </div>
 
   <div class="section">
-    <div class="section-title">Mis Valores — En Orden de Importancia</div>
+    <div class="section-title">${isEN?'My Values — In Order of Importance':'Mis Valores — En Orden de Importancia'}</div>
     ${values}
   </div>
 
   <div class="section">
-    <div class="section-title">Mi Pasión</div>
+    <div class="section-title">${isEN?'My Passion':'Mi Pasión'}</div>
     <div class="body-text">${state.passionStatement || ''}</div>
   </div>
 
   <div class="section">
-    <div class="section-title">Mis Fortalezas</div>
+    <div class="section-title">${isEN?'My Strengths':'Mis Fortalezas'}</div>
     <div class="strength-wrap">${strengths}</div>
   </div>
 
   <div class="section">
-    <div class="section-title">Mi Valor Único</div>
+    <div class="section-title">${isEN?'My Unique Value':'Mi Valor Único'}</div>
     <div class="body-text">${state.uvStatement || ''}</div>
   </div>
 
   <div class="steps-box">
-    <div class="steps-title">Próximos Pasos</div>
-    <div class="step-item"><span class="step-num">1</span>Mantén tu propósito visible — escríbelo donde lo veas cada día.</div>
-    <div class="step-item"><span class="step-num">2</span>Identifica UNA decisión esta semana alineada con tu propósito.</div>
-    <div class="step-item"><span class="step-num">3</span>Comparte tu propósito con alguien de confianza.</div>
-    <div class="step-item"><span class="step-num">4</span>Trabaja con un coach para convertirlo en un plan concreto.</div>
+    <div class="steps-title">${isEN?'Next Steps':'Próximos Pasos'}</div>
+    <div class="step-item"><span class="step-num">1</span>${isEN?'Keep your purpose visible — write it where you see it every day.':'Mantén tu propósito visible — escríbelo donde lo veas cada día.'}</div>
+    <div class="step-item"><span class="step-num">2</span>${isEN?'Identify ONE decision this week aligned with your purpose.':'Identifica UNA decisión esta semana alineada con tu propósito.'}</div>
+    <div class="step-item"><span class="step-num">3</span>${isEN?'Share your purpose with someone you trust.':'Comparte tu propósito con alguien de confianza.'}</div>
+    <div class="step-item"><span class="step-num">4</span>${isEN?'Work with a coach to turn it into a concrete action plan.':'Trabaja con un coach para convertirlo en un plan concreto.'}</div>
   </div>
 
   <hr class="divider">
 
   <!-- PART 2: PROCESS ANSWERS -->
-  <div class="part-title">Parte 2 — Tus Respuestas del Proceso</div>
+  <div class="part-title">${isEN?'Part 2 — Your Process Responses':'Parte 2 — Tus Respuestas del Proceso'}</div>
 
   <div class="section">
-    <div class="section-title">Paso 1 — Tu Ubicación</div>
-    ${state.why ? `<div class="qa-label">¿Por qué quieres descubrir tu propósito?</div>
+    <div class="section-title">${isEN?'Step 1 — Your Location':'Paso 1 — Tu Ubicación'}</div>
+    ${state.why ? `<div class="qa-label">${isEN?'Why do you want to discover your purpose?':'¿Por qué quieres descubrir tu propósito?'}</div>
     <div class="qa-q">${state.why}</div>` : ''}
-    ${state.location ? `<div class="qa-label">Estado actual</div>
+    ${state.location ? `<div class="qa-label">${isEN?'Current state':'Estado actual'}</div>
     <div class="qa-q">${state.location.charAt(0).toUpperCase() + state.location.slice(1)}</div>` : ''}
-    ${state.followupAnswer ? `<div class="qa-label">Reflexión de seguimiento</div>
+    ${state.followupAnswer ? `<div class="qa-label">${isEN?'Follow-up reflection':'Reflexión de seguimiento'}</div>
     <div class="qa-q">${state.followupAnswer}</div>` : ''}
   </div>
 
   <div class="section">
-    <div class="section-title">Paso 2 — Tu Identidad</div>
+    <div class="section-title">${isEN?'Step 2 — Your Identity':'Paso 2 — Tu Identidad'}</div>
     ${identityHtml}
     ${state.rankedValues && state.rankedValues.length ? `
-    <div class="qa-label">Valores finales (en orden)</div>
+    <div class="qa-label">${isEN?'Final values (in order)':'Valores finales (en orden)'}</div>
     <div class="qa-q">${state.rankedValues.map((v,i) => `${i+1}. ${v}`).join(' · ')}</div>` : ''}
   </div>
 
   <div class="section">
-    <div class="section-title">Paso 3 — Tu Pasión</div>
-    ${state.passionAnswers?.q1 ? `<div class="qa-label">¿Cuándo sentiste que estabas exactamente donde debías estar?</div>
+    <div class="section-title">${isEN?'Step 3 — Your Passion':'Paso 3 — Tu Pasión'}</div>
+    ${state.passionAnswers?.q1 ? `<div class="qa-label">${isEN?'When did you feel you were exactly where you were meant to be?':'¿Cuándo sentiste que estabas exactamente donde debías estar?'}</div>
     <div class="qa-q">${state.passionAnswers.q1}</div>` : ''}
-    ${state.passionAnswers?.q2 ? `<div class="qa-label">¿Qué te duele ver en el mundo?</div>
+    ${state.passionAnswers?.q2 ? `<div class="qa-label">${isEN?'What hurts you to see in the world?':'¿Qué te duele ver en el mundo?'}</div>
     <div class="qa-q">${state.passionAnswers.q2}</div>` : ''}
-    ${state.passionAnswers?.q3 ? `<div class="qa-label">¿Qué sueñas hacer o construir?</div>
+    ${state.passionAnswers?.q3 ? `<div class="qa-label">${isEN?'What do you dream of doing or building?':'¿Qué sueñas hacer o construir?'}</div>
     <div class="qa-q">${state.passionAnswers.q3}</div>` : ''}
   </div>
 
   <div class="section">
-    <div class="section-title">Paso 4 — Tus Fortalezas</div>
-    ${state.strengthColor ? `<div class="qa-label">Perfil de color</div>
+    <div class="section-title">${isEN?'Step 4 — Your Strengths':'Paso 4 — Tus Fortalezas'}</div>
+    ${state.strengthColor ? `<div class="qa-label">${isEN?'Color profile':'Perfil de color'}</div>
     <div class="qa-q">${state.strengthColor.charAt(0).toUpperCase() + state.strengthColor.slice(1)}</div>` : ''}
-    ${state.activeStrengths?.length ? `<div class="qa-label">Fortalezas activas</div>
+    ${state.activeStrengths?.length ? `<div class="qa-label">${isEN?'Active strengths':'Fortalezas activas'}</div>
     <div class="qa-q">${state.activeStrengths.join(' · ')}</div>` : ''}
   </div>
 
   <div class="section">
-    <div class="section-title">Paso 5 — Tu Valor Único</div>
-    ${state.uvAnswers?.q1 ? `<div class="qa-label">¿A quién sirves?</div>
+    <div class="section-title">${isEN?'Step 5 — Your Unique Value':'Paso 5 — Tu Valor Único'}</div>
+    ${state.uvAnswers?.q1 ? `<div class="qa-label">${isEN?'Who do you serve?':'¿A quién sirves?'}</div>
     <div class="qa-q">${state.uvAnswers.q1}</div>` : ''}
-    ${state.uvAnswers?.q2 ? `<div class="qa-label">¿Qué problema resuelves?</div>
+    ${state.uvAnswers?.q2 ? `<div class="qa-label">${isEN?'What problem do you solve?':'¿Qué problema resuelves?'}</div>
     <div class="qa-q">${state.uvAnswers.q2}</div>` : ''}
-    ${state.uvAnswers?.q3 ? `<div class="qa-label">¿Cómo usas tus fortalezas?</div>
+    ${state.uvAnswers?.q3 ? `<div class="qa-label">${isEN?'How do you use your strengths?':'¿Cómo usas tus fortalezas?'}</div>
     <div class="qa-q">${state.uvAnswers.q3}</div>` : ''}
-    ${state.uvAnswers?.q4 ? `<div class="qa-label">¿Qué resultado concreto generas?</div>
+    ${state.uvAnswers?.q4 ? `<div class="qa-label">${isEN?'What concrete result do you generate?':'¿Qué resultado concreto generas?'}</div>
     <div class="qa-q">${state.uvAnswers.q4}</div>` : ''}
   </div>
 
 </div>
 
 <div class="footer">
-  <span class="footer-brand">The Lab · Leo Sierra — Diseña Tu Propósito</span>
+  <span class="footer-brand">The Lab · Leo Sierra — ${isEN?'Design Your Purpose':'Diseña Tu Propósito'}</span>
   <span class="footer-note">thelab.com</span>
 </div>
 
@@ -2662,9 +2826,9 @@ ${mantraText ? `
 
   } catch(e) {
     console.error('PDF error:', e);
-    alert('Hubo un error generando el PDF. Por favor intenta de nuevo.');
+    alert(t('Hubo un error generando el PDF. Por favor intenta de nuevo.','There was an error generating the PDF. Please try again.'));
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '📄 Descargar Resumen'; }
+    if (btn) { btn.disabled = false; btn.textContent = t('📄 Descargar Resumen','📄 Download Summary'); }
   }
 }
 
@@ -2868,13 +3032,13 @@ function validateAccessCode() {
   const raw   = document.getElementById('access-code-input').value.trim().toUpperCase();
   const errEl = document.getElementById('access-error');
 
-  if (!raw) { errEl.textContent = 'Por favor ingresa tu código de acceso.'; return; }
+  if (!raw) { errEl.textContent = t('Por favor ingresa tu código de acceso.','Please enter your access code.'); return; }
   if (!ACCESS_CODES.includes(raw)) {
-    errEl.textContent = 'Código incorrecto. Verifica e intenta de nuevo.';
+    errEl.textContent = t('Código incorrecto. Verifica e intenta de nuevo.','Incorrect code. Please verify and try again.');
     return;
   }
   if (getUsedCodes().includes(raw)) {
-    errEl.textContent = 'Este código ya fue utilizado. Contacta a The Lab para obtener uno nuevo.';
+    errEl.textContent = t('Este código ya fue utilizado. Contacta a The Lab para obtener uno nuevo.','This code has already been used. Contact The Lab for a new one.');
     return;
   }
 
