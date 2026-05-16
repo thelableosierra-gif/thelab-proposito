@@ -40,7 +40,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'The Lab <onboarding@resend.dev>',
+        from: 'The Lab <noreply@jointhelab.org>',
         to: [email],
         subject: isEN ? 'Your Life Purpose - The Lab' : 'Tu Proposito de Vida - The Lab',
         html: htmlBody
