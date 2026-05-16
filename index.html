@@ -836,6 +836,44 @@ function updateStepContent(lang) {
     if (el) el.setAttribute(attr, val);
   }
 
+  // Welcome quote
+  setQueryHTML('#screen-0 .welcome-quote p', isEN
+    ? '"There are two great moments in a person\'s life: the day they are born and the day they discover why."'
+    : '"Hay dos grandes momentos en la vida de una persona: el día que nace y el día que descubre por qué nació."');
+
+  // Welcome card steps list
+  setQueryText('#screen-0 .card-title', isEN ? 'What you will discover in this process' : 'Qué vas a descubrir en este proceso');
+  const stepItems = document.querySelectorAll('#screen-0 .card > div > div');
+  const stepsEN = [
+    ['Your Location', 'Where you truly are today'],
+    ['Your Identity', 'The values that truly govern you'],
+    ['Your Passion', 'What moves you from within'],
+    ['Your Strengths', 'How you naturally generate value'],
+    ['Your Unique Value', 'The impact only you can generate'],
+    ['Your Purpose', 'The declaration that integrates it all']
+  ];
+  const stepsES = [
+    ['Tu Ubicación', 'Dónde estás realmente hoy'],
+    ['Tu Identidad', 'Los valores que realmente te gobiernan'],
+    ['Tu Pasión', 'Lo que te mueve desde adentro'],
+    ['Tus Fortalezas', 'Cómo generas valor naturalmente'],
+    ['Tu Valor Único', 'El impacto que solo tú puedes generar'],
+    ['Tu Propósito', 'La declaración que lo integra todo']
+  ];
+  const steps = isEN ? stepsEN : stepsES;
+  stepItems.forEach((item, i) => {
+    if (steps[i]) {
+      const strong = item.querySelector('strong');
+      const span = item.querySelector('span');
+      if (strong) strong.textContent = steps[i][0];
+      if (span) {
+        // Replace the text node after the strong tag
+        const textNodes = [...span.childNodes].filter(n => n.nodeType === 3);
+        if (textNodes.length) textNodes[0].textContent = ' — ' + steps[i][1];
+      }
+    }
+  });
+
   // ── STEP 1 ──────────────────────────────────────────
   setQueryText('#screen-1 .step-label', isEN ? 'Step 1 of 6' : 'Paso 1 de 6');
   setQueryHTML('#screen-1 .step-title', isEN ? 'Your <span>Location</span>' : 'Tu <span>Ubicación</span>');
