@@ -864,7 +864,7 @@ function updateStepContent(lang) {
   stepItems.forEach((item, i) => {
     if (steps[i]) {
       const strong = item.querySelector('strong');
-      const span = item.querySelector('span');
+      const span = [...item.querySelectorAll('span')].find(s => s.querySelector('strong'));
       if (strong) strong.textContent = steps[i][0];
       if (span) {
         // Replace the text node after the strong tag
