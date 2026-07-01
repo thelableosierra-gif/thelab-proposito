@@ -1,1 +1,469 @@
-<!-- placeholder -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lab · Diseña Tu Propósito — Registro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFE600;
+    --black: #0A0A0A;
+    --gray: #1A1A1A;
+    --gray-light: #2C2C2C;
+    --white: #FFFFFF;
+    --text-muted: #999;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: var(--gray);
+    border: 1px solid var(--gray-light);
+    border-radius: 20px;
+    max-width: 480px;
+    width: 100%;
+    padding: 40px 32px;
+  }
+  .lang-toggle {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .lang-toggle button {
+    background: transparent;
+    border: 1px solid var(--gray-light);
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .lang-toggle button.active {
+    background: var(--yellow);
+    color: var(--black);
+    border-color: var(--yellow);
+    font-weight: 700;
+  }
+  .brand {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    line-height: 1.1;
+  }
+  .subtitle {
+    color: var(--text-muted);
+cat > register.html << 'EOF'
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lab · Diseña Tu Propósito — Registro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFE600;
+    --black: #0A0A0A;
+    --gray: #1A1A1A;
+    --gray-light: #2C2C2C;
+    --white: #FFFFFF;
+    --text-muted: #999;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: var(--gray);
+    border: 1px solid var(--gray-light);
+    border-radius: 20px;
+    max-width: 480px;
+    width: 100%;
+    padding: 40px 32px;
+  }
+  .lang-toggle {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .lang-toggle button {
+    background: transparent;
+    border: 1px solid var(--gray-light);
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .lang-toggle button.active {
+    background: var(--yellow);
+    color: var(--black);
+    border-color: var(--yellow);
+    font-weight: 700;
+  }
+  .brand {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    line-height: 1.1;
+  }
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+  input[type="text"],
+  input[type="email"] {
+    width: 100%;
+    background: var(--black);
+    border: 1px solid var(--gray-light);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus {
+    border-color: var(--yellow);
+  }
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--black);
+    border: 1px solid var(--gray-light);
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+  }
+  .radio-option input[type="radio"] {
+    accent-color: var(--yellow);
+    width: 16px;
+    height: 16px;
+  }
+  .radio-option span {
+    font-size: 14px;
+  }
+  .radio-option.selected {
+    border-color: var(--yellow);
+  }
+  #other-text {
+    margin-top: 8px;
+    display: none;
+  }
+  button[type="submit"] {
+    width: 100%;
+    background: var(--yellow);
+    color: var(--black);
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-top: 28px;
+  }
+  button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .error-msg {
+    color: #FF5C5C;
+    font-size: 13px;
+    margin-top: 14px;
+    display: none;
+  }
+  .success-screen {
+    display: none;
+    text-align: center;
+  }
+  .success-screen .icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+  .success-screen h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .success-screen p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .success-screen a.button-link {
+    display: inline-block;
+    background: var(--yellow);
+    color: var(--black);
+    text-decoration: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    padding: 14px 28px;
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="lang-toggle">
+    <button id="lang-es" class="active" onclick="setLanguage('es')">ES</button>
+    <button id="lang-en" onclick="setLanguage('en')">EN</button>
+  </div>
+
+  <div id="form-screen">
+    <div class="brand" id="t-brand">THE LAB · LEO SIERRA</div>
+    <h1 id="t-title">Diseña Tu Propósito</h1>
+    <p class="subtitle" id="t-subtitle">Regístrate para recibir tu código de acceso personal y comenzar el proceso guiado de 6 pasos.</p>
+
+    <form id="register-form">
+      <label id="t-label-name">Nombre completo</label>
+      <input type="text" id="name" required>
+
+      <label id="t-label-email">Correo electrónico</label>
+      <input type="email" id="email" required>
+
+      <label id="t-label-howheard">¿Cómo conociste The Lab?</label>
+      <div class="radio-group" id="howheard-group">
+        <label class="radio-option"><input type="radio" name="howHeard" value="WhatsApp"><span>WhatsApp</span></label>
+        <label class="radio-option"><input type="radio" name="howHeard" value="Instagram"><span>Instagram</span></label>
+        <label class="radio-option"><input type="radio" name="howHeard" value="Facebook"><span>Facebook</span></label>
+        <label class="radio-option"><input type="radio" name="howHeard" value="Un amigo" id="t-friend"><span id="t-friend-label">Un amigo</span></label>
+        <label class="radio-option"><input type="radio" name="howHeard" value="Taller o evento" id="t-event"><span id="t-event-label">Un taller o evento</span></label>
+        <label class="radio-option"><input type="radio" name="howHeard" value="Otro" id="other-radio"><span id="t-other-label">Otro</span></label>
+      </div>
+      <input type="text" id="other-text" placeholder="Cuéntanos más...">
+
+      <button type="submit" id="submit-btn">REGISTRARME →</button>
+      <p class="error-msg" id="error-msg"></p>
+    </form>
+  </div>
+
+  <div class="success-screen" id="success-screen">
+    <div class="icon">✅</div>
+    <h2 id="t-success-title">¡Listo!</h2>
+    <p id="t-success-text">Revisa tu correo — te enviamos tu código de acceso personal. Úsalo para comenzar tu proceso.</p>
+    <a href="https://thelab-proposito-n1q9.vercel.app" class="button-link" id="t-success-btn">IR AL ASSESSMENT →</a>
+  </div>
+
+</div>
+
+<script>
+  let currentLang = 'es';
+
+  const STRINGS = {
+    es: {
+      brand: 'THE LAB · LEO SIERRA',
+      title: 'Diseña Tu Propósito',
+      subtitle: 'Regístrate para recibir tu código de acceso personal y comenzar el proceso guiado de 6 pasos.',
+      labelName: 'Nombre completo',
+      labelEmail: 'Correo electrónico',
+      labelHowHeard: '¿Cómo conociste The Lab?',
+      friendLabel: 'Un amigo',
+      eventLabel: 'Un taller o evento',
+      otherLabel: 'Otro',
+      otherPlaceholder: 'Cuéntanos más...',
+      submitBtn: 'REGISTRARME →',
+      submitBtnLoading: 'ENVIANDO...',
+      errRequired: 'Por favor completa tu nombre y correo.',
+      errHowHeard: 'Por favor selecciona cómo conociste The Lab.',
+      errGeneric: 'Hubo un error. Por favor intenta de nuevo.',
+      errNoCodes: 'No hay códigos disponibles en este momento. Contacta a The Lab.',
+      successTitle: '¡Listo!',
+      successText: 'Revisa tu correo — te enviamos tu código de acceso personal. Úsalo para comenzar tu proceso.',
+      successBtn: 'IR AL ASSESSMENT →',
+    },
+    en: {
+      brand: 'THE LAB · LEO SIERRA',
+      title: 'Design Your Purpose',
+      subtitle: 'Register to receive your personal access code and begin the guided 6-step process.',
+      labelName: 'Full name',
+      labelEmail: 'Email address',
+      labelHowHeard: 'How did you hear about The Lab?',
+      friendLabel: 'A friend',
+      eventLabel: 'A workshop or event',
+      otherLabel: 'Other',
+      otherPlaceholder: 'Tell us more...',
+      submitBtn: 'REGISTER →',
+      submitBtnLoading: 'SENDING...',
+      errRequired: 'Please fill in your name and email.',
+      errHowHeard: 'Please select how you heard about The Lab.',
+      errGeneric: 'Something went wrong. Please try again.',
+      errNoCodes: 'No codes are available right now. Please contact The Lab.',
+      successTitle: 'All set!',
+      successText: 'Check your email — we sent you your personal access code. Use it to begin your process.',
+      successBtn: 'GO TO THE ASSESSMENT →',
+    }
+  };
+
+  function applyStrings() {
+    const s = STRINGS[currentLang];
+    document.getElementById('t-brand').textContent = s.brand;
+    document.getElementById('t-title').textContent = s.title;
+    document.getElementById('t-subtitle').textContent = s.subtitle;
+    document.getElementById('t-label-name').textContent = s.labelName;
+    document.getElementById('t-label-email').textContent = s.labelEmail;
+    document.getElementById('t-label-howheard').textContent = s.labelHowHeard;
+    document.getElementById('t-friend-label').textContent = s.friendLabel;
+    document.getElementById('t-event-label').textContent = s.eventLabel;
+    document.getElementById('t-other-label').textContent = s.otherLabel;
+    document.getElementById('other-text').placeholder = s.otherPlaceholder;
+    document.getElementById('submit-btn').textContent = s.submitBtn;
+    document.getElementById('t-success-title').textContent = s.successTitle;
+    document.getElementById('t-success-text').textContent = s.successText;
+    document.getElementById('t-success-btn').textContent = s.successBtn;
+    document.documentElement.lang = currentLang;
+  }
+
+  function setLanguage(lang) {
+    currentLang = lang;
+    document.getElementById('lang-es').classList.toggle('active', lang === 'es');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    applyStrings();
+  }
+
+  // Auto-detect browser language
+  (function detectLanguage() {
+    const browserLang = navigator.language || navigator.userLanguage || 'es';
+    if (browserLang.toLowerCase().startsWith('en')) {
+      setLanguage('en');
+    } else {
+      setLanguage('es');
+    }
+  })();
+
+  // Show/hide "other" text field
+  document.querySelectorAll('input[name="howHeard"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      document.querySelectorAll('.radio-option').forEach(function(opt) {
+        opt.classList.remove('selected');
+      });
+      radio.closest('.radio-option').classList.add('selected');
+      document.getElementById('other-text').style.display =
+        document.getElementById('other-radio').checked ? 'block' : 'none';
+    });
+  });
+
+  document.getElementById('register-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const s = STRINGS[currentLang];
+    const errEl = document.getElementById('error-msg');
+    errEl.style.display = 'none';
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const howHeardRadio = document.querySelector('input[name="howHeard"]:checked');
+    const otherText = document.getElementById('other-text').value.trim();
+
+    if (!name || !email) {
+      errEl.textContent = s.errRequired;
+      errEl.style.display = 'block';
+      return;
+    }
+
+    if (!howHeardRadio) {
+      errEl.textContent = s.errHowHeard;
+      errEl.style.display = 'block';
+      return;
+    }
+
+    let howHeard = howHeardRadio.value;
+    if (howHeard === 'Otro' && otherText) {
+      howHeard = 'Otro: ' + otherText;
+    }
+
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = s.submitBtnLoading;
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, email: email, howHeard: howHeard, lang: currentLang }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        errEl.textContent = response.status === 409 ? s.errNoCodes : s.errGeneric;
+        errEl.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = s.submitBtn;
+        return;
+      }
+
+      document.getElementById('form-screen').style.display = 'none';
+      document.getElementById('success-screen').style.display = 'block';
+
+    } catch (err) {
+      errEl.textContent = s.errGeneric;
+      errEl.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = s.submitBtn;
+    }
+  });
+</script>
+
+</body>
+</html>
