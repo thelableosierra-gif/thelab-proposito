@@ -10,7 +10,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_NAME = 'Códigos - Uso Participantes';
 // Los códigos empiezan en la fila 1 (sin fila de encabezados).
-const RANGE = `${SHEET_NAME}!A1:D`;
+// El nombre de la hoja va entre comillas simples porque contiene espacios.
+const RANGE = `'${SHEET_NAME}'!A1:D`;
 
 function getSheetsClient() {
   // GOOGLE_PRIVATE_KEY is stored as base64 in Vercel to avoid line-break
@@ -75,7 +76,7 @@ export default async function handler(req, res) {
     const sheetRowNumber = targetRowIndex + 1; // +1 porque el rango empieza en la fila 1
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!B${sheetRowNumber}:D${sheetRowNumber}`,
+      range: `'${SHEET_NAME}'!B${sheetRowNumber}:D${sheetRowNumber}`,
       valueInputOption: 'RAW',
       requestBody: {
         values: [['YES', name, email]],
