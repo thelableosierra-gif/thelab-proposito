@@ -13,10 +13,18 @@ const SHEET_NAME = 'Códigos - Uso Participantes';
 const RANGE = `${SHEET_NAME}!A1:D`;
 
 function getSheetsClient() {
+  // GOOGLE_PRIVATE_KEY is stored as base64 in Vercel to avoid line-break
+  // corruption when pasting multi-line PEM keys into the dashboard.
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY || '';
+  const decodedKey = Buffer.from(rawKey, 'base64').toString('utf-8');
+  const privateKey = decodedKey.includes('BEGIN PRIVATE KEY')
+    ? decodedKey
+    : rawKey.replace(/\\n/g, '\n'); // fallback for a plain (non-base64) value
+
   const auth = new google.auth.JWT(
     process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
     null,
-    (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+    privateKey,
     ['https://www.googleapis.com/auth/spreadsheets']
   );
   return google.sheets({ version: 'v4', auth });
