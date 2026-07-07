@@ -482,7 +482,7 @@ textarea::placeholder{color:var(--gray-4);}
       <textarea class="passion-edit" id="passion-statement-text" rows="3"></textarea>
     </div>
     <div id="passion-ai-reflection" style="margin:1rem 0;"></div>
-    <div class="btn-row">
+    <div id="btn-to-step4" class="btn-row">
       <button class="btn-primary" onclick="goToStep(4)">SIGUIENTE: TUS FORTALEZAS →</button>
     </div>
   </div>
@@ -591,7 +591,7 @@ textarea::placeholder{color:var(--gray-4);}
       <div class="uv-text" id="uv-statement-text"></div>
     </div>
     <div id="uv-ai-reflection" style="margin:1rem 0;"></div>
-    <div class="btn-row">
+    <div id="btn-to-step6" class="btn-row">
       <button class="btn-primary" onclick="goToStep(6)">SIGUIENTE: TU PROPÓSITO →</button>
     </div>
   </div>
@@ -891,6 +891,7 @@ function updateStepContent(lang) {
     ? 'Write honestly. There is no right or wrong answer...'
     : 'Escribe con honestidad. No hay respuesta correcta o incorrecta...');
   setQueryText('#screen-1 .btn-primary', isEN ? 'CONTINUE →' : 'CONTINUAR →');
+  setQueryText('#location-section .card-title', isEN ? 'Which of these situations do you identify with most?' : '¿Con cuál de estas situaciones te identificas más?');
 
   // Location options
   const locBtns = document.querySelectorAll('#screen-1 .loc-btn');
@@ -962,6 +963,7 @@ function updateStepContent(lang) {
 
   const passionLabel = document.querySelector('.passion-label');
   if (passionLabel) passionLabel.textContent = isEN ? '✦ My Passion Statement' : '✦ Tu Declaración de Pasión';
+  setQueryText('#btn-to-step4 .btn-primary', isEN ? 'NEXT: YOUR STRENGTHS →' : 'SIGUIENTE: TUS FORTALEZAS →');
 
   // ── STEP 4 ──────────────────────────────────────────
   setQueryText('#screen-4 .step-label', isEN ? 'Step 4 of 6' : 'Paso 4 de 6');
@@ -1037,6 +1039,7 @@ function updateStepContent(lang) {
   const uvSubmitBtn = document.getElementById('uv-submit-btn');
   if (uvSubmitBtn) uvSubmitBtn.textContent = isEN ? 'DEFINE MY UNIQUE VALUE →' : 'DEFINIR MI VALOR ÚNICO →';
   setQueryText('#uv-result .uv-label', isEN ? 'Your Unique Value' : 'Tu Valor Único');
+  setQueryText('#btn-to-step6 .btn-primary', isEN ? 'NEXT: YOUR PURPOSE →' : 'SIGUIENTE: TU PROPÓSITO →');
 
   // ── STEP 6 ──────────────────────────────────────────
   setQueryText('#screen-6 .step-label', isEN ? 'Step 6 of 6' : 'Paso 6 de 6');
@@ -1327,8 +1330,13 @@ async function callClaude(prompt, systemPrompt) {
       })
     });
     const data = await res.json();
-    return data.content?.[0]?.text || '';
+    if (!res.ok || data.error || !data.content?.[0]?.text) {
+      console.error('Claude API error:', res.status, data);
+      return STRINGS[currentLang].connError;
+    }
+    return data.content[0].text;
   } catch(e) {
+    console.error('callClaude fetch failed:', e);
     return STRINGS[currentLang].connError;
   }
 }
