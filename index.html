@@ -1330,11 +1330,12 @@ async function callClaude(prompt, systemPrompt) {
       })
     });
     const data = await res.json();
-    if (!res.ok || data.error || !data.content?.[0]?.text) {
+    const textBlock = data.content?.find(b => b.type === 'text');
+    if (!res.ok || data.error || !textBlock?.text) {
       console.error('Claude API error:', res.status, data);
       return STRINGS[currentLang].connError;
     }
-    return data.content[0].text;
+    return textBlock.text;
   } catch(e) {
     console.error('callClaude fetch failed:', e);
     return STRINGS[currentLang].connError;
