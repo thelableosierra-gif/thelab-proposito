@@ -3031,6 +3031,8 @@ function resumeSession() {
       s.classList.remove('active');
       s.style.display = 'none';
     });
+    const accessScreen = document.getElementById('screen-access');
+    if (accessScreen) accessScreen.style.display = 'none';
     const sc = document.getElementById(`screen-${n}`);
     sc.style.display = 'block';
     sc.classList.add('active');
