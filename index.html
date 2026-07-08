@@ -627,7 +627,7 @@ textarea::placeholder{color:var(--gray-4);}
       <div class="purpose-label">✦ Tu Propósito de Vida</div>
       <textarea class="purpose-edit-area" id="purpose-edit-text" rows="5"></textarea>
     </div>
-    <p style="font-size:.8rem;color:var(--gray-5);margin-top:.5rem;">Puedes ajustar el texto hasta que resuene completamente contigo.</p>
+    <p id="purpose-adjust-hint" style="font-size:.8rem;color:var(--gray-5);margin-top:.5rem;">Puedes ajustar el texto hasta que resuene completamente contigo.</p>
     <div class="btn-row">
       <button class="btn-primary" onclick="finalizePurpose()">✦ ESTE ES MI PROPÓSITO →</button>
     </div>
@@ -1057,7 +1057,7 @@ function updateStepContent(lang) {
   }
   setQueryText('#purpose-generating .ai-label', isEN ? 'Integrating your process...' : 'Integrando tu proceso...');
   setQueryText('.purpose-label', isEN ? '✦ My Life Purpose' : '✦ Tu Propósito de Vida');
-  setQueryText('#screen-6 > p', isEN
+  setQueryText('#purpose-adjust-hint', isEN
     ? 'You can adjust the text until it resonates completely with you.'
     : 'Puedes ajustar el texto hasta que resuene completamente contigo.');
   setQueryText('#screen-6 .btn-primary', isEN ? '✦ THIS IS MY PURPOSE →' : '✦ ESTE ES MI PROPÓSITO →');
@@ -2082,7 +2082,7 @@ function renderStrengthPhaseC() {
       </div>
       <div id="custom-added-list" style="margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.35rem;"></div>
       <div class="btn-row" style="margin-top:1rem;">
-        <button class="btn-primary" onclick="showFinalStrengthConfirmation()">VER MI LISTA FINAL →</button>
+        <button class="btn-primary" onclick="showFinalStrengthConfirmation()">${isEN ? 'SEE MY FINAL LIST →' : 'VER MI LISTA FINAL →'}</button>
       </div>
     </div>
   `);
@@ -2227,7 +2227,7 @@ async function generateStrengthInsight() {
 
   const profile = getStrengthProfiles()[state.strengthColor];
   const prompt = t(
-    `El usuario identificó su perfil de fortalezas como ${state.strengthColor.toUpperCase()} (${profile.tagline}).
+    `El usuario identificó su perfil de fortalezas como ${profile.name} (${profile.tagline}).
 Sus fortalezas activas: ${state.activeStrengths.join(', ')}
 
 Respondió sobre sus fortalezas en acción:
@@ -2239,7 +2239,7 @@ Escribe una reflexión personalizada (3-4 oraciones) que:
 1. Conecte sus fortalezas específicas con las situaciones reales que describió
 2. Nombre el patrón de impacto que ves — cómo genera valor en otros de manera natural
 3. Cierre con una frase que lo ancle: sus fortalezas son la forma en que ejecutará su propósito`,
-    `The user identified their strength profile as ${state.strengthColor.toUpperCase()} (${profile.tagline}).
+    `The user identified their strength profile as ${profile.name} (${profile.tagline}).
 Their active strengths: ${state.activeStrengths.join(', ')}
 
 They answered about their strengths in action:
