@@ -2803,7 +2803,7 @@ ${mantraText ? `
     ${state.why ? `<div class="qa-label">${isEN?'Why do you want to discover your purpose?':'¿Por qué quieres descubrir tu propósito?'}</div>
     <div class="qa-q">${state.why}</div>` : ''}
     ${state.location ? `<div class="qa-label">${isEN?'Current state':'Estado actual'}</div>
-    <div class="qa-q">${state.location.charAt(0).toUpperCase() + state.location.slice(1)}</div>` : ''}
+    <div class="qa-q">${(isEN ? {confundido:'Confused',frustrado:'Frustrated',realizado:'Fulfilled'} : {confundido:'Confundido',frustrado:'Frustrado',realizado:'Realizado'})[state.location]}</div>` : ''}
     ${state.followupAnswer ? `<div class="qa-label">${isEN?'Follow-up reflection':'Reflexión de seguimiento'}</div>
     <div class="qa-q">${state.followupAnswer}</div>` : ''}
   </div>
@@ -2829,7 +2829,7 @@ ${mantraText ? `
   <div class="section">
     <div class="section-title">${isEN?'Step 4 — Your Strengths':'Paso 4 — Tus Fortalezas'}</div>
     ${state.strengthColor ? `<div class="qa-label">${isEN?'Color profile':'Perfil de color'}</div>
-    <div class="qa-q">${state.strengthColor.charAt(0).toUpperCase() + state.strengthColor.slice(1)}</div>` : ''}
+    <div class="qa-q">${getStrengthProfiles()[state.strengthColor].name}</div>` : ''}
     ${state.activeStrengths?.length ? `<div class="qa-label">${isEN?'Active strengths':'Fortalezas activas'}</div>
     <div class="qa-q">${state.activeStrengths.join(' · ')}</div>` : ''}
   </div>
