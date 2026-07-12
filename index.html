@@ -262,7 +262,7 @@ textarea::placeholder{color:var(--gray-4);}
 
 /* LANG TOGGLE */
 .lang-toggle{display:flex;align-items:center;gap:2px;background:rgba(0,0,0,0.15);border-radius:20px;padding:3px;flex-shrink:0;margin-left:4px;}
-.lang-btn{background:transparent;border:none;border-radius:16px;padding:4px 10px;font-size:.75rem;font-weight:800;cursor:pointer;color:var(--black);opacity:.5;transition:all .2s;letter-spacing:.05em;line-height:1;}
+.lang-btn{background:transparent;border:none;border-radius:16px;padding:4px 10px;font-size:.75rem;font-weight:700;cursor:pointer;color:var(--black);opacity:.5;transition:all .2s;letter-spacing:.05em;line-height:1;}
 .lang-btn.active{background:var(--black);color:var(--yellow);opacity:1;}
 
 /* ANIMATIONS */
@@ -482,7 +482,7 @@ textarea::placeholder{color:var(--gray-4);}
       <textarea class="passion-edit" id="passion-statement-text" rows="3"></textarea>
     </div>
     <div id="passion-ai-reflection" style="margin:1rem 0;"></div>
-    <div class="btn-row">
+    <div id="btn-to-step4" class="btn-row">
       <button class="btn-primary" onclick="goToStep(4)">SIGUIENTE: TUS FORTALEZAS →</button>
     </div>
   </div>
@@ -591,7 +591,7 @@ textarea::placeholder{color:var(--gray-4);}
       <div class="uv-text" id="uv-statement-text"></div>
     </div>
     <div id="uv-ai-reflection" style="margin:1rem 0;"></div>
-    <div class="btn-row">
+    <div id="btn-to-step6" class="btn-row">
       <button class="btn-primary" onclick="goToStep(6)">SIGUIENTE: TU PROPÓSITO →</button>
     </div>
   </div>
@@ -627,7 +627,7 @@ textarea::placeholder{color:var(--gray-4);}
       <div class="purpose-label">✦ Tu Propósito de Vida</div>
       <textarea class="purpose-edit-area" id="purpose-edit-text" rows="5"></textarea>
     </div>
-    <p style="font-size:.8rem;color:var(--gray-5);margin-top:.5rem;">Puedes ajustar el texto hasta que resuene completamente contigo.</p>
+    <p id="purpose-adjust-hint" style="font-size:.8rem;color:var(--gray-5);margin-top:.5rem;">Puedes ajustar el texto hasta que resuene completamente contigo.</p>
     <div class="btn-row">
       <button class="btn-primary" onclick="finalizePurpose()">✦ ESTE ES MI PROPÓSITO →</button>
     </div>
@@ -891,6 +891,7 @@ function updateStepContent(lang) {
     ? 'Write honestly. There is no right or wrong answer...'
     : 'Escribe con honestidad. No hay respuesta correcta o incorrecta...');
   setQueryText('#screen-1 .btn-primary', isEN ? 'CONTINUE →' : 'CONTINUAR →');
+  setQueryText('#location-section .card-title', isEN ? 'Which of these situations do you identify with most?' : '¿Con cuál de estas situaciones te identificas más?');
 
   // Location options
   const locBtns = document.querySelectorAll('#screen-1 .loc-btn');
@@ -962,6 +963,7 @@ function updateStepContent(lang) {
 
   const passionLabel = document.querySelector('.passion-label');
   if (passionLabel) passionLabel.textContent = isEN ? '✦ My Passion Statement' : '✦ Tu Declaración de Pasión';
+  setQueryText('#btn-to-step4 .btn-primary', isEN ? 'NEXT: YOUR STRENGTHS →' : 'SIGUIENTE: TUS FORTALEZAS →');
 
   // ── STEP 4 ──────────────────────────────────────────
   setQueryText('#screen-4 .step-label', isEN ? 'Step 4 of 6' : 'Paso 4 de 6');
@@ -1037,6 +1039,7 @@ function updateStepContent(lang) {
   const uvSubmitBtn = document.getElementById('uv-submit-btn');
   if (uvSubmitBtn) uvSubmitBtn.textContent = isEN ? 'DEFINE MY UNIQUE VALUE →' : 'DEFINIR MI VALOR ÚNICO →';
   setQueryText('#uv-result .uv-label', isEN ? 'Your Unique Value' : 'Tu Valor Único');
+  setQueryText('#btn-to-step6 .btn-primary', isEN ? 'NEXT: YOUR PURPOSE →' : 'SIGUIENTE: TU PROPÓSITO →');
 
   // ── STEP 6 ──────────────────────────────────────────
   setQueryText('#screen-6 .step-label', isEN ? 'Step 6 of 6' : 'Paso 6 de 6');
@@ -1054,7 +1057,7 @@ function updateStepContent(lang) {
   }
   setQueryText('#purpose-generating .ai-label', isEN ? 'Integrating your process...' : 'Integrando tu proceso...');
   setQueryText('.purpose-label', isEN ? '✦ My Life Purpose' : '✦ Tu Propósito de Vida');
-  setQueryText('#screen-6 > p', isEN
+  setQueryText('#purpose-adjust-hint', isEN
     ? 'You can adjust the text until it resonates completely with you.'
     : 'Puedes ajustar el texto hasta que resuene completamente contigo.');
   setQueryText('#screen-6 .btn-primary', isEN ? '✦ THIS IS MY PURPOSE →' : '✦ ESTE ES MI PROPÓSITO →');
@@ -1322,15 +1325,21 @@ async function callClaude(prompt, systemPrompt) {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-5',
         max_tokens: 1000,
         system: sys,
         messages: [{role: 'user', content: prompt}]
       })
     });
     const data = await res.json();
-    return data.content?.[0]?.text || '';
+    const textBlock = data.content?.find(b => b.type === 'text');
+    if (!res.ok || data.error || !textBlock?.text) {
+      console.error('Claude API error:', res.status, data);
+      return STRINGS[currentLang].connError;
+    }
+    return textBlock.text;
   } catch(e) {
+    console.error('callClaude fetch failed:', e);
     return STRINGS[currentLang].connError;
   }
 }
@@ -2075,7 +2084,7 @@ function renderStrengthPhaseC() {
       </div>
       <div id="custom-added-list" style="margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.35rem;"></div>
       <div class="btn-row" style="margin-top:1rem;">
-        <button class="btn-primary" onclick="showFinalStrengthConfirmation()">VER MI LISTA FINAL →</button>
+        <button class="btn-primary" onclick="showFinalStrengthConfirmation()">${isEN ? 'SEE MY FINAL LIST →' : 'VER MI LISTA FINAL →'}</button>
       </div>
     </div>
   `);
@@ -2220,7 +2229,7 @@ async function generateStrengthInsight() {
 
   const profile = getStrengthProfiles()[state.strengthColor];
   const prompt = t(
-    `El usuario identificó su perfil de fortalezas como ${state.strengthColor.toUpperCase()} (${profile.tagline}).
+    `El usuario identificó su perfil de fortalezas como ${profile.name} (${profile.tagline}).
 Sus fortalezas activas: ${state.activeStrengths.join(', ')}
 
 Respondió sobre sus fortalezas en acción:
@@ -2232,7 +2241,7 @@ Escribe una reflexión personalizada (3-4 oraciones) que:
 1. Conecte sus fortalezas específicas con las situaciones reales que describió
 2. Nombre el patrón de impacto que ves — cómo genera valor en otros de manera natural
 3. Cierre con una frase que lo ancle: sus fortalezas son la forma en que ejecutará su propósito`,
-    `The user identified their strength profile as ${state.strengthColor.toUpperCase()} (${profile.tagline}).
+    `The user identified their strength profile as ${profile.name} (${profile.tagline}).
 Their active strengths: ${state.activeStrengths.join(', ')}
 
 They answered about their strengths in action:
@@ -2835,7 +2844,7 @@ ${mantraText ? `
     ${state.why ? `<div class="qa-label">${isEN?'Why do you want to discover your purpose?':'¿Por qué quieres descubrir tu propósito?'}</div>
     <div class="qa-q">${state.why}</div>` : ''}
     ${state.location ? `<div class="qa-label">${isEN?'Current state':'Estado actual'}</div>
-    <div class="qa-q">${state.location.charAt(0).toUpperCase() + state.location.slice(1)}</div>` : ''}
+    <div class="qa-q">${(isEN ? {confundido:'Confused',frustrado:'Frustrated',realizado:'Fulfilled'} : {confundido:'Confundido',frustrado:'Frustrado',realizado:'Realizado'})[state.location]}</div>` : ''}
     ${state.followupAnswer ? `<div class="qa-label">${isEN?'Follow-up reflection':'Reflexión de seguimiento'}</div>
     <div class="qa-q">${state.followupAnswer}</div>` : ''}
   </div>
@@ -2861,7 +2870,7 @@ ${mantraText ? `
   <div class="section">
     <div class="section-title">${isEN?'Step 4 — Your Strengths':'Paso 4 — Tus Fortalezas'}</div>
     ${state.strengthColor ? `<div class="qa-label">${isEN?'Color profile':'Perfil de color'}</div>
-    <div class="qa-q">${state.strengthColor.charAt(0).toUpperCase() + state.strengthColor.slice(1)}</div>` : ''}
+    <div class="qa-q">${getStrengthProfiles()[state.strengthColor].name}</div>` : ''}
     ${state.activeStrengths?.length ? `<div class="qa-label">${isEN?'Active strengths':'Fortalezas activas'}</div>
     <div class="qa-q">${state.activeStrengths.join(' · ')}</div>` : ''}
   </div>
@@ -3063,6 +3072,8 @@ function resumeSession() {
       s.classList.remove('active');
       s.style.display = 'none';
     });
+    const accessScreen = document.getElementById('screen-access');
+    if (accessScreen) accessScreen.style.display = 'none';
     const sc = document.getElementById(`screen-${n}`);
     sc.style.display = 'block';
     sc.classList.add('active');
@@ -3094,7 +3105,17 @@ const ACCESS_CODES = [
   'TLAB-G8L3','TLAB-H0M9','TLAB-J5N4','TLAB-K3P7','TLAB-L6Q0',
   'TLAB-M2R8','TLAB-N7S1','TLAB-P4T6','TLAB-Q9U3','TLAB-R1V5',
   'TLAB-S6W0','TLAB-T8X4','TLAB-U3Y7','TLAB-V5Z2','TLAB-W0A6',
-  'TLAB-X2B9','TLAB-Y7C1','TLAB-Z4D8','TLAB-A9E3','TLAB-B5F0'
+  'TLAB-X2B9','TLAB-Y7C1','TLAB-Z4D8','TLAB-A9E3','TLAB-B5F0',
+  'TLAB-A2J7','TLAB-A3U9','TLAB-A5G6','TLAB-A8M3','TLAB-B7P1',
+  'TLAB-D1A7','TLAB-E1W1','TLAB-E3M0','TLAB-E5Z5','TLAB-F1N3',
+  'TLAB-F4X4','TLAB-G2H3','TLAB-G3C3','TLAB-G3Q7','TLAB-G5E3',
+  'TLAB-H1U5','TLAB-H4C4','TLAB-H7W9','TLAB-J5R4','TLAB-K2H2',
+  'TLAB-K3N9','TLAB-K8D6','TLAB-L0D8','TLAB-L6F6','TLAB-L9T4',
+  'TLAB-M0X5','TLAB-M4N4','TLAB-N0K6','TLAB-N0Y1','TLAB-N4C2',
+  'TLAB-N7U7','TLAB-N9U9','TLAB-P1J9','TLAB-P7H0','TLAB-Q7K8',
+  'TLAB-R2H3','TLAB-R8A9','TLAB-S8F2','TLAB-S8H3','TLAB-V0A1',
+  'TLAB-V0X7','TLAB-W0N8','TLAB-W5L5','TLAB-W7N2','TLAB-X1H4',
+  'TLAB-X5R6','TLAB-Y2F3','TLAB-Y4F4','TLAB-Y9Y6','TLAB-Z6R1',
 ];
 
 function getUsedCodes() {
