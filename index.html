@@ -1128,6 +1128,8 @@ function autoDetectLanguage() {
 // STATE
 // ===========================
 const state = {
+  participantName: '',
+  participantEmail: '',
   why: '',
   location: '',
   followupAnswer: '',
@@ -2565,6 +2567,45 @@ Write a powerful closing message (3-4 sentences) that:
   saveProgress();
   finalEl.scrollIntoView({behavior:'smooth'});
   generateMantra();
+  autoSendResults();
+}
+
+// ===========================
+// AUTOMATIC RESULT EMAIL (additive)
+// ===========================
+let _autoSendFired = false;
+async function autoSendResults() {
+  if (_autoSendFired) return;
+  if (!state.participantEmail || !state.participantName) return;
+  _autoSendFired = true;
+
+  try {
+    const mantraText = state.mantra || '';
+
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        nombre:     state.participantName,
+        email:      state.participantEmail,
+        telefono:   '',
+        proposito:  state.purpose         || '',
+        mantra:     mantraText,
+        valores:    state.rankedValues    || [],
+        pasion:     state.passionStatement|| '',
+        fortalezas: state.activeStrengths || [],
+        valorUnico: state.uvStatement     || '',
+        why:               state.why               || '',
+        location:          state.location          || '',
+        identityResponses: state.identityResponses || [],
+        passionAnswers:    state.passionAnswers    || {},
+        strengthColor:     state.strengthColor     || '',
+        lang:       currentLang
+      })
+    });
+  } catch (e) {
+    console.error('Auto-send results error:', e);
+  }
 }
 
 // ===========================
@@ -3071,26 +3112,44 @@ function markCodeUsed(code) {
   } catch(e) {}
 }
 
-function validateAccessCode() {
+async function validateAccessCode() {
   const raw   = document.getElementById('access-code-input').value.trim().toUpperCase();
   const errEl = document.getElementById('access-error');
 
   if (!raw) { errEl.textContent = t('Por favor ingresa tu código de acceso.','Please enter your access code.'); return; }
-  if (!ACCESS_CODES.includes(raw)) {
-    errEl.textContent = t('Código incorrecto. Verifica e intenta de nuevo.','Incorrect code. Please verify and try again.');
-    return;
-  }
-  if (getUsedCodes().includes(raw)) {
-    errEl.textContent = t('Este código ya fue utilizado. Contacta a The Lab para obtener uno nuevo.','This code has already been used. Contact The Lab for a new one.');
-    return;
-  }
 
-  markCodeUsed(raw);
-  sessionStorage.setItem('thelab-access-granted', 'true');
-  document.getElementById('screen-access').style.display = 'none';
-  document.getElementById('screen-0').style.display = 'block';
-  document.getElementById('screen-0').classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
+  errEl.textContent = '';
+
+  try {
+    const res = await fetch('/api/verify-code', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ code: raw })
+    });
+    const data = await res.json();
+
+    if (!data.valid) {
+      if (data.reason === 'not_issued') {
+        errEl.textContent = t('Este código aún no ha sido activado. Contacta a The Lab.','This code has not been activated yet. Contact The Lab.');
+      } else {
+        errEl.textContent = t('Código incorrecto. Verifica e intenta de nuevo.','Incorrect code. Please verify and try again.');
+      }
+      return;
+    }
+
+    state.participantName = data.name || '';
+    state.participantEmail = data.email || '';
+
+    sessionStorage.setItem('thelab-access-granted', 'true');
+    document.getElementById('screen-access').style.display = 'none';
+    document.getElementById('screen-0').style.display = 'block';
+    document.getElementById('screen-0').classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+
+  } catch (e) {
+    console.error('Access code verify error:', e);
+    errEl.textContent = t('Hubo un error al verificar tu código. Intenta de nuevo.','There was an error verifying your code. Please try again.');
+  }
 }
 
 // Check for saved progress on load

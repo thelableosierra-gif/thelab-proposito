@@ -49,12 +49,33 @@ export default async function handler(req, res) {
   const FROM = 'The Lab <noreply@jointhelab.org>';
   const subj1 = isEN ? 'Your Life Purpose Report - The Lab' : 'Tu Reporte de Proposito - The Lab';
   const subj2 = 'Nuevo participante: ' + nombre;
-  try {
-    const h = buildHTML();
-    const r1 = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { 'Authorization': 'Bearer ' + process.env.RESEND_API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: FROM, to: [email], subject: subj1, html: h }) });
-    if (!r1.ok) { const e = await r1.json(); return res.status(500).json({ error: 'Error participant', detail: e }); }
-    const r2 = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { 'Authorization': 'Bearer ' + process.env.RESEND_API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: FROM, to: ['thelab.leosierra@gmail.com'], subject: subj2, html: h }) });
-    if (!r2.ok) { const e = await r2.json(); return res.status(500).json({ error: 'Error lab', detail: e }); }
-    return res.status(200).json({ ok: true });
-  } catch(e) { return res.status(500).json({ error: 'Exception', detail: e.message }); }
+  const h = buildHTML();
+
+  async function sendOne(to, subject) {
+    try {
+      const r = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + process.env.RESEND_API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: FROM, to: [to], subject: subject, html: h })
+      });
+      if (!r.ok) {
+        const e = await r.json();
+        return { ok: false, error: e };
+      }
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  }
+
+  const [participantResult, labResult] = await Promise.all([
+    sendOne(email, subj1),
+    sendOne('thelab.leosierra@gmail.com', subj2)
+  ]);
+
+  const status = (participantResult.ok && labResult.ok) ? 200 : 207;
+  return res.status(status).json({
+    participant: participantResult,
+    lab: labResult
+  });
 }
