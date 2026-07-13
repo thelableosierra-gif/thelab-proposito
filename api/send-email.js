@@ -46,8 +46,9 @@ export default async function handler(req, res) {
   function section(title) {
     return '<div style="border-top:2px solid #f5c800;margin:24px 0 16px;padding-top:12px"><p style="margin:0;font-size:11px;letter-spacing:2px;font-weight:800;color:#111">' + title + '</p></div>';
   }
-  function buildHTML() {
+  function buildHTML(warningBanner) {
     let h = '<div style="font-family:sans-serif;max-width:640px;margin:0 auto;color:#111">';
+    if (warningBanner) h += '<div style="background:#ffe6e6;border-left:4px solid #cc0000;padding:14px 20px;margin-bottom:0"><p style="margin:0;font-size:13px;color:#900;font-weight:700">⚠️ ' + warningBanner + '</p></div>';
     h += '<div style="background:#f5c800;padding:24px 32px"><h1 style="margin:0;font-size:20px">THE LAB &middot; LEO SIERRA</h1><p style="margin:4px 0 0;font-size:13px">' + (isEN ? 'Life Purpose Full Report' : 'Reporte Completo de Proposito') + '</p></div>';
     h += '<div style="background:#111;padding:16px 32px"><p style="color:#f5c800;margin:0;font-size:12px;letter-spacing:1px">' + (isEN ? 'PARTICIPANT' : 'PARTICIPANTE') + '</p>';
     h += '<p style="color:#fff;margin:4px 0 0;font-size:16px;font-weight:600">' + nombre + '</p>';
@@ -80,15 +81,13 @@ export default async function handler(req, res) {
   }
   const FROM = 'The Lab <noreply@jointhelab.org>';
   const subj1 = isEN ? 'Your Life Purpose Report - The Lab' : 'Tu Reporte de Proposito - The Lab';
-  const subj2 = 'Nuevo participante: ' + nombre;
-  const h = buildHTML();
 
-  async function sendOne(to, subject) {
+  async function sendOne(to, subject, html) {
     try {
       const r = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + process.env.RESEND_API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: FROM, to: [to], subject: subject, html: h })
+        body: JSON.stringify({ from: FROM, to: [to], subject: subject, html: html })
       });
       if (!r.ok) {
         const e = await r.json();
@@ -100,10 +99,15 @@ export default async function handler(req, res) {
     }
   }
 
-  const [participantResult, labResult] = await Promise.all([
-    sendOne(email, subj1),
-    sendOne('thelab.leosierra@gmail.com', subj2)
-  ]);
+  const participantResult = await sendOne(email, subj1, buildHTML(null));
+
+  const leoWarning = participantResult.ok
+    ? null
+    : (isEN
+        ? `The participant's own copy FAILED to send (they may not have received their report).`
+        : `La copia del participante NO se pudo enviar (es posible que no haya recibido su reporte).`);
+  const subj2 = (participantResult.ok ? '' : '⚠️ ') + 'Nuevo participante: ' + nombre;
+  const labResult = await sendOne('thelab.leosierra@gmail.com', subj2, buildHTML(leoWarning));
 
   await logToRespuestas([
     new Date().toISOString(),

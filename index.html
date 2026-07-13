@@ -2971,29 +2971,14 @@ async function submitCoachForm(btn) {
   errEl.textContent = '';
 
   try {
-    const mantraText = state.mantra ||
-      document.getElementById('mantra-text')?.value?.trim() || '';
-
-    const res = await fetch('/api/send-email', {
+    // Note: the full report was already auto-sent when results rendered
+    // (see autoSendResults()). This form only notifies Leo that this
+    // person wants to talk to a coach — it does not resend the report or
+    // duplicate the Respuestas log.
+    const res = await fetch('/api/notify-coach-request', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        nombre,
-        email,
-        telefono,
-        proposito:  state.purpose        || '',
-        mantra:     mantraText,
-        valores:    state.rankedValues    || [],
-        pasion:     state.passionStatement|| '',
-        fortalezas: state.activeStrengths || [],
-        valorUnico: state.uvStatement     || '',
-        why:               state.why               || '',
-        location:          state.location          || '',
-        identityResponses: state.identityResponses || [],
-        passionAnswers:    state.passionAnswers    || {},
-        strengthColor:     state.strengthColor     || '',
-        lang:       currentLang
-      })
+      body: JSON.stringify({ nombre, email, telefono })
     });
 
     if (res.ok) {
@@ -3003,7 +2988,7 @@ async function submitCoachForm(btn) {
       throw new Error('Error del servidor');
     }
   } catch(e) {
-    console.error('Email error:', e);
+    console.error('Coach request error:', e);
     errEl.textContent = s.coachErrSend;
     btn.disabled = false;
     btn.textContent = s.coachSubmitBtn;
