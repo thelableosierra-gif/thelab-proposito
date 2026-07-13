@@ -1,3 +1,35 @@
+import { google } from 'googleapis';
+
+function getSheetsClient() {
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY || '';
+  const decodedKey = Buffer.from(rawKey, 'base64').toString('utf-8');
+  const privateKey = decodedKey.includes('BEGIN PRIVATE KEY')
+    ? decodedKey
+    : rawKey.replace(/\\n/g, '\n');
+
+  const auth = new google.auth.JWT({
+    email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    key: privateKey,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
+  return google.sheets({ version: 'v4', auth });
+}
+
+async function logToRespuestas(row) {
+  try {
+    const sheets = getSheetsClient();
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: process.env.GOOGLE_SHEET_ID,
+      range: 'Respuestas!A1:M1',
+      valueInputOption: 'RAW',
+      insertDataOption: 'INSERT_ROWS',
+      requestBody: { values: [row] }
+    });
+  } catch (e) {
+    console.error('Respuestas log error:', e.message || e);
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const { nombre, email, telefono, proposito, pasion, mantra, valores, fortalezas, valorUnico, why, location, identityResponses, passionAnswers, strengthColor, lang } = req.body;
@@ -71,6 +103,22 @@ export default async function handler(req, res) {
   const [participantResult, labResult] = await Promise.all([
     sendOne(email, subj1),
     sendOne('thelab.leosierra@gmail.com', subj2)
+  ]);
+
+  await logToRespuestas([
+    new Date().toISOString(),
+    nombre,
+    email,
+    lang || '',
+    proposito || '',
+    mantra || '',
+    vStr,
+    pasion || '',
+    strengthColor || '',
+    fStr,
+    valorUnico || '',
+    why || '',
+    locationLabel
   ]);
 
   const status = (participantResult.ok && labResult.ok) ? 200 : 207;
