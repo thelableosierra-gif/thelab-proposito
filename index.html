@@ -2982,8 +2982,13 @@ async function submitCoachForm(btn) {
     });
 
     if (res.ok) {
+      const calendlyUrl = 'https://calendly.com/thelab-leosierra/30min?name='
+        + encodeURIComponent(nombre) + '&email=' + encodeURIComponent(email);
       document.getElementById('coach-form-inline').innerHTML = `
-        <div class="coach-success">${s.coachSuccessMsg(nombre, email)}</div>`;
+        <div class="coach-success">${s.coachSuccessMsg(nombre, email)}</div>
+        <a href="${calendlyUrl}" target="_blank" rel="noopener" class="btn-primary" style="display:block;text-align:center;margin-top:.75rem;text-decoration:none;">
+          ${currentLang === 'en' ? 'Choose a Time →' : 'Elegir un Horario →'}
+        </a>`;
     } else {
       throw new Error('Error del servidor');
     }
