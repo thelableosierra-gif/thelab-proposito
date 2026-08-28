@@ -249,6 +249,7 @@ textarea::placeholder{color:var(--gray-4);}
 .access-input:focus{outline:none;border-color:var(--black);}
 .access-error{font-size:.82rem;color:#CC2200;font-weight:600;margin-bottom:.75rem;min-height:1.2rem;}
 .access-hint{font-size:.75rem;color:var(--gray-4);margin-top:1rem;line-height:1.4;}
+.access-hint a{color:var(--black);font-weight:700;text-decoration:underline;}
 
 /* COACH FORM */
 .coach-form{margin-top:1rem;padding:1.25rem;background:var(--gray-2);border-radius:var(--radius);text-align:left;}
@@ -270,9 +271,13 @@ textarea::placeholder{color:var(--gray-4);}
 .fade-in{animation:fadeIn .4s ease;}
 
 /* RESUME BANNER */
-.resume-banner{background:var(--yellow);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;}
+/* Fixed to the bottom of the viewport (rather than a normal document-flow
+   sibling) so it's always visible regardless of which screen sits behind it
+   — including #screen-access, whose .access-screen rule below is
+   min-height:100vh and would otherwise push an in-flow banner off-screen. */
+.resume-banner{background:var(--yellow);border-radius:var(--radius);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);width:calc(100% - 2rem);max-width:600px;z-index:150;box-shadow:0 6px 24px rgba(0,0,0,.25);}
 .resume-banner p{font-size:.88rem;font-weight:600;color:var(--black);}
-.resume-banner button{background:var(--black);color:var(--yellow);border:none;border-radius:8px;padding:.4rem .9rem;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.resume-banner button{background:var(--black);color:var(--yellow);border:none;border-radius:8px;padding:.4rem .9rem;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
 
 /* RESPONSIVE */
 @media(max-width:500px){
@@ -319,7 +324,7 @@ textarea::placeholder{color:var(--gray-4);}
       onkeydown="if(event.key==='Enter') validateAccessCode()">
     <div class="access-error" id="access-error"></div>
     <button class="btn-primary" onclick="validateAccessCode()">INGRESAR →</button>
-    <div class="access-hint">Si no tienes un código, contacta a The Lab para obtener acceso.</div>
+    <div class="access-hint">Si no tienes un código, <a href="register.html">regístrate aquí</a> para obtener uno.</div>
   </div>
 </div>
 
@@ -657,7 +662,7 @@ const STRINGS = {
     accessSub: 'Ingresa tu código de acceso personal para comenzar el proceso.',
     accessPlaceholder: 'TLAB-XXXX',
     accessBtn: 'INGRESAR →',
-    accessHint: 'Si no tienes un código, contacta a The Lab para obtener acceso.',
+    accessHint: 'Si no tienes un código, <a href="register.html">regístrate aquí</a> para obtener uno.',
     accessErrEmpty: 'Por favor ingresa tu código de acceso.',
     accessErrInvalid: 'Código incorrecto. Verifica e intenta de nuevo.',
     accessErrUsed: 'Este código ya fue utilizado. Contacta a The Lab para obtener uno nuevo.',
@@ -707,7 +712,7 @@ const STRINGS = {
     accessSub: 'Enter your personal access code to begin the process.',
     accessPlaceholder: 'TLAB-XXXX',
     accessBtn: 'ENTER →',
-    accessHint: "If you don't have a code, contact The Lab to get access.",
+    accessHint: 'If you don\'t have a code, <a href="register.html">register here</a> to get one.',
     accessErrEmpty: 'Please enter your access code.',
     accessErrInvalid: 'Incorrect code. Please verify and try again.',
     accessErrUsed: 'This code has already been used. Contact The Lab for a new one.',
@@ -778,7 +783,7 @@ function setLanguage(lang) {
   const accessBtn = document.querySelector('#screen-access .btn-primary');
   if (accessBtn) accessBtn.textContent = s.accessBtn;
   const accessHint = document.querySelector('.access-hint');
-  if (accessHint) accessHint.textContent = s.accessHint;
+  if (accessHint) accessHint.innerHTML = s.accessHint;
 
   // Resume banner
   const resumeMsg = document.querySelector('.resume-banner p');
@@ -1531,6 +1536,7 @@ async function submitIdentityQuestion(idx) {
   if (!p1) return alert(t('Por favor responde la primera pregunta.','Please answer the first question.'));
 
   const btn = document.querySelector(`#current-identity-question .btn-primary`);
+  const btnOriginalText = btn.textContent;
   btn.disabled = true;
   btn.textContent = t('Extrayendo valores...','Extracting values...');
 
@@ -1555,7 +1561,20 @@ Example: ["Integrity","Leadership","Family","Growth","Loyalty"]
 Values must be short words or phrases (1-3 words) in English.`
   );
 
-  const response = await callClaude(prompt);
+  let response;
+  try {
+    response = await callClaude(prompt);
+  } catch (e) {
+    console.error('submitIdentityQuestion callClaude error:', e);
+    btn.disabled = false;
+    btn.textContent = btnOriginalText;
+    alert(t(
+      'Hubo un error al procesar tu respuesta. Intenta de nuevo.',
+      'There was an error processing your answer. Please try again.'
+    ));
+    return;
+  }
+
   let values = [];
   try {
     const clean = response.replace(/```json|```/g,'').trim();
@@ -1563,6 +1582,12 @@ Values must be short words or phrases (1-3 words) in English.`
   } catch(e) {
     values = response.match(/["']([^"']+)["']/g)?.map(v => v.replace(/["']/g,'')) || (isEN ? ['Growth','Commitment','Connection'] : ['Crecimiento','Compromiso','Conexión']);
   }
+
+  // Extraction succeeded — this button's job is done; hide it so it can't be
+  // left stuck showing the disabled "Extracting..." state, and so it can't
+  // be clicked again for the same question.
+  btn.textContent = btnOriginalText;
+  btn.closest('.btn-row').style.display = 'none';
 
   const chipsEl = document.getElementById(`chips-for-q${idx}`);
   chipsEl.style.display = 'block';
@@ -2266,6 +2291,10 @@ Write a personalized reflection (3-4 sentences) that:
       <div class="chips-area">${state.activeStrengths.map(s => `<span class="chip selected locked">${s}</span>`).join('')}</div>
     </div>
   `;
+
+  // This question's submit button is done its job — without hiding it, it
+  // stays permanently visible and disabled with the "Analyzing..." label.
+  btn.closest('.btn-row')?.style && (btn.closest('.btn-row').style.display = 'none');
 
   document.getElementById('btn-to-step5').style.display = 'block';
   saveProgress();
@@ -3176,13 +3205,21 @@ window.addEventListener('load', () => {
       if (saved && saved.currentStep > 0) {
         document.getElementById('resumeBanner').style.display = 'flex';
       }
-      return;
-    }
-    // First visit — show access screen (default visible), hide rest
-    const saved = JSON.parse(localStorage.getItem('thelab-proposito-state'));
-    if (saved && saved.currentStep > 0) {
-      // Has saved progress — still require code unless session is active
-      document.getElementById('resumeBanner').style.display = 'flex';
+      // NOTE: previously this branch `return`ed here, which skipped the
+      // autoDetectLanguage() call below entirely. That meant a returning
+      // visitor's saved language preference (sessionStorage['thelab-lang'])
+      // was never re-applied on reload — the page stayed in its default
+      // hardcoded Spanish even though the language toggle correctly showed
+      // "EN" as active. autoDetectLanguage()/setLanguage() must run on
+      // every load, including this branch, so the fall-through below
+      // replaces the early return.
+    } else {
+      // First visit — show access screen (default visible), hide rest
+      const saved = JSON.parse(localStorage.getItem('thelab-proposito-state'));
+      if (saved && saved.currentStep > 0) {
+        // Has saved progress — still require code unless session is active
+        document.getElementById('resumeBanner').style.display = 'flex';
+      }
     }
   } catch(e) {}
   // Auto-detect language AFTER all existing load logic
