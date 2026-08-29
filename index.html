@@ -2498,7 +2498,23 @@ Validate before writing:
 ✓ Does it communicate who, how and impact in a single fluid sentence?`
   );
 
-  const response = await callClaude(prompt);
+  let response = await callClaude(prompt);
+  let issues = validatePurposeStatement(response, isEN);
+
+  // The prompt's rules (word count, no rigid template, no listing strengths)
+  // are instructions to the model, not guarantees. If the first attempt
+  // clearly breaks one of them, retry once with specific corrective
+  // feedback rather than silently showing a lower-quality result. This is
+  // invisible to the participant — same loading state, just a few seconds
+  // longer on the rare occasion a retry is needed.
+  if (issues.length > 0) {
+    const retryNote = t(
+      `\n\nTu intento anterior no cumplió estas reglas: ${issues.join('; ')}. Corrige esto y escribe de nuevo la declaración completa, cumpliendo TODAS las reglas de arriba.`,
+      `\n\nYour previous attempt did not follow these rules: ${issues.join('; ')}. Fix this and rewrite the complete statement, following ALL the rules above.`
+    );
+    response = await callClaude(prompt + retryNote);
+  }
+
   state.purpose = response.trim();
 
   document.getElementById('purpose-generating').style.display = 'none';
@@ -2506,6 +2522,40 @@ Validate before writing:
   resultEl.style.display = 'block';
   document.getElementById('purpose-edit-text').value = state.purpose;
   resultEl.scrollIntoView({behavior:'smooth'});
+}
+
+// Lightweight check for whether a generated purpose statement actually
+// followed generatePurpose()'s style rules. Deliberately checks only the
+// few things that are cheaply and reliably checkable in code (word count,
+// the banned "strengths" word, the rigid "My purpose is..." opening) —
+// this is a safety net for the clearest violations, not a full rewrite of
+// the model's own judgment about what "sounds natural" means.
+function validatePurposeStatement(text, isEN) {
+  const trimmed = (text || '').trim();
+  const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
+  const bannedWordPattern = isEN ? /\bstrengths?\b/i : /\bfortalezas?\b/i;
+  const rigidOpeningPattern = isEN ? /^my purpose is\b/i : /^mi propósito es\b/i;
+  const issues = [];
+
+  // The prompt asks for 35-55 words; allow some slack so we only flag
+  // clear misses (e.g. a one-line fragment or a full paragraph), not
+  // near-target lengths like 56 or 33 words.
+  if (wordCount < 25 || wordCount > 65) {
+    issues.push(isEN
+      ? `it is ${wordCount} words, but it must be between 35-55 words`
+      : `tiene ${wordCount} palabras, pero debe tener entre 35-55 palabras`);
+  }
+  if (bannedWordPattern.test(trimmed)) {
+    issues.push(isEN
+      ? 'it uses the word "strength(s)", which is not allowed'
+      : 'usa la palabra "fortaleza(s)", que no está permitida');
+  }
+  if (rigidOpeningPattern.test(trimmed)) {
+    issues.push(isEN
+      ? 'it starts with the rigid template "My purpose is..." instead of an integrated fluid sentence'
+      : 'empieza con la estructura rígida "Mi propósito es..." en lugar de una oración fluida integrada');
+  }
+  return issues;
 }
 
 async function finalizePurpose() {
