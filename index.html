@@ -1114,6 +1114,177 @@ function updateStepContent(lang) {
     const steps = isEN ? nextStepsEN : nextStepsES;
     if (steps[i] && textNode) textNode.textContent = steps[i];
   });
+
+  // Re-translate dynamically-rendered content (Steps 1, 2, 4) that
+  // updateStepContent's static-template patches above don't reach.
+  retranslateDynamicContent(lang);
+}
+
+// Re-translates "chrome" (labels, instructions, buttons, placeholders) of
+// dynamic content that was rendered from data by other functions
+// (renderIdentityQuestion, selectLocation, the strength-panel chain), so a
+// language switch mid-step doesn't leave it frozen in the old language.
+// Deliberately never touches: typed textarea .value, already-generated AI
+// response text (locked to its generation-time language by design), or
+// data values the user selected/typed (extracted identity-value chips,
+// chosen/custom strength names) — those aren't safely re-translatable.
+function retranslateDynamicContent(lang) {
+  const isEN = lang === 'en';
+
+  // ---- STEP 1: follow-up question + its submit button ----
+  if (state.location) {
+    const fq = document.getElementById('followup-question');
+    if (fq) fq.textContent = getFollowupQuestions()[state.location];
+    const followupBtn = document.getElementById('followup-submit-btn');
+    if (followupBtn) {
+      followupBtn.textContent = followupBtn.disabled
+        ? t('Procesando...', 'Processing...')
+        : t('VER MI DIAGNÓSTICO →', 'SEE MY DIAGNOSIS →');
+    }
+  }
+
+  // ---- STEP 2: the currently-active identity question card ----
+  const iqCard = document.querySelector('#current-identity-question .active-card');
+  if (iqCard) {
+    const q = getIdentityQuestions()[currentQIndex];
+    const tag = iqCard.querySelector('.territory-tag');
+    if (tag) tag.textContent = q.territory;
+    const qTexts = iqCard.querySelectorAll('.question-text');
+    if (qTexts[0]) qTexts[0].textContent = q.q1;
+    if (q.q2 && qTexts[1]) qTexts[1].textContent = q.q2;
+    const p1 = document.getElementById('iq-p1');
+    if (p1) p1.placeholder = q.p1;
+    const p2 = document.getElementById('iq-p2');
+    if (p2 && q.q2) p2.placeholder = q.p2;
+    const p2Label = iqCard.querySelector('.q-part2-label');
+    if (p2Label) p2Label.innerHTML = `↳ ${t('Ahora profundiza:', 'Now go deeper:')}`;
+    const iqBtn = iqCard.querySelector('.btn-primary');
+    if (iqBtn) {
+      iqBtn.textContent = iqBtn.disabled
+        ? t('Extrayendo valores...', 'Extracting values...')
+        : t('EXTRAER MIS VALORES →', 'EXTRACT MY VALUES →');
+    }
+  }
+
+  // Chips card for the currently-active question (chrome only — chip
+  // labels themselves are AI-extracted data captured in one language).
+  const chipsEl = document.getElementById(`chips-for-q${currentQIndex}`);
+  if (chipsEl) {
+    const title = chipsEl.querySelector('.card-title');
+    if (title) title.textContent = isEN ? 'From your answer these values emerged' : 'De tu respuesta emergieron estos valores';
+    const instr = chipsEl.querySelector('.chips-instruction');
+    if (instr) instr.innerHTML = isEN ? 'Choose the <strong>2 that resonate most</strong> with who you really are:' : 'Elige los <strong>2 que más resuenan</strong> con quién realmente eres:';
+    const countEl = document.getElementById(`chip-count-${currentQIndex}`);
+    const countLabel = chipsEl.querySelector('.chips-count');
+    if (countLabel && countEl) {
+      const currentCount = countEl.textContent;
+      countLabel.innerHTML = `${isEN ? 'Selected:' : 'Seleccionados:'} <strong id="chip-count-${currentQIndex}">${currentCount}</strong> / 2`;
+    }
+    const confirmBtn = chipsEl.querySelector(`#chip-confirm-${currentQIndex} .btn-primary`);
+    if (confirmBtn) confirmBtn.textContent = isEN ? 'SAVE AND CONTINUE →' : 'GUARDAR Y CONTINUAR →';
+  }
+
+  // ---- STEP 4: the strength-panel chain ----
+  if (state.strengthColor) {
+    const profiles = getStrengthProfiles();
+    const profile = profiles[state.strengthColor];
+
+    const colorDisplay = document.getElementById('strength-color-display');
+    if (colorDisplay && profile) {
+      const profileLabel = isEN ? 'Your Profile' : 'Tu Perfil';
+      const profileReminder = isEN
+        ? 'Remember: you have traits from all profiles, but this is your dominant tendency.'
+        : 'Recuerda: tienes rasgos de todos los perfiles, pero este es tu tendencia dominante.';
+      colorDisplay.innerHTML = `
+        <div class="insight-box fade-in">
+          <strong>${profile.emoji} ${profileLabel}: ${profile.name} — ${profile.tagline}</strong>
+          ${profile.description}<br><br>
+          <em>${profile.best}</em>
+        </div>
+        <p style="font-size:.82rem;color:var(--gray-5);margin-bottom:.5rem;">${profileReminder}</p>
+      `;
+    }
+
+    const phaseA = document.getElementById('sp-phase-a');
+    if (phaseA && profile) {
+      const title = phaseA.querySelector('.strength-panel-title');
+      if (title) title.textContent = isEN ? 'These are your dominant strengths' : 'Estas son tus fortalezas dominantes';
+      const desc = phaseA.querySelector('p');
+      if (desc) desc.innerHTML = isEN ? `Based on your <strong>${profile.emoji} ${profile.name}</strong> profile, these are the strengths that most naturally define you:` : `Basado en tu perfil <strong>${profile.emoji} ${profile.name}</strong>, estas son las fortalezas que más te definen naturalmente:`;
+      const banner = phaseA.querySelector('div[style*="background:var(--yellow)"]');
+      if (banner) banner.innerHTML = isEN ? 'Does any of these <strong>not represent you</strong>? Tap it to remove it.' : '¿Alguna de estas <strong>no te representa</strong>? Tócala para eliminarla.';
+      const btn = phaseA.querySelector('.btn-primary');
+      if (btn) btn.textContent = isEN ? 'SEE OTHER STRENGTHS →' : 'VER OTRAS FORTALEZAS →';
+    }
+
+    const phaseB = document.getElementById('sp-phase-b');
+    if (phaseB) {
+      const title = phaseB.querySelector('.strength-panel-title');
+      if (title) title.textContent = isEN ? 'Strengths from other profiles' : 'Fortalezas de otros perfiles';
+      const desc = phaseB.querySelector('p');
+      if (desc) desc.textContent = isEN ? 'Do you see something here that represents you? Tap to add it to your profile.' : '¿Ves algo aquí que sí te representa? Toca para agregarlo a tu perfil.';
+      // Group headers: only safe to re-map when the number of currently
+      // rendered header groups still matches what today's data would
+      // produce — otherwise leave them as-is rather than risk mismatching
+      // a header with the wrong group of chips.
+      const headerDivs = phaseB.querySelectorAll('div[style*="text-transform:uppercase"]');
+      const otherColors = Object.keys(profiles).filter(c => c !== state.strengthColor);
+      const candidateGroups = otherColors.filter(c => profiles[c].strengths.some(s => !state.activeStrengths.includes(s)));
+      if (candidateGroups.length === headerDivs.length) {
+        headerDivs.forEach((div, i) => {
+          const p = profiles[candidateGroups[i]];
+          div.innerHTML = `${p.emoji} ${p.name} — ${p.tagline}`;
+        });
+      }
+      const btn = phaseB.querySelector('.btn-primary');
+      if (btn) btn.textContent = isEN ? 'ADD MY OWN →' : 'AGREGAR MIS PROPIAS →';
+    }
+
+    const phaseC = document.getElementById('sp-phase-c');
+    if (phaseC) {
+      const title = phaseC.querySelector('.strength-panel-title');
+      if (title) title.textContent = isEN ? 'Something not on the list?' : '¿Algo que no está en la lista?';
+      const desc = phaseC.querySelector('p');
+      if (desc) desc.textContent = isEN ? 'If there is a strength of yours that does not appear in any profile, write it here.' : 'Si hay una fortaleza tuya que no aparece en ningún perfil, escríbela aquí.';
+      const input = document.getElementById('new-strength-input');
+      if (input) input.placeholder = isEN ? 'e.g. Creativity, Resilience...' : 'Ej: Creatividad, Resiliencia...';
+      const addBtn = phaseC.querySelector('.add-btn');
+      if (addBtn) addBtn.textContent = `+ ${isEN ? 'Add' : 'Agregar'}`;
+      const btn = phaseC.querySelector('.btn-primary');
+      if (btn) btn.textContent = isEN ? 'SEE MY FINAL LIST →' : 'VER MI LISTA FINAL →';
+    }
+
+    const phaseFinal = document.getElementById('sp-phase-final');
+    if (phaseFinal) {
+      const title = phaseFinal.querySelector('.strength-panel-title');
+      if (title) title.innerHTML = `✦ ${isEN ? 'Your Final Strengths List' : 'Tu Lista Final de Fortalezas'}`;
+      const paras = phaseFinal.querySelectorAll('p');
+      if (paras[0]) paras[0].textContent = isEN ? 'These are the strengths you will move forward with. Do they represent you?' : 'Estas son las fortalezas con las que vas a avanzar. ¿Te representan?';
+      if (paras[1]) paras[1].textContent = isEN ? 'If you want to adjust something, go back up and modify. If you are ready, continue.' : 'Si quieres ajustar algo, regresa arriba y modifica. Si estás listo, continúa.';
+      const btn = phaseFinal.querySelector('.btn-primary');
+      if (btn) btn.textContent = isEN ? 'CONFIRM AND CONTINUE →' : 'CONFIRMAR Y CONTINUAR →';
+    }
+
+    const reflEl = document.getElementById('strength-reflection-questions');
+    if (reflEl && reflEl.style.display !== 'none') {
+      const title = reflEl.querySelector('.card-title');
+      if (title) title.textContent = isEN ? 'Connect your strengths to your real life' : 'Conecta tus fortalezas con tu vida real';
+      const qTexts = reflEl.querySelectorAll('.question-text');
+      const qStrings = isEN
+        ? ['In what moments of your life have you seen these strengths in action?', 'What results did you generate in others when you acted from these strengths?', 'What kind of problems do you enjoy solving when you are using these strengths?']
+        : ['¿En qué momentos de tu vida has visto estas fortalezas en acción?', '¿Qué resultados generaste en otros cuando actuaste desde estas fortalezas?', '¿Qué tipo de problemas disfrutas resolver cuando estás usando estas fortalezas?'];
+      qTexts.forEach((el, i) => { if (qStrings[i]) el.textContent = qStrings[i]; });
+      const placeholders = isEN
+        ? ['A specific situation where these strengths appeared...', 'The concrete impact you generated...', 'The problems that energize you to solve...']
+        : ['Una situación específica donde estas fortalezas aparecieron...', 'El impacto concreto que generaste...', 'Los problemas que te energizan resolver...'];
+      ['sr-q1', 'sr-q2', 'sr-q3'].forEach((id, i) => {
+        const ta = document.getElementById(id);
+        if (ta) ta.placeholder = placeholders[i];
+      });
+      const btn = reflEl.querySelector('.btn-primary');
+      if (btn) btn.textContent = isEN ? 'SEE MY COMPLETE PROFILE →' : 'VER MI PERFIL COMPLETO →';
+    }
+  }
 }
 
 // Auto-detect language from browser
@@ -1796,7 +1967,9 @@ ${answersText}
 Ofrece una reflexión profunda (3-4 oraciones) que:
 1. Explique lo que dice esta jerarquía de valores sobre quién es esta persona — conectada con sus respuestas reales, no genérica
 2. Señale cómo el valor #1 probablemente ha guiado sus decisiones más importantes sin que lo haya notado
-3. Cierre afirmando su identidad como base para construir su propósito`,
+3. Cierre afirmando su identidad como base para construir su propósito
+
+IMPORTANTE: Basa todo lo que digas únicamente en los valores y las respuestas de identidad mostradas arriba. No inventes personas, eventos, anécdotas o detalles específicos (por ejemplo un coach, un compañero de equipo, una situación concreta) que el usuario no haya mencionado explícitamente. Si quieres ilustrar un punto, hazlo en términos generales sin inventar hechos.`,
     `The user defined and ranked their 4 identity values:
 1. ${rankingSlots[0]} (most important)
 2. ${rankingSlots[1]}
@@ -1809,7 +1982,9 @@ ${answersText}
 Offer a deep reflection (3-4 sentences) that:
 1. Explains what this hierarchy of values says about who this person is — connected to their real responses, not generic
 2. Points out how value #1 has probably guided their most important decisions without them noticing
-3. Closes affirming their identity as the foundation for building their purpose`
+3. Closes affirming their identity as the foundation for building their purpose
+
+IMPORTANT: Base everything you say strictly on the values and identity responses shown above. Do not invent people, events, anecdotes, or specific details (for example a coach, a teammate, a concrete situation) that the user did not explicitly mention. If you want to illustrate a point, do so in general terms without fabricating facts.`
   );
 
   const response = await callClaude(prompt);
