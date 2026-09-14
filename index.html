@@ -810,6 +810,11 @@ function setLanguage(lang) {
   // Update all static step content
   updateStepContent(lang);
 
+  // Tab title (never reflects a mid-visit language switch otherwise)
+  document.title = lang === 'en'
+    ? 'PURPOSE: Design an Extraordinary Life in 6 Steps — The Lab'
+    : 'PROPÓSITO: Diseña una Vida Extraordinaria en 6 Pasos — The Lab';
+
   // Persist language choice
   try { sessionStorage.setItem('thelab-lang', lang); } catch(e) {}
 }
@@ -1114,8 +1119,25 @@ function updateStepContent(lang) {
     const steps = isEN ? nextStepsEN : nextStepsES;
     if (steps[i] && textNode) textNode.textContent = steps[i];
   });
+  setQueryText('.next-steps h4', isEN ? 'Next Steps' : 'Próximos Pasos');
 
-  // Re-translate dynamically-rendered content (Steps 1, 2, 4) that
+  // Final results screen (built by finalizePurpose() — chrome only, the
+  // AI-generated closing message and the user's own values/statements
+  // are left untouched).
+  setQueryText('#final-screen .final-hero h2', isEN ? '🎯 Your Purpose Is Designed' : '🎯 Tu Propósito Está Diseñado');
+  setQueryText('#final-screen .final-hero p', isEN
+    ? 'This is the beginning. Now comes what matters: living it.'
+    : 'Este es el comienzo. Ahora viene lo importante: vivirlo.');
+  const summaryLabels = document.querySelectorAll('#final-screen .summary-card .summary-label');
+  const summaryLabelsEN = ['Your Values (in order)', 'Your Passion', 'Your Strengths', 'Your Unique Value'];
+  const summaryLabelsES = ['Tus Valores (en orden)', 'Tu Pasión', 'Tus Fortalezas', 'Tu Valor Único'];
+  summaryLabels.forEach((el, i) => {
+    const labels = isEN ? summaryLabelsEN : summaryLabelsES;
+    if (labels[i]) el.textContent = labels[i];
+  });
+  setQueryText('#final-screen .final-message-label', isEN ? '✦ Final Message' : '✦ Mensaje Final');
+
+  // Re-translate dynamically-rendered content (Steps 1-6) that
   // updateStepContent's static-template patches above don't reach.
   retranslateDynamicContent(lang);
 }
@@ -1182,6 +1204,82 @@ function retranslateDynamicContent(lang) {
     }
     const confirmBtn = chipsEl.querySelector(`#chip-confirm-${currentQIndex} .btn-primary`);
     if (confirmBtn) confirmBtn.textContent = isEN ? 'SAVE AND CONTINUE →' : 'GUARDAR Y CONTINUAR →';
+  }
+
+  // ---- STEP 2: "choose your 4 values" consolidation screen ----
+  // (chrome only — the value chips themselves are the user's own selections)
+  const phase2 = document.getElementById('identity-phase2');
+  if (phase2 && phase2.style.display !== 'none') {
+    const instr = phase2.querySelector('.select-4-instruction');
+    if (instr) instr.innerHTML = isEN
+      ? 'You completed the 5 questions. From all your answers these values emerged. <strong>Choose the 4 that most define you</strong> — the ones that are real, not aspirational.'
+      : 'Completaste las 5 preguntas. De todas tus respuestas emergieron estos valores. <strong>Elige los 4 que más te definen</strong> — los que no son aspiracionales sino reales.';
+    const countLabel = phase2.querySelector('.chips-count');
+    const countEl = document.getElementById('final-count');
+    if (countLabel && countEl) {
+      const currentCount = countEl.textContent;
+      countLabel.innerHTML = `${isEN ? 'Selected:' : 'Seleccionados:'} <strong id="final-count">${currentCount}</strong> / 4`;
+    }
+    const confirmBtn = phase2.querySelector('#final-confirm-btn .btn-primary');
+    if (confirmBtn) confirmBtn.textContent = isEN ? 'THESE ARE MY 4 VALUES →' : 'ESTOS SON MIS 4 VALORES →';
+  }
+
+  // ---- STEP 2: ranking screen ----
+  // (chrome only — assigned slots show the user's own chosen values, so
+  // only still-empty slot placeholders are safe to re-translate)
+  const phase3 = document.getElementById('identity-phase3');
+  if (phase3 && phase3.style.display !== 'none') {
+    const title = phase3.querySelector('.card-title');
+    if (title) title.textContent = isEN ? 'Now order them by importance' : 'Ahora ordénalos por importancia';
+    const instr = phase3.querySelector('p');
+    if (instr) instr.textContent = isEN
+      ? 'Tap a numbered slot and then the value you want to assign. #1 is your most fundamental value.'
+      : 'Toca un slot numerado y luego el valor que quieres asignar. El #1 es tu valor más fundamental.';
+    [0, 1, 2, 3].forEach(i => {
+      const slot = document.getElementById(`rs-${i}`);
+      const label = document.getElementById(`rs-label-${i}`);
+      if (slot && label && !slot.classList.contains('filled')) {
+        label.textContent = `— ${isEN ? 'Tap to assign' : 'Toca para asignar'} —`;
+      }
+    });
+    const confirmBtn = phase3.querySelector('#ranking-confirm .btn-primary');
+    if (confirmBtn) confirmBtn.textContent = isEN ? 'CONFIRM MY IDENTITY →' : 'CONFIRMAR MI IDENTIDAD →';
+  }
+
+  // ---- STEP 2: identity AI-result screen ----
+  // (chrome only — the AI reflection paragraph is locked to its
+  // generation-time language by design)
+  const identityResult = document.getElementById('identity-ai-result');
+  if (identityResult && identityResult.style.display !== 'none') {
+    const stillLoading = !!identityResult.querySelector('.typing-dots');
+    const aiLabel = identityResult.querySelector('.ai-label');
+    if (aiLabel) {
+      aiLabel.textContent = stillLoading
+        ? (isEN ? 'Analyzing your identity...' : 'Analizando tu identidad...')
+        : `✦ ${isEN ? 'Your Identity' : 'Tu Identidad'}`;
+    }
+    const cardTitle = identityResult.querySelector('.card-title');
+    if (cardTitle) cardTitle.textContent = isEN ? 'Your 4 Values — In Order of Importance' : 'Tus 4 Valores — En Orden de Importancia';
+    const mainTag = identityResult.querySelector('.rank-main-tag');
+    if (mainTag) mainTag.textContent = isEN ? 'MAIN' : 'PRINCIPAL';
+  }
+
+  // ---- STEP 3: passion result ----
+  // (chrome only — the passion statement text and its AI reflection are
+  // locked to generation-time language by design)
+  const passionResult = document.getElementById('passion-result');
+  if (passionResult && passionResult.style.display !== 'none') {
+    const stillLoading = !!passionResult.querySelector('.typing-dots');
+    const aiLabel = passionResult.querySelector('.ai-label');
+    if (aiLabel) {
+      aiLabel.textContent = stillLoading
+        ? (isEN ? 'Processing your responses...' : 'Procesando tus respuestas...')
+        : `✦ ${isEN ? 'Why this passion is yours' : 'Por qué esta pasión es tuya'}`;
+    }
+    const nextBtn = passionResult.querySelector('.btn-row .btn-primary');
+    if (nextBtn) nextBtn.textContent = isEN ? 'NEXT: YOUR STRENGTHS →' : 'SIGUIENTE: TUS FORTALEZAS →';
+    const submitBtn = document.getElementById('passion-submit-btn');
+    if (submitBtn && submitBtn.disabled) submitBtn.textContent = isEN ? 'Discovering your passion...' : 'Descubriendo tu pasión...';
   }
 
   // ---- STEP 4: the strength-panel chain ----
@@ -1284,6 +1382,42 @@ function retranslateDynamicContent(lang) {
       const btn = reflEl.querySelector('.btn-primary');
       if (btn) btn.textContent = isEN ? 'SEE MY COMPLETE PROFILE →' : 'VER MI PERFIL COMPLETO →';
     }
+
+    // Final strengths-profile AI response (generateStrengthInsight) —
+    // chrome only, the AI reflection paragraph is locked to its
+    // generation-time language by design.
+    const strengthAiResponse = document.getElementById('strength-ai-response');
+    if (strengthAiResponse && strengthAiResponse.innerHTML.trim() !== '') {
+      const stillLoading = !!strengthAiResponse.querySelector('.typing-dots');
+      const aiLabel = strengthAiResponse.querySelector('.ai-label');
+      if (aiLabel) {
+        aiLabel.textContent = stillLoading
+          ? (isEN ? 'Building your profile...' : 'Construyendo tu perfil...')
+          : `✦ ${isEN ? 'Your Strengths Profile' : 'Tu Perfil de Fortalezas'}`;
+      }
+      const cardTitle = strengthAiResponse.querySelector('.card-title');
+      if (cardTitle) cardTitle.textContent = isEN ? 'Your Active Strengths' : 'Tus Fortalezas Activas';
+    }
+    const srBtn = document.querySelector('#strength-reflection-questions .btn-primary');
+    if (srBtn && srBtn.disabled) srBtn.textContent = isEN ? 'Analyzing...' : 'Analizando...';
+  }
+
+  // ---- STEP 5: unique-value result ----
+  // (chrome only — the statement text and its AI reflection are locked
+  // to generation-time language by design)
+  const uvResult = document.getElementById('uv-result');
+  if (uvResult && uvResult.style.display !== 'none') {
+    const stillLoading = !!uvResult.querySelector('.typing-dots');
+    const aiLabel = uvResult.querySelector('.ai-label');
+    if (aiLabel) {
+      aiLabel.textContent = stillLoading
+        ? (isEN ? 'Synthesizing...' : 'Sintetizando...')
+        : `✦ ${isEN ? 'Why this value is genuinely yours' : 'Por qué este valor es genuinamente tuyo'}`;
+    }
+    const nextBtn = uvResult.querySelector('.btn-row .btn-primary');
+    if (nextBtn) nextBtn.textContent = isEN ? 'NEXT: YOUR PURPOSE →' : 'SIGUIENTE: TU PROPÓSITO →';
+    const submitBtn = document.getElementById('uv-submit-btn');
+    if (submitBtn && submitBtn.disabled) submitBtn.textContent = isEN ? 'Defining your unique value...' : 'Definiendo tu valor único...';
   }
 }
 
@@ -2000,7 +2134,7 @@ IMPORTANT: Base everything you say strictly on the values and identity responses
           <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;background:${i===0?'var(--yellow)':'var(--gray-2)'};border-radius:8px;">
             <span style="font-weight:800;font-size:.8rem;color:${i===0?'var(--black)':'var(--gray-5)'};min-width:20px;">${i+1}</span>
             <span style="font-weight:700;font-size:.92rem;color:var(--black);">${v}</span>
-            ${i===0?`<span style="margin-left:auto;font-size:.7rem;font-weight:700;color:var(--black);letter-spacing:.08em;">${isEN?'MAIN':'PRINCIPAL'}</span>`:''}
+            ${i===0?`<span class="rank-main-tag" style="margin-left:auto;font-size:.7rem;font-weight:700;color:var(--black);letter-spacing:.08em;">${isEN?'MAIN':'PRINCIPAL'}</span>`:''}
           </div>`).join('')}
       </div>
     </div>
@@ -2800,7 +2934,7 @@ Write a powerful closing message (3-4 sentences) that:
     </div>
 
     <div class="ai-wrap fade-in" style="margin:1rem 0;">
-      <div class="ai-label">✦ ${isEN ? 'Final Message' : 'Mensaje Final'}</div>
+      <div class="ai-label final-message-label">✦ ${isEN ? 'Final Message' : 'Mensaje Final'}</div>
       <div class="ai-text">${closing}</div>
     </div>
 
