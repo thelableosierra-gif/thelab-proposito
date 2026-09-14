@@ -1066,7 +1066,7 @@ function updateStepContent(lang) {
     formulaParts[3].textContent = isEN ? 'YOUR PURPOSE' : 'TU PROPÓSITO';
   }
   setQueryText('#purpose-generating .ai-label', isEN ? 'Integrating your process...' : 'Integrando tu proceso...');
-  setQueryText('.purpose-label', isEN ? '✦ My Life Purpose' : '✦ Tu Propósito de Vida');
+  setQueryText('#purpose-result .purpose-label', isEN ? '✦ My Life Purpose' : '✦ Tu Propósito de Vida');
   setQueryText('#purpose-adjust-hint', isEN
     ? 'You can adjust the text until it resonates completely with you.'
     : 'Puedes ajustar el texto hasta que resuene completamente contigo.');
@@ -1136,6 +1136,7 @@ function updateStepContent(lang) {
     if (labels[i]) el.textContent = labels[i];
   });
   setQueryText('#final-screen .final-message-label', isEN ? '✦ Final Message' : '✦ Mensaje Final');
+  setQueryText('#final-screen .purpose-label', isEN ? '✦ My Life Purpose' : '✦ Tu Propósito de Vida');
 
   // Re-translate dynamically-rendered content (Steps 1-6) that
   // updateStepContent's static-template patches above don't reach.
@@ -1162,6 +1163,34 @@ function retranslateDynamicContent(lang) {
       followupBtn.textContent = followupBtn.disabled
         ? t('Procesando...', 'Processing...')
         : t('VER MI DIAGNÓSTICO →', 'SEE MY DIAGNOSIS →');
+    }
+  }
+
+  // ---- STEP 1: first AI block (reflection on "why") ----
+  // (chrome only — the AI reflection text itself is locked to
+  // generation-time language by design)
+  const whyResponse = document.getElementById('why-ai-response');
+  if (whyResponse && whyResponse.style.display !== 'none') {
+    const stillLoading = !!whyResponse.querySelector('.typing-dots');
+    const aiLabel = whyResponse.querySelector('.ai-label');
+    if (aiLabel) {
+      aiLabel.textContent = stillLoading
+        ? (isEN ? 'Reflecting...' : 'Reflexionando...')
+        : `✦ ${isEN ? 'Reflection' : 'Reflexión'}`;
+    }
+  }
+
+  // ---- STEP 1: second AI block (initial diagnosis) ----
+  // (chrome only — the AI diagnosis text itself is locked to
+  // generation-time language by design)
+  const locationResponse = document.getElementById('location-ai-response');
+  if (locationResponse) {
+    const stillLoading = !!locationResponse.querySelector('.typing-dots');
+    const aiLabel = locationResponse.querySelector('.ai-label');
+    if (aiLabel) {
+      aiLabel.textContent = stillLoading
+        ? (isEN ? 'Analyzing your starting point...' : 'Analizando tu punto de partida...')
+        : `✦ ${isEN ? 'Your Initial Diagnosis' : 'Tu Diagnóstico Inicial'}`;
     }
   }
 
