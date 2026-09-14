@@ -2603,7 +2603,9 @@ Respondió sobre sus fortalezas en acción:
 Escribe una reflexión personalizada (3-4 oraciones) que:
 1. Conecte sus fortalezas específicas con las situaciones reales que describió
 2. Nombre el patrón de impacto que ves — cómo genera valor en otros de manera natural
-3. Cierre con una frase que lo ancle: sus fortalezas son la forma en que ejecutará su propósito`,
+3. Cierre con una frase que lo ancle: sus fortalezas son la forma en que ejecutará su propósito
+
+IMPORTANTE: Basa todo lo que digas únicamente en el perfil de fortalezas, las fortalezas activas y las respuestas mostradas arriba. No inventes personas, eventos, anécdotas o detalles específicos (por ejemplo un compañero de trabajo, una situación concreta, una emoción no mencionada) que el usuario no haya mencionado explícitamente. Si quieres ilustrar un punto, hazlo en términos generales sin inventar hechos.`,
     `The user identified their strength profile as ${profile.name} (${profile.tagline}).
 Their active strengths: ${state.activeStrengths.join(', ')}
 
@@ -2615,7 +2617,9 @@ They answered about their strengths in action:
 Write a personalized reflection (3-4 sentences) that:
 1. Connects their specific strengths to the real situations they described
 2. Names the impact pattern you see — how they naturally generate value in others
-3. Closes with a phrase that anchors them: their strengths are the way they will execute their purpose`
+3. Closes with a phrase that anchors them: their strengths are the way they will execute their purpose
+
+IMPORTANT: Base everything you say strictly on the strength profile, active strengths, and answers shown above. Do not invent people, events, anecdotes, or specific details (for example a coworker, a concrete situation, an unmentioned emotion) that the user did not explicitly mention. If you want to illustrate a point, do so in general terms without fabricating facts.`
   );
 
   const response = await callClaude(prompt);
