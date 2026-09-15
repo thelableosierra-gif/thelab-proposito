@@ -1,8 +1,16 @@
 // api/verify-code.js
 // Verifica un código de acceso contra el Google Sheet en vivo (no una lista
 // fija). Si el código existe y fue emitido por el registro (columna B =
-// "YES"), devuelve el nombre y email asociados para poder enviar el reporte
-// automáticamente al terminar la evaluación.
+// "YES"), el código es válido.
+//
+// SECURITY FIX (Sept 2026): this endpoint used to return the participant's
+// name and email in the response so the client could attach them to the
+// final results email. That meant anyone who held (or guessed) a valid
+// code — not necessarily its rightful owner — could retrieve another
+// participant's PII with a single request. It now returns only whether
+// the code is valid; name/email are re-derived server-side, from the
+// code alone, at the point the results email is actually sent
+// (see api/send-email.js), and are never exposed to the browser here.
 
 import { google } from 'googleapis';
 
@@ -50,7 +58,6 @@ export default async function handler(req, res) {
       const rowCode = (rows[i][0] || '').trim().toUpperCase();
       if (rowCode === normalized) {
         const used = (rows[i][1] || '').trim().toUpperCase();
-        const name = rows[i][2] || '';
         const email = rows[i][3] || '';
 
         if (used !== 'YES') {
@@ -59,7 +66,7 @@ export default async function handler(req, res) {
         if (!email) {
           return res.status(200).json({ valid: false, reason: 'no_contact' });
         }
-        return res.status(200).json({ valid: true, name, email });
+        return res.status(200).json({ valid: true });
       }
     }
 
