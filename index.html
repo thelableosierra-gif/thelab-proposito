@@ -1481,8 +1481,7 @@ function autoDetectLanguage() {
 // STATE
 // ===========================
 const state = {
-  participantName: '',
-  participantEmail: '',
+  accessCode: '',
   why: '',
   location: '',
   followupAnswer: '',
@@ -3016,7 +3015,7 @@ Write a powerful closing message (3-4 sentences) that:
 let _autoSendFired = false;
 async function autoSendResults() {
   if (_autoSendFired) return;
-  if (!state.participantEmail || !state.participantName) return;
+  if (!state.accessCode) return;
   _autoSendFired = true;
 
   try {
@@ -3026,8 +3025,7 @@ async function autoSendResults() {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        nombre:     state.participantName,
-        email:      state.participantEmail,
+        code:       state.accessCode,
         telefono:   '',
         proposito:  state.purpose         || '',
         mantra:     mantraText,
@@ -3514,30 +3512,15 @@ function resumeSession() {
 }
 
 // ===========================
-// ACCESS CODES (additive)
+// ACCESS CODES
 // ===========================
-const ACCESS_CODES = [
-  'TLAB-A3K9','TLAB-B7M2','TLAB-C4P8','TLAB-D6Q1','TLAB-E2R5',
-  'TLAB-F9W4','TLAB-G1N7','TLAB-H5T3','TLAB-J8V6','TLAB-K2X0',
-  'TLAB-L4Y8','TLAB-M7Z3','TLAB-N1Q6','TLAB-P3R9','TLAB-Q6S2',
-  'TLAB-R8U5','TLAB-S0W7','TLAB-T4X1','TLAB-U9Y4','TLAB-V2Z6',
-  'TLAB-W5A8','TLAB-X7B3','TLAB-Y0C9','TLAB-Z3D4','TLAB-A6E7',
-  'TLAB-B1F2','TLAB-C9G5','TLAB-D4H8','TLAB-E7J1','TLAB-F2K6',
-  'TLAB-G8L3','TLAB-H0M9','TLAB-J5N4','TLAB-K3P7','TLAB-L6Q0',
-  'TLAB-M2R8','TLAB-N7S1','TLAB-P4T6','TLAB-Q9U3','TLAB-R1V5',
-  'TLAB-S6W0','TLAB-T8X4','TLAB-U3Y7','TLAB-V5Z2','TLAB-W0A6',
-  'TLAB-X2B9','TLAB-Y7C1','TLAB-Z4D8','TLAB-A9E3','TLAB-B5F0',
-  'TLAB-A2J7','TLAB-A3U9','TLAB-A5G6','TLAB-A8M3','TLAB-B7P1',
-  'TLAB-D1A7','TLAB-E1W1','TLAB-E3M0','TLAB-E5Z5','TLAB-F1N3',
-  'TLAB-F4X4','TLAB-G2H3','TLAB-G3C3','TLAB-G3Q7','TLAB-G5E3',
-  'TLAB-H1U5','TLAB-H4C4','TLAB-H7W9','TLAB-J5R4','TLAB-K2H2',
-  'TLAB-K3N9','TLAB-K8D6','TLAB-L0D8','TLAB-L6F6','TLAB-L9T4',
-  'TLAB-M0X5','TLAB-M4N4','TLAB-N0K6','TLAB-N0Y1','TLAB-N4C2',
-  'TLAB-N7U7','TLAB-N9U9','TLAB-P1J9','TLAB-P7H0','TLAB-Q7K8',
-  'TLAB-R2H3','TLAB-R8A9','TLAB-S8F2','TLAB-S8H3','TLAB-V0A1',
-  'TLAB-V0X7','TLAB-W0N8','TLAB-W5L5','TLAB-W7N2','TLAB-X1H4',
-  'TLAB-X5R6','TLAB-Y2F3','TLAB-Y4F4','TLAB-Y9Y6','TLAB-Z6R1',
-];
+// NOTE (security fix, Sept 2026): a hardcoded array of ~90 access codes
+// used to live here as a leftover from an earlier design. It was never
+// referenced by any function (verified) but shipped in plain text to
+// every visitor's browser via page source, including at least one code
+// that had actually been issued to a real participant. Removed entirely.
+// Access codes are validated exclusively server-side against the live
+// Google Sheet via /api/verify-code.
 
 function getUsedCodes() {
   try { return JSON.parse(localStorage.getItem('thelab-used-codes') || '[]'); }
@@ -3579,8 +3562,11 @@ async function validateAccessCode() {
       return;
     }
 
-    state.participantName = data.name || '';
-    state.participantEmail = data.email || '';
+    // Security fix (Sept 2026): /api/verify-code no longer returns the
+    // participant's name/email (that used to let anyone holding a valid
+    // code retrieve another person's PII). We only keep the code itself;
+    // the final send-results step re-derives name/email server-side.
+    state.accessCode = raw;
 
     sessionStorage.setItem('thelab-access-granted', 'true');
     document.getElementById('screen-access').style.display = 'none';
