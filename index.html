@@ -3462,6 +3462,11 @@ function saveProgress() {
   } catch(e) {}
 }
 
+// Security fix (Sept 2026): set when a saved session predates the
+// access-code fix (no accessCode on it) and needs the person to briefly
+// re-enter their code before we can safely resume them — see resumeSession().
+let pendingResumeStep = null;
+
 function resumeSession() {
   try {
     const saved = JSON.parse(localStorage.getItem('thelab-proposito-state'));
@@ -3483,32 +3488,55 @@ function resumeSession() {
       scenarioAnswers      = s.scenarioAnswers || {elevator:null, trip:null};
     }
 
-    document.getElementById('resumeBanner').style.display = 'none';
-    const n = saved.currentStep;
-
-    // Show the correct screen
-    document.querySelectorAll('.screen').forEach(s => {
-      s.classList.remove('active');
-      s.style.display = 'none';
-    });
-    const accessScreen = document.getElementById('screen-access');
-    if (accessScreen) accessScreen.style.display = 'none';
-    const sc = document.getElementById(`screen-${n}`);
-    sc.style.display = 'block';
-    sc.classList.add('active');
-    updateProgress(n);
-    window.scrollTo({top:0, behavior:'smooth'});
-
-    // Restore step-specific UI
-    if (n === 2) {
-      if (currentIdentityPhase === 'phase2') renderPhase2();
-      else if (currentIdentityPhase === 'phase3') renderPhase3();
-      else renderIdentityQuestion(currentQIndex);
-    } else if (n === 6) {
-      generatePurpose();
+    // Security fix (Sept 2026): a session saved before the access-code
+    // fix shipped won't have state.accessCode (it didn't exist yet), even
+    // though sessionStorage/localStorage otherwise mark it as validated.
+    // Silently continuing would pass the earlier `if (!state.accessCode)
+    // return;` guard in autoSendResults() and skip sending the final
+    // report with no error shown to anyone. Instead, ask for the code
+    // once more here — all of their answers above are already restored
+    // and will still be there right after — then resume exactly where
+    // they left off (see the pendingResumeStep handling in
+    // validateAccessCode()).
+    if (!state.accessCode) {
+      pendingResumeStep = saved.currentStep;
+      document.getElementById('resumeBanner').style.display = 'none';
+      document.querySelectorAll('.screen').forEach(s => {
+        s.classList.remove('active');
+        s.style.display = 'none';
+      });
+      document.getElementById('screen-access').style.display = 'block';
+      window.scrollTo({top:0, behavior:'smooth'});
+      return;
     }
 
+    document.getElementById('resumeBanner').style.display = 'none';
+    showResumedStep(saved.currentStep);
+
   } catch(e) { console.error('Resume error:', e); }
+}
+
+function showResumedStep(n) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const accessScreen = document.getElementById('screen-access');
+  if (accessScreen) accessScreen.style.display = 'none';
+  const sc = document.getElementById(`screen-${n}`);
+  sc.style.display = 'block';
+  sc.classList.add('active');
+  updateProgress(n);
+  window.scrollTo({top:0, behavior:'smooth'});
+
+  // Restore step-specific UI
+  if (n === 2) {
+    if (currentIdentityPhase === 'phase2') renderPhase2();
+    else if (currentIdentityPhase === 'phase3') renderPhase3();
+    else renderIdentityQuestion(currentQIndex);
+  } else if (n === 6) {
+    generatePurpose();
+  }
 }
 
 // ===========================
@@ -3570,9 +3598,20 @@ async function validateAccessCode() {
 
     sessionStorage.setItem('thelab-access-granted', 'true');
     document.getElementById('screen-access').style.display = 'none';
-    document.getElementById('screen-0').style.display = 'block';
-    document.getElementById('screen-0').classList.add('active');
-    window.scrollTo({top:0, behavior:'smooth'});
+
+    // If this validation was triggered by resumeSession() finding a
+    // pre-fix saved session (see there for why), send them back to
+    // exactly the step they were on instead of restarting at screen-0 —
+    // their answers were already restored, only accessCode was missing.
+    if (pendingResumeStep !== null) {
+      const n = pendingResumeStep;
+      pendingResumeStep = null;
+      showResumedStep(n);
+    } else {
+      document.getElementById('screen-0').style.display = 'block';
+      document.getElementById('screen-0').classList.add('active');
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
 
   } catch (e) {
     console.error('Access code verify error:', e);
