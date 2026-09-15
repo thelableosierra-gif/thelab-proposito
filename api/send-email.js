@@ -1,5 +1,8 @@
 import { google } from 'googleapis';
 
+const SHEET_NAME = 'Sheet1';
+const CODE_RANGE = `${SHEET_NAME}!A1:D`;
+
 function getSheetsClient() {
   const rawKey = process.env.GOOGLE_PRIVATE_KEY || '';
   const decodedKey = Buffer.from(rawKey, 'base64').toString('utf-8');
@@ -13,6 +16,36 @@ function getSheetsClient() {
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
   return google.sheets({ version: 'v4', auth });
+}
+
+// SECURITY FIX (Sept 2026): this endpoint used to trust nombre/email sent
+// directly by the client, with no server-side check that they matched the
+// access code actually issued. That meant anyone could POST arbitrary
+// participant data here, or trigger an email to an address they chose.
+// It now takes only the access `code` and looks up the real name/email
+// itself, the same way api/verify-code.js does — the report can only ever
+// go to the email address actually on file for that code.
+async function lookupParticipantByCode(sheets, code) {
+  const normalized = (code || '').trim().toUpperCase();
+  if (!normalized) return null;
+
+  const readResult = await sheets.spreadsheets.values.get({
+    spreadsheetId: process.env.GOOGLE_SHEET_ID,
+    range: CODE_RANGE,
+  });
+  const rows = readResult.data.values || [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const rowCode = (rows[i][0] || '').trim().toUpperCase();
+    if (rowCode === normalized) {
+      const used = (rows[i][1] || '').trim().toUpperCase();
+      const nombre = rows[i][2] || '';
+      const email = rows[i][3] || '';
+      if (used !== 'YES' || !email) return null;
+      return { nombre, email };
+    }
+  }
+  return null;
 }
 
 async function logToRespuestas(row) {
@@ -32,8 +65,20 @@ async function logToRespuestas(row) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const { nombre, email, telefono, proposito, pasion, mantra, valores, fortalezas, valorUnico, why, location, identityResponses, passionAnswers, strengthColor, lang } = req.body;
-  if (!nombre || !email) return res.status(400).json({ error: 'Faltan campos requeridos' });
+  const { code, telefono, proposito, pasion, mantra, valores, fortalezas, valorUnico, why, location, identityResponses, passionAnswers, strengthColor, lang } = req.body;
+  if (!code) return res.status(400).json({ error: 'Falta el código de acceso' });
+
+  const sheets = getSheetsClient();
+  let participant;
+  try {
+    participant = await lookupParticipantByCode(sheets, code);
+  } catch (err) {
+    console.error('Participant lookup error:', err);
+    return res.status(500).json({ error: 'server_error' });
+  }
+  if (!participant) return res.status(400).json({ error: 'Código inválido o sin contacto asociado' });
+  const { nombre, email } = participant;
+
   const isEN = lang === 'en';
   const vStr = Array.isArray(valores) ? valores.join(', ') : (valores || '');
   const fStr = Array.isArray(fortalezas) ? fortalezas.join(', ') : (fortalezas || '');
