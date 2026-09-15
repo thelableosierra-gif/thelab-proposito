@@ -1431,6 +1431,17 @@ function retranslateDynamicContent(lang) {
     if (srBtn && srBtn.disabled) srBtn.textContent = isEN ? 'Analyzing...' : 'Analizando...';
   }
 
+  // ---- STEP 5: strengths carryover hint ----
+  // (chrome only — the strength chip labels themselves are the user's
+  // own carried-over selections from Step 4)
+  const strengthsHint = document.getElementById('strengths-context-hint');
+  if (strengthsHint) {
+    const hintTitle = strengthsHint.children[0];
+    if (hintTitle) hintTitle.textContent = isEN ? 'Your identified strengths' : 'Tus fortalezas identificadas';
+    const hintFooter = strengthsHint.children[2];
+    if (hintFooter) hintFooter.textContent = isEN ? 'Use them as a starting point to answer the question below.' : 'Úsalas como punto de partida para responder la pregunta de abajo.';
+  }
+
   // ---- STEP 5: unique-value result ----
   // (chrome only — the statement text and its AI reflection are locked
   // to generation-time language by design)
