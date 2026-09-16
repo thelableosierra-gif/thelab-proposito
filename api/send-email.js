@@ -48,6 +48,11 @@ async function lookupParticipantByCode(sheets, code) {
   return null;
 }
 
+// RELIABILITY FIX (Sept 2026): this used to swallow a failed Respuestas write
+// silently — the participant's report still sent, so nobody (not even Leo)
+// would ever know that completion never got logged. It now reports success/
+// failure back to the caller, which sends a fallback alert email on failure
+// (see handler below) so a missing row is surfaced instead of disappearing.
 async function logToRespuestas(row) {
   try {
     const sheets = getSheetsClient();
@@ -58,9 +63,29 @@ async function logToRespuestas(row) {
       insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [row] }
     });
+    return true;
   } catch (e) {
     console.error('Respuestas log error:', e.message || e);
+    return false;
   }
+}
+
+// Builds a plain, readable alert email with everything Leo would need to
+// manually add the missing row to Respuestas himself.
+function buildRespuestasFailureAlert(code, row) {
+  const labels = ['Timestamp', 'Nombre', 'Email', 'Idioma', 'Proposito', 'Mantra', 'Valores', 'Pasion', 'Fortalezas/Color', 'Fortalezas', 'Valor Unico', 'Porque', 'Ubicacion'];
+  let h = '<div style="font-family:sans-serif;max-width:640px;margin:0 auto;color:#111">';
+  h += '<div style="background:#ffe6e6;border-left:4px solid #cc0000;padding:16px 24px">';
+  h += '<p style="margin:0 0 8px;font-weight:700;color:#900">A completed assessment could not be logged to the Respuestas sheet.</p>';
+  h += '<p style="margin:0;font-size:13px;color:#900">The participant\'s report email still sent normally — this only affects your tracking row. Use the details below to add it manually if you want it recorded.</p>';
+  h += '</div><div style="padding:20px 24px">';
+  h += '<p style="margin:0 0 10px"><strong>Access code:</strong> ' + code + '</p>';
+  row.forEach(function (value, i) {
+    if (!value) return;
+    h += '<p style="margin:0 0 8px;font-size:13px"><strong>' + labels[i] + ':</strong> ' + value + '</p>';
+  });
+  h += '</div></div>';
+  return h;
 }
 
 export default async function handler(req, res) {
@@ -154,7 +179,7 @@ export default async function handler(req, res) {
   const subj2 = (participantResult.ok ? '' : '⚠️ ') + 'Nuevo participante: ' + nombre;
   const labResult = await sendOne('thelab.leosierra@gmail.com', subj2, buildHTML(leoWarning));
 
-  await logToRespuestas([
+  const respuestasRow = [
     new Date().toISOString(),
     nombre,
     email,
@@ -168,7 +193,19 @@ export default async function handler(req, res) {
     valorUnico || '',
     why || '',
     locationLabel
-  ]);
+  ];
+  const loggedOk = await logToRespuestas(respuestasRow);
+  if (!loggedOk) {
+    try {
+      await sendOne(
+        'thelab.leosierra@gmail.com',
+        '⚠️ Respuestas log failed: ' + nombre,
+        buildRespuestasFailureAlert(code, respuestasRow)
+      );
+    } catch (e) {
+      console.error('Respuestas failure alert also failed to send:', e.message || e);
+    }
+  }
 
   const status = (participantResult.ok && labResult.ok) ? 200 : 207;
   return res.status(status).json({
