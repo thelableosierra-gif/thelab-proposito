@@ -133,7 +133,8 @@ export default async function handler(req, res) {
     h += row(isEN ? 'Core Values' : 'Valores Principales', vStr);
     if (Array.isArray(identityResponses) && identityResponses.length) {
       identityResponses.forEach(function(r) {
-        if (r && r.q1) h += row(r.territory || '', r.q1 + (r.q2 ? ' [' + (isEN ? 'Values' : 'Valores') + ': ' + r.q2 + ']' : ''));
+        // q2 is the "go deeper" follow-up answer, not a list of values.
+        if (r && r.q1) h += row(r.territory || '', r.q1 + (r.q2 ? '<br><span style="color:#666">&#8627; ' + (isEN ? 'Going deeper' : 'Profundizando') + ': ' + r.q2 + '</span>' : ''));
       });
     }
     h += section(isEN ? 'STEP 3 - PASSION' : 'PASO 3 - PASION');
@@ -142,7 +143,11 @@ export default async function handler(req, res) {
       h += row(isEN ? 'What moves you deeply' : 'Lo que te mueve profundamente', passionAnswers.q1 || passionAnswers.q2 || '');
     }
     h += section(isEN ? 'STEP 4 - STRENGTHS' : 'PASO 4 - FORTALEZAS');
-    h += row(isEN ? 'Strength Profile' : 'Perfil de Fortalezas', strengthColor ? (strengthColor.charAt(0).toUpperCase() + strengthColor.slice(1)) : '');
+    // strengthColor arrives as the Spanish key (rojo/amarillo/azul/verde); translate for English reports.
+    const colorNames = { rojo: ['Rojo', 'Red'], amarillo: ['Amarillo', 'Yellow'], azul: ['Azul', 'Blue'], verde: ['Verde', 'Green'] };
+    const colorKey = String(strengthColor || '').toLowerCase();
+    const colorLabel = colorNames[colorKey] ? colorNames[colorKey][isEN ? 1 : 0] : (strengthColor ? (strengthColor.charAt(0).toUpperCase() + strengthColor.slice(1)) : '');
+    h += row(isEN ? 'Strength Profile' : 'Perfil de Fortalezas', colorLabel);
     h += row(isEN ? 'My Strengths' : 'Mis Fortalezas', fStr);
     h += section(isEN ? 'STEP 5 - UNIQUE VALUE' : 'PASO 5 - VALOR UNICO');
     h += row(isEN ? 'Unique Value to Others' : 'Valor Unico para Otros', valorUnico);
