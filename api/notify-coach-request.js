@@ -8,11 +8,16 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Rejects emails without a real domain ending (e.g. "name@gmail" with no
+// ".com"), so a typo can't reach the Sheet and silently lose the report.
+const EMAIL_RE = /^[^\s@]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { nombre, email, telefono } = req.body || {};
   if (!nombre || !email) return res.status(400).json({ error: 'Faltan campos requeridos' });
+  if (!EMAIL_RE.test(String(email).trim())) return res.status(400).json({ error: 'Email inválido / Invalid email.', code: 'INVALID_EMAIL' });
 
   try {
     await resend.emails.send({

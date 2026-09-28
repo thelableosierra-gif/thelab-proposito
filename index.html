@@ -3391,7 +3391,7 @@ async function submitCoachForm(btn) {
     errEl.textContent = s.coachErrFields;
     return;
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!/^[^\s@]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/.test(email)) {
     errEl.textContent = s.coachErrEmail;
     return;
   }

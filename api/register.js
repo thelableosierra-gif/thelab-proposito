@@ -7,6 +7,10 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Rejects emails without a real domain ending (e.g. "name@gmail" with no
+// ".com"), so a typo can't reach the Sheet and silently lose the report.
+const EMAIL_RE = /^[^\s@]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_NAME = 'Sheet1';
 // Rango amplio; el código busca la primera fila con un código válido sin usar,
@@ -39,6 +43,10 @@ export default async function handler(req, res) {
 
   if (!name || !email) {
     return res.status(400).json({ error: 'Faltan datos: nombre o email.' });
+  }
+
+  if (!EMAIL_RE.test(String(email).trim())) {
+    return res.status(400).json({ error: 'Email inválido / Invalid email.', code: 'INVALID_EMAIL' });
   }
 
   try {

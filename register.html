@@ -251,6 +251,7 @@
       submitBtn: 'REGISTRARME →',
       submitBtnLoading: 'ENVIANDO...',
       errRequired: 'Por favor completa tu nombre y correo.',
+      errEmail: 'Revisa tu correo. Parece incompleto (ej: nombre@gmail.com).',
       errHowHeard: 'Por favor selecciona cómo conociste The Lab.',
       errGeneric: 'Hubo un error. Por favor intenta de nuevo.',
       errNoCodes: 'No hay códigos disponibles en este momento. Contacta a The Lab.',
@@ -272,6 +273,7 @@
       submitBtn: 'REGISTER →',
       submitBtnLoading: 'SENDING...',
       errRequired: 'Please fill in your name and email.',
+      errEmail: 'Check your email. It looks incomplete (e.g. name@gmail.com).',
       errHowHeard: 'Please select how you heard about The Lab.',
       errGeneric: 'Something went wrong. Please try again.',
       errNoCodes: 'No codes are available right now. Please contact The Lab.',
@@ -349,6 +351,15 @@
       return;
     }
 
+    // Requires a real domain ending (e.g. ".com"). The browser's built-in
+    // type="email" check accepts "name@gmail", which silently loses the report.
+    if (!/^[^\s@]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/.test(email)) {
+      errEl.textContent = s.errEmail;
+      errEl.style.display = 'block';
+      document.getElementById('email').focus();
+      return;
+    }
+
     if (!howHeardRadio) {
       errEl.textContent = s.errHowHeard;
       errEl.style.display = 'block';
@@ -374,7 +385,8 @@
       const data = await response.json();
 
       if (!response.ok) {
-        errEl.textContent = response.status === 409 ? s.errNoCodes : s.errGeneric;
+        errEl.textContent = response.status === 409 ? s.errNoCodes
+          : (data && data.code === 'INVALID_EMAIL') ? s.errEmail : s.errGeneric;
         errEl.style.display = 'block';
         submitBtn.disabled = false;
         submitBtn.textContent = s.submitBtn;
